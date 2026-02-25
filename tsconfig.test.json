@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "outDir": ".tmp-tests",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "skipLibCheck": true
+  },
+  "include": [
+    "src/lib/presenter/reducer.ts",
+    "src/lib/presenter/reducer.test.ts",
+    "scripts/presenter-reducer-test.ts"
+  ]
+}

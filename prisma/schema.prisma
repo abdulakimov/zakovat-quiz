@@ -1,0 +1,275 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  PENDING_VERIFICATION
+  ACTIVE
+  DISABLED
+}
+
+enum MediaType {
+  IMAGE
+  AUDIO
+  VIDEO
+}
+
+enum TeamMemberRole {
+  OWNER
+  MEMBER
+}
+
+enum TeamMemberStatus {
+  ACTIVE
+  PENDING
+}
+
+enum TeamInviteStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  CANCELED
+  EXPIRED
+}
+
+enum PackVisibility {
+  DRAFT
+  PRIVATE
+  PUBLIC
+}
+
+enum QuestionType {
+  TEXT
+  IMAGE
+  VIDEO
+  AUDIO
+  OPTIONS
+}
+
+enum AnswerType {
+  TEXT
+  IMAGE
+  AUDIO
+  VIDEO
+}
+
+enum QuestionMediaRole {
+  QUESTION_PRIMARY
+  QUESTION_EXTRA
+  ANSWER_PRIMARY
+  ANSWER_EXTRA
+}
+
+model User {
+  id              String                   @id @default(cuid())
+  username        String                   @unique
+  email           String                   @unique
+  name            String?
+  displayName     String?                  @db.VarChar(32)
+  avatarAssetId   String?
+  passwordHash    String
+  role            Role                     @default(USER)
+  status          UserStatus               @default(PENDING_VERIFICATION)
+  emailVerifiedAt DateTime?
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+  verification    EmailVerificationCode?
+  mediaAssets     MediaAsset[]             @relation("MediaOwner")
+  avatarAsset     MediaAsset?              @relation("UserAvatar", fields: [avatarAssetId], references: [id], onDelete: SetNull)
+  ownedTeams      Team[]                   @relation("TeamOwner")
+  packs           Pack[]
+  teamMembers     TeamMember[]
+  teamInvites     TeamInvite[]             @relation("InvitedUser")
+  sentTeamInvites TeamInvite[]             @relation("InvitedBy")
+
+  @@index([avatarAssetId])
+}
+
+model EmailVerificationCode {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  codeHash    String
+  expiresAt   DateTime
+  attempts    Int      @default(0)
+  sendCount   Int      @default(0)
+  lastSentAt  DateTime?
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model MediaAsset {
+  id           String    @id @default(cuid())
+  ownerId      String
+  type         MediaType
+  path         String
+  originalName String
+  size         Int
+  width        Int?
+  height       Int?
+  mimeType     String?
+  sizeBytes    Int?
+  createdAt    DateTime  @default(now())
+  owner        User      @relation("MediaOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  userAvatars  User[]    @relation("UserAvatar")
+  teamAvatars  Team[]    @relation("TeamAvatar")
+  breakMusicForPacks Pack[]   @relation("PackBreakMusic")
+  timerMusicForPacks Pack[]   @relation("PackTimerMusic")
+  questionMediaLinks QuestionMedia[]
+
+  @@index([ownerId])
+}
+
+model Pack {
+  id                         String         @id @default(cuid())
+  ownerId                    String
+  title                      String
+  description                String?
+  visibility                 PackVisibility @default(DRAFT)
+  defaultQuestionTimerPresetSec Int?
+  breakTimerSec              Int            @default(60)
+  breakMusicAssetId          String?
+  timerMusicAssetId          String?
+  createdAt                  DateTime       @default(now())
+  updatedAt                  DateTime       @updatedAt
+  owner                      User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  breakMusicAsset            MediaAsset?    @relation("PackBreakMusic", fields: [breakMusicAssetId], references: [id], onDelete: SetNull)
+  timerMusicAsset            MediaAsset?    @relation("PackTimerMusic", fields: [timerMusicAssetId], references: [id], onDelete: SetNull)
+  rounds                     Round[]
+
+  @@index([ownerId])
+  @@index([breakMusicAssetId])
+  @@index([timerMusicAssetId])
+  @@index([defaultQuestionTimerPresetSec])
+}
+
+model Round {
+  id                String       @id @default(cuid())
+  packId            String
+  order             Int
+  title             String
+  description       String?
+  defaultTimerSec   Int          @default(60)
+  defaultQuestionType QuestionType @default(TEXT)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  pack              Pack         @relation(fields: [packId], references: [id], onDelete: Cascade)
+  questions         Question[]
+
+  @@unique([packId, order])
+  @@index([packId])
+}
+
+model Question {
+  /// IMAGE/VIDEO/AUDIO questions should have exactly one QUESTION_PRIMARY QuestionMedia row.
+  /// IMAGE/VIDEO/AUDIO answers should have exactly one ANSWER_PRIMARY QuestionMedia row when answerType is media.
+  /// OPTIONS questions should have exactly 4 QuestionOption rows and exactly one isCorrect=true.
+  /// TEXT questions do not require media.
+  id          String         @id @default(cuid())
+  roundId      String
+  order        Int
+  type         QuestionType  @default(TEXT)
+  answerType   AnswerType    @default(TEXT)
+  text         String
+  answer       String
+  answerText   String?
+  explanation  String?
+  timerSec     Int?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  round        Round         @relation(fields: [roundId], references: [id], onDelete: Cascade)
+  options      QuestionOption[]
+  media        QuestionMedia[]
+
+  @@unique([roundId, order])
+  @@index([roundId])
+}
+
+
+model QuestionOption {
+  id         String   @id @default(cuid())
+  questionId String
+  order      Int
+  text       String
+  isCorrect  Boolean  @default(false)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, order])
+  @@index([questionId])
+}
+
+model QuestionMedia {
+  id         String     @id @default(cuid())
+  questionId String
+  assetId     String
+  role        QuestionMediaRole @default(QUESTION_PRIMARY)
+  createdAt   DateTime          @default(now())
+  question    Question          @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  asset       MediaAsset        @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@unique([questionId, assetId, role])
+  @@index([questionId])
+  @@index([assetId])
+}
+
+/// Team owner must also be created as a TeamMember row with role OWNER and status ACTIVE.
+/// We will enforce "max 2 ACTIVE teams per user" later in server actions with a transaction.
+model Team {
+  id           String       @id @default(cuid())
+  name         String
+  slogan       String?      @db.VarChar(80)
+  ownerId      String
+  avatarAssetId String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  owner        User         @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  avatarAsset  MediaAsset?  @relation("TeamAvatar", fields: [avatarAssetId], references: [id], onDelete: SetNull)
+  members      TeamMember[]
+  invites      TeamInvite[]
+
+  @@index([ownerId])
+  @@index([avatarAssetId])
+}
+
+model TeamMember {
+  id        String           @id @default(cuid())
+  teamId    String
+  userId    String
+  role      TeamMemberRole   @default(MEMBER)
+  status    TeamMemberStatus @default(PENDING)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  team      Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, userId])
+  @@index([userId])
+  @@index([teamId])
+}
+
+model TeamInvite {
+  id            String           @id @default(cuid())
+  teamId         String
+  invitedUserId  String
+  invitedById    String
+  status         TeamInviteStatus @default(PENDING)
+  expiresAt      DateTime         @default(dbgenerated("(CURRENT_TIMESTAMP + interval '7 days')"))
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  team           Team             @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  invitedUser    User             @relation("InvitedUser", fields: [invitedUserId], references: [id], onDelete: Cascade)
+  invitedBy      User             @relation("InvitedBy", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@unique([teamId, invitedUserId])
+  @@index([invitedUserId])
+  @@index([teamId])
+}

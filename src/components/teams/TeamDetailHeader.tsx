@@ -1,0 +1,199 @@
+"use client";
+
+import * as React from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { renameTeam } from "@/src/actions/teams";
+import { IconButton } from "@/src/components/ui/icon-button";
+import { toast } from "@/src/components/ui/sonner";
+import { PageHeader } from "@/src/components/layout/PageHeader";
+import { CopyIcon, LinkIcon, PencilIcon } from "@/src/ui/icons";
+import { renameTeamSchema } from "@/src/schemas/teams";
+
+type TeamDetailHeaderProps = {
+  teamId: string;
+  initialName: string;
+  avatarUrl?: string | null;
+  slogan?: string | null;
+  memberCount: number;
+  isOwner: boolean;
+  extraActions?: React.ReactNode;
+};
+
+async function copyWithFallback(value: string) {
+  try {
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+  } catch {
+    // Fall through to legacy copy fallback.
+  }
+
+  try {
+    const textarea = document.createElement("textarea");
+    textarea.value = value;
+    textarea.setAttribute("readonly", "true");
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+    const success = document.execCommand("copy");
+    document.body.removeChild(textarea);
+    return success;
+  } catch {
+    return false;
+  }
+}
+
+export function TeamDetailHeader({
+  teamId,
+  initialName,
+  avatarUrl,
+  slogan,
+  memberCount,
+  isOwner,
+  extraActions,
+}: TeamDetailHeaderProps) {
+  const [isEditing, setIsEditing] = React.useState(false);
+  const [currentName, setCurrentName] = React.useState(initialName);
+  const [isPending, startTransition] = React.useTransition();
+  const form = useForm({
+    resolver: zodResolver(renameTeamSchema.pick({ name: true })),
+    defaultValues: { name: initialName },
+  });
+
+  React.useEffect(() => {
+    setCurrentName(initialName);
+    form.reset({ name: initialName });
+  }, [initialName, form]);
+
+  const save = form.handleSubmit((values) => {
+    startTransition(() => {
+      void (async () => {
+        const fd = new FormData();
+        fd.set("teamId", teamId);
+        fd.set("name", values.name);
+        const result = await renameTeam({}, fd);
+        if (result?.error) {
+          toast.error(result.error);
+          return;
+        }
+        setCurrentName(values.name);
+        setIsEditing(false);
+        toast.success(result?.success ?? "Saved");
+      })();
+    });
+  });
+
+  return (
+    <TooltipProvider>
+      <PageHeader
+        backHref="/app/teams"
+        breadcrumbs={[
+          { label: "App", href: "/app" },
+          { label: "Teams", href: "/app/teams" },
+          { label: currentName },
+        ]}
+        title={
+          <div className="flex flex-wrap items-center gap-3">
+            <Avatar className="h-12 w-12 rounded-xl">
+              {avatarUrl ? <AvatarImage src={avatarUrl} alt={currentName} className="rounded-xl" /> : null}
+              {!avatarUrl ? (
+                <AvatarFallback className="rounded-xl">{currentName.slice(0, 2).toUpperCase()}</AvatarFallback>
+              ) : null}
+            </Avatar>
+            {!isEditing ? (
+              <>
+                <span className="truncate text-2xl font-semibold tracking-tight text-slate-900">{currentName}</span>
+                <Badge>{memberCount} members</Badge>
+                {isOwner ? (
+                  <IconButton label="Rename team" tooltip="Rename" className="h-8 w-8" onClick={() => setIsEditing(true)}>
+                    <PencilIcon className="h-4 w-4" />
+                  </IconButton>
+                ) : null}
+              </>
+            ) : (
+              <form onSubmit={save} className="flex flex-wrap items-center gap-2">
+                <div className="min-w-0">
+                  <Input
+                    autoFocus
+                    {...form.register("name")}
+                    disabled={isPending}
+                    aria-invalid={form.formState.errors.name ? "true" : "false"}
+                    className="h-10 text-base"
+                  />
+                  {form.formState.errors.name ? (
+                    <p className="mt-1 text-xs text-red-600">{form.formState.errors.name.message}</p>
+                  ) : null}
+                </div>
+                <Button type="submit" size="sm" disabled={isPending}>
+                  {isPending ? "Saving..." : "Save"}
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={isPending}
+                  onClick={() => {
+                    form.reset({ name: currentName });
+                    setIsEditing(false);
+                  }}
+                >
+                  Cancel
+                </Button>
+              </form>
+            )}
+          </div>
+        }
+        description={slogan?.trim() ? slogan : "Manage members and invitations."}
+        actions={
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="justify-center sm:justify-start"
+                  onClick={() => {
+                    void (async () => {
+                      const ok = await copyWithFallback(teamId);
+                      if (ok) toast.success("Copied!");
+                      else toast.error("Failed to copy");
+                    })();
+                  }}
+                >
+                  <CopyIcon className="mr-2 h-4 w-4" />
+                  <span className="sm:hidden">Copy ID</span>
+                  <span className="hidden sm:inline">Copy team ID</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Copy team ID</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="inline-flex">
+                  <Button type="button" variant="outline" size="sm" disabled className="justify-center sm:justify-start">
+                    <LinkIcon className="mr-2 h-4 w-4" />
+                    <span className="sm:hidden">Share link</span>
+                    <span className="hidden sm:inline">Copy share link</span>
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>Coming soon</TooltipContent>
+            </Tooltip>
+
+            {extraActions}
+          </div>
+        }
+      />
+    </TooltipProvider>
+  );
+}

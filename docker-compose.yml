@@ -1,0 +1,58 @@
+﻿services:
+  db:
+    image: postgres:16
+    container_name: zakovat-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: quiz
+      POSTGRES_PASSWORD: quiz
+      POSTGRES_DB: quiz_creator
+    ports:
+      - "5432:5432"
+    volumes:
+      - quiz_creator_db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U quiz -d quiz_creator"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: zakovat-mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  app:
+    image: node:20-bookworm-slim
+    container_name: zakovat-app
+    profiles:
+      - app
+    working_dir: /app
+    command: ["sh", "-c", "corepack enable && pnpm install && pnpm dev"]
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://quiz:quiz@db:5432/quiz_creator?schema=public
+      APP_URL: http://localhost:3000
+      SESSION_SECRET: development-only-session-secret-change-me-1234567890
+      SMTP_HOST: mailhog
+      SMTP_PORT: 1025
+      SMTP_USER: mailhog
+      SMTP_PASS: mailhog
+      SMTP_FROM: no-reply@zakovat.local
+    volumes:
+      - ./:/app
+      - uploads_data:/data/uploads
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+
+volumes:
+  quiz_creator_db:
+  uploads_data:
