@@ -17,10 +17,10 @@ function makeUser(label: string) {
 async function submitSignup(page: import("@playwright/test").Page, label: string) {
   const user = makeUser(label);
   await page.goto("/auth/signup");
-  await page.getByLabel("Name").fill(user.name);
-  await page.getByLabel("Username").fill(user.username);
-  await page.getByLabel("Email").fill(user.email);
-  await page.getByLabel("Password").fill(user.password);
+  await page.getByLabel(/^Name$/).fill(user.name);
+  await page.getByLabel(/^Username$/).fill(user.username);
+  await page.getByLabel(/^Email$/).fill(user.email);
+  await page.getByLabel(/^Password$/).fill(user.password);
   await page.getByRole("button", { name: /create account/i }).click();
   return user;
 }
