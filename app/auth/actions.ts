@@ -19,6 +19,7 @@ import {
   getSessionMaxAge,
   signSession,
 } from "@/lib/session";
+import { getAuthEnv } from "@/src/env";
 
 export type AuthState = {
   error?: string;
@@ -101,6 +102,29 @@ function generateCode() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+async function setSessionCookie(user: {
+  id: string;
+  role: "USER" | "ADMIN";
+  username: string;
+  name: string | null;
+}) {
+  const token = await signSession({
+    sub: user.id,
+    role: user.role,
+    username: user.username,
+    name: user.name ?? null,
+  });
+
+  const cookieStore = await cookies();
+  cookieStore.set(getSessionCookieName(), token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: getSessionMaxAge(),
+  });
+}
+
 async function upsertVerification(userId: string) {
   const now = new Date();
   const code = generateCode();
@@ -149,6 +173,7 @@ export async function signup(
   _prevState: AuthState,
   formData: FormData
 ): Promise<AuthState> {
+  const emailVerificationEnabled = getAuthEnv().EMAIL_VERIFICATION_ENABLED;
   const execute = safeAction(signupSchema, async (input) => {
     const username = input.username.toLowerCase();
     const name = normalizeName(input.name ?? null);
@@ -174,9 +199,15 @@ export async function signup(
         name,
         passwordHash,
         role: "USER",
-        status: "PENDING_VERIFICATION",
+        status: emailVerificationEnabled ? "PENDING_VERIFICATION" : "ACTIVE",
+        emailVerifiedAt: emailVerificationEnabled ? null : new Date(),
       },
     });
+
+    if (!emailVerificationEnabled) {
+      await setSessionCookie(user);
+      redirect("/app");
+    }
 
     const code = await upsertVerification(user.id);
     try {
@@ -222,6 +253,7 @@ export async function login(
 ): Promise<AuthState> {
   const clientIp = await getClientIp();
   const execute = safeAction(loginSchema, async (input) => {
+    const emailVerificationEnabled = getAuthEnv().EMAIL_VERIFICATION_ENABLED;
     const identifier = input.usernameOrEmail.toLowerCase();
     const rate = consumeRateLimit({
       ...LOGIN_LIMIT,
@@ -246,7 +278,15 @@ export async function login(
       return { error: "Invalid username or password." } satisfies AuthState;
     }
 
-    if (user.status !== "ACTIVE") {
+    if (user.status === "DISABLED") {
+      logger.warn("Login blocked: user not active", {
+        userId: user.id,
+        status: user.status,
+      });
+      return { error: "Invalid username or password." } satisfies AuthState;
+    }
+
+    if (user.status === "PENDING_VERIFICATION" && emailVerificationEnabled) {
       logger.warn("Login blocked: user not active", {
         userId: user.id,
         status: user.status,
@@ -260,21 +300,17 @@ export async function login(
       return { error: "Invalid username or password." } satisfies AuthState;
     }
 
-    const token = await signSession({
-      sub: user.id,
-      role: user.role,
-      username: user.username,
-      name: user.name ?? null,
-    });
+    if (user.status === "PENDING_VERIFICATION" && !emailVerificationEnabled) {
+      await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          status: "ACTIVE",
+          emailVerifiedAt: user.emailVerifiedAt ?? new Date(),
+        },
+      });
+    }
 
-    const cookieStore = await cookies();
-    cookieStore.set(getSessionCookieName(), token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: getSessionMaxAge(),
-    });
+    await setSessionCookie(user);
 
     logger.info("Login successful", { userId: user.id });
     redirect("/app");
@@ -299,6 +335,10 @@ export async function verifyEmail(
   _prevState: AuthState,
   formData: FormData
 ): Promise<AuthState> {
+  if (!getAuthEnv().EMAIL_VERIFICATION_ENABLED) {
+    return { error: "Email verification is disabled." } satisfies AuthState;
+  }
+
   const clientIp = await getClientIp();
   const execute = safeAction(verifySchema, async (input) => {
     const email = input.email.toLowerCase();
@@ -371,6 +411,10 @@ export async function resendVerification(
   _prevState: AuthState,
   formData: FormData
 ): Promise<AuthState> {
+  if (!getAuthEnv().EMAIL_VERIFICATION_ENABLED) {
+    return { error: "Email verification is disabled." } satisfies AuthState;
+  }
+
   const clientIp = await getClientIp();
   const execute = safeAction(resendVerificationSchema, async (input) => {
     const email = input.email.toLowerCase();
