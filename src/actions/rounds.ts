@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { safeAction } from "@/src/lib/actions";
+import { safeAction, type ActionResult } from "@/src/lib/actions";
 import { createRoundSchema, deleteRoundSchema, moveRoundSchema, reorderRoundsSchema, updateRoundSchema } from "@/src/schemas/rounds";
 import { z } from "zod";
 
@@ -33,9 +33,9 @@ function mapActionError(error: string, fieldErrors?: Record<string, string[] | u
   return firstFieldError ?? error;
 }
 
-function actionStateFromResult(result: Awaited<ReturnType<ReturnType<typeof safeAction>>>) {
+function actionStateFromResult<TState>(result: ActionResult<TState>): TState {
   if (!result.ok) {
-    return { error: mapActionError(result.error, result.fieldErrors) } satisfies RoundActionState;
+    return { error: mapActionError(result.error, result.fieldErrors) } as TState;
   }
   return result.data;
 }
@@ -366,7 +366,7 @@ export async function renameFutquizRoundsToPenaltyAction(
   });
 
   const result = await execute({});
-  const state = actionStateFromResult(result);
+  const state = actionStateFromResult(result) as RoundActionState;
   if (!state.error) {
     revalidatePath("/app/packs");
   }

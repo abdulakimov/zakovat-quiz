@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { acceptInvite, declineInvite, type TeamActionState } from "@/app/app/teams/actions";
+import { acceptInvite, declineInvite, type TeamActionState } from "@/src/actions/teams";
 import { Button } from "@/components/ui/button";
 
 const initialState: TeamActionState = {};

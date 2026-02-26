@@ -95,7 +95,7 @@ export async function getPresenterPackData(packId: string) {
   });
 
   if (!pack || pack.ownerId !== user.id) {
-    return { pack: null as const, slides: [] as PresenterSlide[], totalQuestions: 0 };
+    return { pack: null, slides: [] as PresenterSlide[], totalQuestions: 0 };
   }
 
   const slides: PresenterSlide[] = [];

@@ -9,6 +9,7 @@ type DialogContextValue = {
 };
 
 const DialogContext = React.createContext<DialogContextValue | null>(null);
+type ClickableChildProps = { onClick?: React.MouseEventHandler };
 
 export function Dialog({
   children,
@@ -43,13 +44,14 @@ export function DialogTrigger({
   const triggerProps = {
     onClick: () => ctx.setOpen(true),
   };
-  if (asChild) {
+  if (asChild && React.isValidElement<ClickableChildProps>(children)) {
+    const childProps = children.props;
     return React.cloneElement(children, {
+      ...childProps,
       ...triggerProps,
-      ...children.props,
       onClick: (event: React.MouseEvent) => {
         triggerProps.onClick();
-        children.props.onClick?.(event);
+        childProps.onClick?.(event);
       },
     });
   }
@@ -116,13 +118,14 @@ export function DialogClose({
     onClick: () => ctx.setOpen(false),
   };
 
-  if (asChild) {
+  if (asChild && React.isValidElement<ClickableChildProps>(children)) {
+    const childProps = children.props;
     return React.cloneElement(children, {
+      ...childProps,
       ...closeProps,
-      ...children.props,
       onClick: (event: React.MouseEvent) => {
         closeProps.onClick();
-        children.props.onClick?.(event);
+        childProps.onClick?.(event);
       },
     });
   }

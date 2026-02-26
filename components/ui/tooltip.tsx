@@ -9,6 +9,12 @@ type TooltipContextValue = {
 };
 
 const TooltipContext = React.createContext<TooltipContextValue | null>(null);
+type TooltipChildProps = {
+  onMouseEnter?: React.MouseEventHandler;
+  onMouseLeave?: React.MouseEventHandler;
+  onFocus?: React.FocusEventHandler;
+  onBlur?: React.FocusEventHandler;
+};
 
 export function TooltipProvider({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
@@ -40,10 +46,11 @@ export function TooltipTrigger({
     onBlur: () => ctx.setOpen(false),
   };
 
-  if (asChild) {
+  if (asChild && React.isValidElement<TooltipChildProps>(children)) {
+    const childProps = children.props;
     return React.cloneElement(children, {
+      ...childProps,
       ...triggerProps,
-      ...children.props,
     });
   }
 

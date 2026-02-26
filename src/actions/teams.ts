@@ -6,7 +6,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 import { MAX_ACTIVE_TEAMS } from "@/src/lib/teams";
-import { safeAction } from "@/src/lib/actions";
+import { safeAction, type ActionResult } from "@/src/lib/actions";
 import {
   createTeamSchema,
   deleteTeamSchema,
@@ -34,9 +34,9 @@ function mapActionError(error: string, fieldErrors?: Record<string, string[] | u
   return firstFieldError ?? error;
 }
 
-function authErrorState(result: Awaited<ReturnType<ReturnType<typeof safeAction>>>) {
+function authErrorState<TState>(result: ActionResult<TState>): TState {
   if (!result.ok) {
-    return { error: mapActionError(result.error, result.fieldErrors) } satisfies TeamActionState;
+    return { error: mapActionError(result.error, result.fieldErrors) } as TState;
   }
 
   return result.data;
@@ -700,7 +700,7 @@ export async function getTeamDetails(teamId: string) {
   });
 
   if (!team) {
-    return { user, team: null as const, isMember: false, isOwner: false };
+    return { user, team: null, isMember: false, isOwner: false };
   }
 
   const myMembership = team.members.find((member) => member.userId === user.id) ?? null;

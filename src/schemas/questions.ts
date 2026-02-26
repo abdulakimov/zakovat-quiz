@@ -42,8 +42,9 @@ const baseQuestionSchema = z.object({
 
 function enforceQuestionTypeRules<T extends z.ZodRawShape>(schema: z.ZodObject<T>) {
   return schema.superRefine((data, ctx) => {
-    const isMediaType = data.type === "IMAGE" || data.type === "VIDEO" || data.type === "AUDIO";
-    if (isMediaType && !data.primaryMediaAssetId) {
+    const value = data as z.infer<typeof baseQuestionSchema>;
+    const isMediaType = value.type === "IMAGE" || value.type === "VIDEO" || value.type === "AUDIO";
+    if (isMediaType && !value.primaryMediaAssetId) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["primaryMediaAssetId"],
@@ -51,8 +52,8 @@ function enforceQuestionTypeRules<T extends z.ZodRawShape>(schema: z.ZodObject<T
       });
     }
 
-    if (data.type === "OPTIONS") {
-      if (!data.options || data.options.length !== 4) {
+    if (value.type === "OPTIONS") {
+      if (!value.options || value.options.length !== 4) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["options"],
@@ -60,7 +61,7 @@ function enforceQuestionTypeRules<T extends z.ZodRawShape>(schema: z.ZodObject<T
         });
         return;
       }
-      const emptyOption = data.options.find((o) => o.text.trim().length < 1);
+      const emptyOption = value.options.find((o: { text: string }) => o.text.trim().length < 1);
       if (emptyOption) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -68,7 +69,7 @@ function enforceQuestionTypeRules<T extends z.ZodRawShape>(schema: z.ZodObject<T
           message: "All 4 option texts are required.",
         });
       }
-      const correctCount = data.options.filter((o) => o.isCorrect).length;
+      const correctCount = value.options.filter((o: { isCorrect: boolean }) => o.isCorrect).length;
       if (correctCount !== 1) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
@@ -79,8 +80,8 @@ function enforceQuestionTypeRules<T extends z.ZodRawShape>(schema: z.ZodObject<T
     }
 
     const isMediaAnswer =
-      data.answerType === "IMAGE" || data.answerType === "VIDEO" || data.answerType === "AUDIO";
-    if (isMediaAnswer && !data.answerPrimaryMediaAssetId) {
+      value.answerType === "IMAGE" || value.answerType === "VIDEO" || value.answerType === "AUDIO";
+    if (isMediaAnswer && !value.answerPrimaryMediaAssetId) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ["answerPrimaryMediaAssetId"],
@@ -117,14 +118,14 @@ export const upsertQuestionOptionsSchema = z.object({
   questionId: trimmed.min(1, "Question is required."),
   options: z.array(questionOptionInputSchema).length(4, "Exactly 4 options are required."),
 }).superRefine((data, ctx) => {
-  if (data.options.some((o) => o.text.trim().length < 1)) {
+  if (data.options.some((o: { text: string }) => o.text.trim().length < 1)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ["options"],
       message: "All 4 option texts are required.",
     });
   }
-  if (data.options.filter((o) => o.isCorrect).length !== 1) {
+  if (data.options.filter((o: { isCorrect: boolean }) => o.isCorrect).length !== 1) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ["options"],

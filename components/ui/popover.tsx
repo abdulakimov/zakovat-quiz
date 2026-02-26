@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 
 type PopoverCtx = { open: boolean; setOpen: (open: boolean) => void };
 const PopoverContext = React.createContext<PopoverCtx | null>(null);
+type ClickableChildProps = { onClick?: React.MouseEventHandler };
 
 export function Popover({
   children,
@@ -33,13 +34,14 @@ export function PopoverTrigger({ children, asChild }: { children: React.ReactEle
     "aria-expanded": ctx.open,
     "aria-haspopup": "dialog" as const,
   };
-  if (asChild) {
+  if (asChild && React.isValidElement<ClickableChildProps>(children)) {
+    const childProps = children.props;
     return React.cloneElement(children, {
+      ...childProps,
       ...triggerProps,
-      ...children.props,
       onClick: (e: React.MouseEvent) => {
         triggerProps.onClick();
-        children.props.onClick?.(e);
+        childProps.onClick?.(e);
       },
     });
   }
@@ -59,12 +61,13 @@ export function PopoverContent({
   const ref = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
-    if (!ctx?.open) return;
+    if (!ctx || !ctx.open) return;
+    const { setOpen } = ctx;
     const onDown = (event: MouseEvent) => {
-      if (!ref.current?.contains(event.target as Node)) ctx.setOpen(false);
+      if (!ref.current?.contains(event.target as Node)) setOpen(false);
     };
     const onEsc = (event: KeyboardEvent) => {
-      if (event.key === "Escape") ctx.setOpen(false);
+      if (event.key === "Escape") setOpen(false);
     };
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onEsc);

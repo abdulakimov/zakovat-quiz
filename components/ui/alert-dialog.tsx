@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 
 type Ctx = { open: boolean; setOpen: (v: boolean) => void };
 const AlertDialogContext = React.createContext<Ctx | null>(null);
+type ClickableChildProps = { onClick?: React.MouseEventHandler };
 
 export function AlertDialog({
   children,
@@ -29,13 +30,14 @@ export function AlertDialogTrigger({ children, asChild }: { children: React.Reac
   const ctx = React.useContext(AlertDialogContext);
   if (!ctx) return children;
   const props = { onClick: () => ctx.setOpen(true) };
-  if (asChild) {
+  if (asChild && React.isValidElement<ClickableChildProps>(children)) {
+    const childProps = children.props;
     return React.cloneElement(children, {
+      ...childProps,
       ...props,
-      ...children.props,
       onClick: (e: React.MouseEvent) => {
         props.onClick();
-        children.props.onClick?.(e);
+        childProps.onClick?.(e);
       },
     });
   }
@@ -75,13 +77,14 @@ export function AlertDialogCancel({ children, asChild }: { children: React.React
   const ctx = React.useContext(AlertDialogContext);
   if (!ctx) return children;
   const props = { onClick: () => ctx.setOpen(false) };
-  if (asChild) {
+  if (asChild && React.isValidElement<ClickableChildProps>(children)) {
+    const childProps = children.props;
     return React.cloneElement(children, {
+      ...childProps,
       ...props,
-      ...children.props,
       onClick: (e: React.MouseEvent) => {
         props.onClick();
-        children.props.onClick?.(e);
+        childProps.onClick?.(e);
       },
     });
   }

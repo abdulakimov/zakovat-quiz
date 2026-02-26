@@ -9,6 +9,7 @@ type DropdownContextValue = {
 };
 
 const DropdownContext = React.createContext<DropdownContextValue | null>(null);
+type MenuChildProps = { className?: string; onClick?: React.MouseEventHandler };
 
 export function DropdownMenu({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
@@ -35,10 +36,11 @@ export function DropdownMenuTrigger({
     "aria-haspopup": "menu" as const,
   };
 
-  if (asChild) {
+  if (asChild && React.isValidElement<MenuChildProps>(children)) {
+    const childProps = children.props;
     return React.cloneElement(children, {
+      ...childProps,
       ...triggerProps,
-      ...children.props,
     });
   }
 
@@ -58,17 +60,18 @@ export function DropdownMenuContent({
   const ref = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
-    if (!ctx?.open) return;
+    if (!ctx || !ctx.open) return;
+    const { setOpen } = ctx;
 
     function onPointerDown(event: MouseEvent) {
       if (!ref.current?.contains(event.target as Node)) {
-        ctx.setOpen(false);
+        setOpen(false);
       }
     }
 
     function onEscape(event: KeyboardEvent) {
       if (event.key === "Escape") {
-        ctx.setOpen(false);
+        setOpen(false);
       }
     }
 
@@ -148,14 +151,15 @@ export function DropdownMenuItem({
     role: "menuitem",
   };
 
-  if (asChild) {
-    return React.cloneElement(children as React.ReactElement, {
+  if (asChild && React.isValidElement<MenuChildProps>(children)) {
+    const childProps = children.props;
+    return React.cloneElement(children, {
+      ...childProps,
       ...itemProps,
-      ...(children as React.ReactElement).props,
-      className: cn(itemProps.className, (children as React.ReactElement).props.className),
+      className: cn(itemProps.className, childProps.className),
       onClick: (event: React.MouseEvent) => {
         itemProps.onClick();
-        (children as React.ReactElement).props.onClick?.(event);
+        childProps.onClick?.(event);
       },
     });
   }

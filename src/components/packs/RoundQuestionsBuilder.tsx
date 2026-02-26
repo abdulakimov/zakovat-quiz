@@ -171,7 +171,7 @@ function QuestionRow({
                   Media
                 </Badge>
               ) : null}
-              <Badge variant="outline" className={cn("border", accent.badge)}>
+              <Badge variant="secondary" className={cn("border", accent.badge)}>
                 <AnswerIcon className="mr-1 h-3.5 w-3.5" aria-hidden />
                 {q.answerType}
               </Badge>

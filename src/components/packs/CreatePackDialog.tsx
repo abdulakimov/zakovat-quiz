@@ -38,7 +38,7 @@ export function CreatePackDialog() {
         const fd = new FormData();
         fd.set("title", values.title);
         fd.set("description", values.description ?? "");
-        fd.set("visibility", values.visibility);
+        fd.set("visibility", values.visibility ?? "DRAFT");
         const result = await createPackAction({}, fd);
         setServerState(result ?? {});
         if (result?.error) {

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { safeAction } from "@/src/lib/actions";
+import { safeAction, type ActionResult } from "@/src/lib/actions";
 import { createPackSchema, deletePackSchema, updatePackSettingsSchema } from "@/src/schemas/packs";
 
 export type PackActionState = {
@@ -17,9 +17,9 @@ function mapActionError(error: string, fieldErrors?: Record<string, string[] | u
   return firstFieldError ?? error;
 }
 
-function actionStateFromResult(result: Awaited<ReturnType<ReturnType<typeof safeAction>>>) {
+function actionStateFromResult<TState>(result: ActionResult<TState>): TState {
   if (!result.ok) {
-    return { error: mapActionError(result.error, result.fieldErrors) } satisfies PackActionState;
+    return { error: mapActionError(result.error, result.fieldErrors) } as TState;
   }
   return result.data;
 }
@@ -181,12 +181,12 @@ export async function getPackDetails(packId: string) {
   });
 
   if (!pack) {
-    return { user, pack: null as const, isOwner: false, audioAssets: [] as const };
+    return { user, pack: null, isOwner: false, audioAssets: [] };
   }
 
   const isOwner = pack.ownerId === user.id;
   if (!isOwner) {
-    return { user, pack: null as const, isOwner: false, audioAssets: [] as const };
+    return { user, pack: null, isOwner: false, audioAssets: [] };
   }
 
   const audioAssets = await prisma.mediaAsset.findMany({
@@ -196,5 +196,13 @@ export async function getPackDetails(packId: string) {
     take: 50,
   });
 
-  return { user, pack, isOwner, audioAssets };
+  return {
+    user,
+    pack,
+    isOwner,
+    audioAssets: audioAssets.map((asset) => ({
+      ...asset,
+      createdAt: asset.createdAt.toISOString(),
+    })),
+  };
 }

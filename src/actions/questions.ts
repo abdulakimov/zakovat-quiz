@@ -5,7 +5,7 @@ import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { safeAction } from "@/src/lib/actions";
+import { safeAction, type ActionResult } from "@/src/lib/actions";
 import {
   createQuestionSchema,
   deleteQuestionSchema,
@@ -27,8 +27,8 @@ function mapActionError(error: string, fieldErrors?: Record<string, string[] | u
   return firstFieldError ?? error;
 }
 
-function actionStateFromResult(result: Awaited<ReturnType<ReturnType<typeof safeAction>>>) {
-  if (!result.ok) return { error: mapActionError(result.error, result.fieldErrors) } satisfies QuestionActionState;
+function actionStateFromResult<TState>(result: ActionResult<TState>): TState {
+  if (!result.ok) return { error: mapActionError(result.error, result.fieldErrors) } as TState;
   return result.data;
 }
 
@@ -573,7 +573,7 @@ export async function getRoundQuestionBuilderData(packId: string, roundId: strin
   });
 
   if (!round || round.packId !== packId || round.pack.ownerId !== user.id) {
-    return { round: null as const, pack: null as const, mediaAssets: [] as const };
+    return { round: null, pack: null, mediaAssets: [] };
   }
 
   const mediaAssets = await prisma.mediaAsset.findMany({
@@ -610,7 +610,7 @@ export async function getQuestionEditorBaseData(packId: string, roundId: string)
   });
 
   if (!round || round.packId !== packId || round.pack.ownerId !== user.id) {
-    return { round: null as const, pack: null as const, mediaAssets: [] as const };
+    return { round: null, pack: null, mediaAssets: [] };
   }
 
   const mediaAssets = await prisma.mediaAsset.findMany({
@@ -678,7 +678,7 @@ export async function getQuestionEditorData(packId: string, roundId: string, que
     question.round.id !== roundId ||
     question.round.pack.ownerId !== user.id
   ) {
-    return { question: null as const, round: null as const, pack: null as const, mediaAssets: [] as const };
+    return { question: null, round: null, pack: null, mediaAssets: [] };
   }
 
   const mediaAssets = await prisma.mediaAsset.findMany({
