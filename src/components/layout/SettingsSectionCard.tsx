@@ -50,7 +50,7 @@ export function SettingsSectionCard({
   const reduceMotion = useShouldReduceMotion();
   return (
     <motion.div
-      initial={false}
+      initial={reduceMotion ? false : "hidden"}
       animate="show"
       variants={variants.cardIn}
       transition={{ duration: reduceMotion ? 0 : durations.base / 1000, ease: easing }}
