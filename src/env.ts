@@ -1,6 +1,15 @@
 import { z } from "zod";
 
 const nonEmpty = z.string().trim().min(1);
+const envBoolean = z.preprocess((value) => {
+  if (typeof value === "string") {
+    const normalized = value.trim().toLowerCase();
+    if (normalized === "true") return true;
+    if (normalized === "false") return false;
+  }
+
+  return value;
+}, z.boolean());
 
 const prismaSchema = z.object({
   DATABASE_URL: nonEmpty,
@@ -12,7 +21,28 @@ const sessionSchema = z.object({
     .min(32, "SESSION_SECRET must be at least 32 characters."),
 });
 
-const appSchema = prismaSchema.merge(sessionSchema);
+const emailSchema = z.object({
+  SMTP_HOST: nonEmpty,
+  SMTP_PORT: z.coerce.number().int().min(1).max(65535),
+  SMTP_USER: nonEmpty,
+  SMTP_PASS: nonEmpty,
+  SMTP_FROM: nonEmpty,
+  APP_URL: z.string().url(),
+});
+
+const authSchema = z.object({
+  EMAIL_VERIFICATION_ENABLED: z.preprocess(
+    (value) => {
+      if (value === undefined) {
+        return process.env.NODE_ENV !== "production";
+      }
+      return value;
+    },
+    envBoolean,
+  ),
+});
+
+const appSchema = prismaSchema.merge(sessionSchema).merge(authSchema);
 
 function formatEnvError(scope: string, error: z.ZodError) {
   const issues = error.issues
