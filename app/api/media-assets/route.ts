@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import type { Prisma } from "@prisma/client";
 import { getSessionCookieName, verifySessionToken } from "@/lib/session";
 
 export const runtime = "nodejs";
@@ -26,20 +25,18 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Invalid media type" }, { status: 400 });
   }
 
-  type MediaAssetItem = Prisma.MediaAssetGetPayload<{
-    select: {
-      id: true;
-      type: true;
-      originalName: true;
-      path: true;
-      size: true;
-      sizeBytes: true;
-      mimeType: true;
-      createdAt: true;
-    };
-  }>;
+  type MediaAssetItem = {
+    id: string;
+    type: "IMAGE" | "AUDIO" | "VIDEO";
+    originalName: string;
+    path: string;
+    size: number | null;
+    sizeBytes: number | null;
+    mimeType: string | null;
+    createdAt: Date;
+  };
 
-  const items: MediaAssetItem[] = await prisma.mediaAsset.findMany({
+  const items = (await prisma.mediaAsset.findMany({
     where: {
       ownerId: session.sub,
       type,
@@ -64,7 +61,7 @@ export async function GET(request: Request) {
       mimeType: true,
       createdAt: true,
     },
-  });
+  })) as MediaAssetItem[];
 
   const responseItems = items.map((item) => ({
     ...item,
