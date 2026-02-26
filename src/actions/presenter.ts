@@ -117,8 +117,8 @@ export async function getPresenterPackData(packId: string) {
     });
 
     for (const q of round.questions) {
-      const primary = q.media.find((m) => m.role === "QUESTION_PRIMARY");
-      const answerPrimary = q.media.find((m) => m.role === "ANSWER_PRIMARY");
+      const primary = q.media.find((m: (typeof q.media)[number]) => m.role === "QUESTION_PRIMARY");
+      const answerPrimary = q.media.find((m: (typeof q.media)[number]) => m.role === "ANSWER_PRIMARY");
       slides.push({
         id: `question:${q.id}`,
         kind: "question",
@@ -176,7 +176,7 @@ export async function getPresenterPackData(packId: string) {
       defaultQuestionTimerPresetSec: pack.defaultQuestionTimerPresetSec,
       breakMusicUrl: pack.breakMusicAsset ? `/api/media/${pack.breakMusicAsset.path}` : null,
       timerMusicUrl: pack.timerMusicAsset ? `/api/media/${pack.timerMusicAsset.path}` : null,
-      rounds: pack.rounds.map((r) => ({
+      rounds: pack.rounds.map((r: (typeof pack.rounds)[number]) => ({
         id: r.id,
         title: r.title,
         order: r.order,

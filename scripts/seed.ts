@@ -1,4 +1,4 @@
-﻿import { PrismaClient, Role, UserStatus } from "@prisma/client";
+﻿import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -14,8 +14,8 @@ async function main() {
     update: {
       email,
       passwordHash,
-      role: Role.ADMIN,
-      status: UserStatus.ACTIVE,
+      role: "ADMIN",
+      status: "ACTIVE",
       emailVerifiedAt: new Date(),
       name: "Admin",
     },
@@ -23,8 +23,8 @@ async function main() {
       username,
       email,
       passwordHash,
-      role: Role.ADMIN,
-      status: UserStatus.ACTIVE,
+      role: "ADMIN",
+      status: "ACTIVE",
       emailVerifiedAt: new Date(),
       name: "Admin",
     },

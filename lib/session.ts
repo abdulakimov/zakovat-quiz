@@ -4,7 +4,14 @@ import { getSessionEnv } from "@/src/env";
 const SESSION_COOKIE_NAME = "zakovat_session";
 const SESSION_TTL_SECONDS = 60 * 60 * 24 * 7;
 
-const encodedSecret = new TextEncoder().encode(getSessionEnv().SESSION_SECRET);
+let encodedSecret: Uint8Array | null = null;
+
+function getEncodedSecret() {
+  if (!encodedSecret) {
+    encodedSecret = new TextEncoder().encode(getSessionEnv().SESSION_SECRET);
+  }
+  return encodedSecret;
+}
 
 export type SessionPayload = {
   sub: string;
@@ -26,12 +33,12 @@ export async function signSession(payload: SessionPayload) {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${SESSION_TTL_SECONDS}s`)
-    .sign(encodedSecret);
+    .sign(getEncodedSecret());
 }
 
 export async function verifySessionToken(token: string) {
   try {
-    const { payload } = await jwtVerify<SessionPayload>(token, encodedSecret);
+    const { payload } = await jwtVerify<SessionPayload>(token, getEncodedSecret());
     return payload;
   } catch {
     return null;

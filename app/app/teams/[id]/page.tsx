@@ -15,6 +15,9 @@ import { SettingsTabsLayout } from "@/src/components/layout/SettingsTabsLayout";
 import { PageHeader } from "@/src/components/layout/PageHeader";
 import { UserPlusIcon } from "@/src/ui/icons";
 
+type TeamMember = NonNullable<Awaited<ReturnType<typeof getTeamDetails>>["team"]>["members"][number];
+type TeamInvite = NonNullable<Awaited<ReturnType<typeof getTeamDetails>>["team"]>["invites"][number];
+
 function NotAuthorizedState() {
   return (
     <div className="space-y-4">
@@ -101,7 +104,7 @@ export default async function TeamDetailPage({
               </div>
             ) : (
               <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                {team.members.map((member) => (
+                {team.members.map((member: TeamMember) => (
                   <div
                     key={member.id}
                     className="flex flex-col gap-2 rounded-lg px-1 py-1 sm:flex-row sm:items-center sm:justify-between"
@@ -154,7 +157,7 @@ export default async function TeamDetailPage({
                   </div>
                 ) : (
                   <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                    {team.invites.map((invite) => (
+                    {team.invites.map((invite: TeamInvite) => (
                       <div
                         key={invite.id}
                         className="flex flex-col gap-3 rounded-lg border border-slate-100 p-3 sm:flex-row sm:items-center sm:justify-between"

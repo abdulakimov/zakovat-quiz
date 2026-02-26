@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
 import { safeAction, type ActionResult } from "@/src/lib/actions";
@@ -83,7 +84,7 @@ export async function updatePackSettingsAction(_prev: PackActionState, formData:
       }
     }
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.pack.update({
         where: { id: pack.id },
         data: {
@@ -200,7 +201,7 @@ export async function getPackDetails(packId: string) {
     user,
     pack,
     isOwner,
-    audioAssets: audioAssets.map((asset) => ({
+    audioAssets: audioAssets.map((asset: (typeof audioAssets)[number]) => ({
       ...asset,
       createdAt: asset.createdAt.toISOString(),
     })),

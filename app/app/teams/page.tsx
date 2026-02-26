@@ -10,6 +10,8 @@ import { ActionGroup } from "@/src/components/ui/action-group";
 import { IconButton } from "@/src/components/ui/icon-button";
 import { SettingsIcon, UserPlusIcon } from "@/src/ui/icons";
 
+type ActiveTeamMembership = Awaited<ReturnType<typeof getMyTeamsAndInvites>>["activeTeams"][number];
+
 function getTeamInitials(name: string) {
   return name
     .trim()
@@ -46,7 +48,7 @@ export default async function TeamsPage() {
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {activeTeams.map((membership) => {
+          {activeTeams.map((membership: ActiveTeamMembership) => {
             const team = membership.team;
             const isOwner = membership.role === "OWNER";
             const memberCount = team._count?.members ?? null;

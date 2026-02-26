@@ -2,10 +2,12 @@ import { PageHeader } from "@/src/components/layout/PageHeader";
 import { getMyPacks } from "@/src/actions/packs";
 import { PacksListClient } from "@/src/components/packs/PacksListClient";
 
+type PackListItem = Awaited<ReturnType<typeof getMyPacks>>["packs"][number];
+
 export default async function PacksPage() {
   const { packs } = await getMyPacks();
 
-  const items = packs.map((pack) => ({
+  const items = packs.map((pack: PackListItem) => ({
     id: pack.id,
     title: pack.title,
     description: pack.description,

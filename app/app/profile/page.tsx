@@ -6,6 +6,9 @@ import { PageHeader } from "@/src/components/layout/PageHeader";
 import { ProfileSecurityForm, ProfileSettingsForm } from "@/src/components/profile/ProfileSettingsForm";
 import { MAX_ACTIVE_TEAMS } from "@/src/lib/teams";
 
+type ActiveTeamMembership = Awaited<ReturnType<typeof getMyTeamsAndInvites>>["activeTeams"][number];
+type PendingInvite = Awaited<ReturnType<typeof getMyTeamsAndInvites>>["pendingInvites"][number];
+
 export default async function ProfilePage() {
   const { user, activeTeams, pendingInvites } = await getMyTeamsAndInvites();
 
@@ -55,7 +58,7 @@ export default async function ProfilePage() {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {activeTeams.map((membership) => (
+                      {activeTeams.map((membership: ActiveTeamMembership) => (
                         <Link
                           key={membership.id}
                           href={`/app/teams/${membership.team.id}`}
@@ -84,7 +87,7 @@ export default async function ProfilePage() {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {pendingInvites.map((invite) => (
+                      {pendingInvites.map((invite: PendingInvite) => (
                         <div key={invite.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
@@ -117,4 +120,3 @@ export default async function ProfilePage() {
     </div>
   );
 }
-
