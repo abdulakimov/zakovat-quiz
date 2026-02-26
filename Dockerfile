@@ -25,4 +25,4 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 EXPOSE 3000
-CMD ["pnpm", "start"]
+CMD ["node", "node_modules/next/dist/bin/next", "start"]
