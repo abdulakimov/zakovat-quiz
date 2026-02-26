@@ -420,6 +420,10 @@ export function QuestionEditor({
   }, [form.formState.isDirty]);
 
   React.useEffect(() => {
+    void form.trigger();
+  }, [form, selectedType, selectedAnswerType, primaryMediaAssetId, answerPrimaryMediaAssetId]);
+
+  React.useEffect(() => {
     if (!form.formState.isDirty) return;
     const onBeforeUnload = (event: BeforeUnloadEvent) => {
       event.preventDefault();

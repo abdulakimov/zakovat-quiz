@@ -15,6 +15,8 @@ const MIME_TO_TYPE: Record<string, "IMAGE" | "AUDIO" | "VIDEO"> = {
   "image/webp": "IMAGE",
   "image/gif": "IMAGE",
   "audio/mpeg": "AUDIO",
+  "audio/mp3": "AUDIO",
+  "audio/x-mp3": "AUDIO",
   "audio/wav": "AUDIO",
   "audio/ogg": "AUDIO",
   "video/mp4": "VIDEO",
@@ -28,12 +30,16 @@ const MIME_TO_EXT: Record<string, string> = {
   "image/webp": ".webp",
   "image/gif": ".gif",
   "audio/mpeg": ".mp3",
+  "audio/mp3": ".mp3",
+  "audio/x-mp3": ".mp3",
   "audio/wav": ".wav",
   "audio/ogg": ".ogg",
   "video/mp4": ".mp4",
   "video/webm": ".webm",
   "video/ogg": ".ogv",
 };
+
+const AUDIO_EXTENSIONS = new Set([".mp3", ".wav", ".ogg"]);
 
 const MAX_BYTES_BY_TYPE: Record<"IMAGE" | "AUDIO" | "VIDEO", number> = {
   IMAGE: 3 * 1024 * 1024,
@@ -63,12 +69,13 @@ export async function POST(request: Request) {
   }
 
   const mime = file.type;
-  const assetType = MIME_TO_TYPE[mime];
+  const originalName = file.name || "upload";
+  const extFromName = path.extname(originalName).toLowerCase();
+  const assetType = MIME_TO_TYPE[mime] ?? (AUDIO_EXTENSIONS.has(extFromName) ? "AUDIO" : undefined);
   if (!assetType) {
     return NextResponse.json({ error: "Unsupported file type" }, { status: 400 });
   }
 
-  const originalName = file.name || "upload";
   const maxBytes = MAX_BYTES_BY_TYPE[assetType];
   if (file.size > maxBytes) {
     return NextResponse.json(
@@ -76,7 +83,7 @@ export async function POST(request: Request) {
       { status: 413 },
     );
   }
-  const ext = path.extname(originalName) || MIME_TO_EXT[mime] || "";
+  const ext = extFromName || MIME_TO_EXT[mime] || "";
   const fileName = `${randomUUID()}${ext}`;
   const relativePath = path.posix.join("media", session.sub, fileName);
   const absoluteDir = path.resolve(UPLOAD_ROOT, "media", session.sub);
