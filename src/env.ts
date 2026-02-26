@@ -12,28 +12,7 @@ const sessionSchema = z.object({
     .min(32, "SESSION_SECRET must be at least 32 characters."),
 });
 
-const emailSchema = z.object({
-  SMTP_HOST: nonEmpty,
-  SMTP_PORT: z.coerce.number().int().min(1).max(65535),
-  SMTP_USER: nonEmpty,
-  SMTP_PASS: nonEmpty,
-  SMTP_FROM: nonEmpty,
-  APP_URL: z.string().url(),
-});
-
-const authSchema = z.object({
-  EMAIL_VERIFICATION_ENABLED: z.preprocess(
-    (value) => {
-      if (value === undefined) {
-        return process.env.NODE_ENV !== "production";
-      }
-      return value;
-    },
-    z.coerce.boolean(),
-  ),
-});
-
-const appSchema = prismaSchema.merge(sessionSchema).merge(authSchema);
+const appSchema = prismaSchema.merge(sessionSchema);
 
 function formatEnvError(scope: string, error: z.ZodError) {
   const issues = error.issues
@@ -63,8 +42,6 @@ function parseEnv<T extends z.ZodTypeAny>(scope: string, schema: T): z.infer<T> 
 
 let prismaEnvCache: z.infer<typeof prismaSchema> | null = null;
 let sessionEnvCache: z.infer<typeof sessionSchema> | null = null;
-let emailEnvCache: z.infer<typeof emailSchema> | null = null;
-let authEnvCache: z.infer<typeof authSchema> | null = null;
 let appEnvCache: z.infer<typeof appSchema> | null = null;
 
 export function getPrismaEnv() {
@@ -75,16 +52,6 @@ export function getPrismaEnv() {
 export function getSessionEnv() {
   sessionEnvCache ??= parseEnv("session", sessionSchema);
   return sessionEnvCache;
-}
-
-export function getEmailEnv() {
-  emailEnvCache ??= parseEnv("email", emailSchema);
-  return emailEnvCache;
-}
-
-export function getAuthEnv() {
-  authEnvCache ??= parseEnv("auth", authSchema);
-  return authEnvCache;
 }
 
 export function getAppEnv() {

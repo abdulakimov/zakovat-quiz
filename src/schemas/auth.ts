@@ -23,16 +23,5 @@ export const loginSchema = z.object({
   password: z.string().min(1, "Password is required."),
 });
 
-export const verifySchema = z.object({
-  email: trimmed.email("Please provide a valid email."),
-  code: trimmed.regex(/^\d{6}$/, "Verification code must be 6 digits."),
-});
-
-export const resendVerificationSchema = verifySchema.pick({
-  email: true,
-});
-
 export type SignupInput = z.infer<typeof signupSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
-export type VerifyInput = z.infer<typeof verifySchema>;
-export type ResendVerificationInput = z.infer<typeof resendVerificationSchema>;

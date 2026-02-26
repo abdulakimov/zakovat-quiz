@@ -9,7 +9,7 @@ type AuthLayoutProps = {
 export function AuthLayout({
   children,
   title = "Zakovat Quiz Creator",
-  description = "Secure sign-in and account verification for your workspace.",
+  description = "Secure sign-in for your workspace.",
 }: AuthLayoutProps) {
   return (
     <div className="min-h-screen bg-slate-50 px-4 py-10 sm:px-6 sm:py-14">

@@ -4,22 +4,15 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
-import { sendVerificationEmail } from "@/lib/email";
 import { logger } from "@/lib/logger";
 import { consumeRateLimit } from "@/src/lib/rate-limit";
 import { safeAction } from "@/src/lib/actions";
-import {
-  loginSchema,
-  resendVerificationSchema,
-  signupSchema,
-  verifySchema,
-} from "@/src/schemas/auth";
+import { loginSchema, signupSchema } from "@/src/schemas/auth";
 import {
   getSessionCookieName,
   getSessionMaxAge,
   signSession,
 } from "@/lib/session";
-import { getAuthEnv } from "@/src/env";
 
 export type AuthState = {
   error?: string;
@@ -27,8 +20,6 @@ export type AuthState = {
 };
 
 const LOGIN_LIMIT = { bucket: "auth:login", limit: 5, windowMs: 10 * 60 * 1000 };
-const VERIFY_LIMIT = { bucket: "auth:verify", limit: 10, windowMs: 10 * 60 * 1000 };
-const RESEND_LIMIT = { bucket: "auth:resend", limit: 5, windowMs: 10 * 60 * 1000 };
 
 function normalizeUsername(value: FormDataEntryValue | null) {
   return typeof value === "string" ? value.trim().toLowerCase() : "";
@@ -61,18 +52,6 @@ function toLoginInput(formData: FormData) {
   };
 }
 
-function toVerifyInput(formData: FormData) {
-  return {
-    email: normalizeEmail(formData.get("email")),
-    code: typeof formData.get("code") === "string" ? String(formData.get("code")).trim() : "",
-  };
-}
-
-function toResendVerificationInput(formData: FormData) {
-  return {
-    email: normalizeEmail(formData.get("email")),
-  };
-}
 
 function toAuthError(resultError: string, fieldErrors?: Record<string, string[] | undefined>): string {
   const firstFieldError = Object.values(fieldErrors ?? {}).flat().find(Boolean);
@@ -98,9 +77,6 @@ function makeRateLimitKey(ip: string, identifier: string) {
   return `${ip}:${identifier || "unknown"}`;
 }
 
-function generateCode() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
 
 async function setSessionCookie(user: {
   id: string;
@@ -125,55 +101,11 @@ async function setSessionCookie(user: {
   });
 }
 
-async function upsertVerification(userId: string) {
-  const now = new Date();
-  const code = generateCode();
-  const codeHash = await bcrypt.hash(code, 10);
-  const expiresAt = new Date(now.getTime() + 10 * 60 * 1000);
-
-  const existing = await prisma.emailVerificationCode.findUnique({
-    where: { userId },
-  });
-
-  if (existing) {
-    const hoursSinceCreated =
-      (now.getTime() - existing.createdAt.getTime()) / (1000 * 60 * 60);
-    const shouldReset = hoursSinceCreated >= 24;
-    const sendCount = shouldReset ? 1 : existing.sendCount + 1;
-    const attempts = shouldReset ? 0 : existing.attempts;
-
-    await prisma.emailVerificationCode.update({
-      where: { userId },
-      data: {
-        codeHash,
-        expiresAt,
-        attempts,
-        sendCount,
-        lastSentAt: now,
-        createdAt: shouldReset ? now : existing.createdAt,
-      },
-    });
-  } else {
-    await prisma.emailVerificationCode.create({
-      data: {
-        userId,
-        codeHash,
-        expiresAt,
-        attempts: 0,
-        sendCount: 1,
-        lastSentAt: now,
-      },
-    });
-  }
-
-  return code;
-}
 
 export async function signup(
   _prevState: AuthState,
   formData: FormData
 ): Promise<AuthState> {
-  const emailVerificationEnabled = getAuthEnv().EMAIL_VERIFICATION_ENABLED;
   const execute = safeAction(signupSchema, async (input) => {
     const username = input.username.toLowerCase();
     const name = normalizeName(input.name ?? null);
@@ -199,44 +131,13 @@ export async function signup(
         name,
         passwordHash,
         role: "USER",
-        status: emailVerificationEnabled ? "PENDING_VERIFICATION" : "ACTIVE",
-        emailVerifiedAt: emailVerificationEnabled ? null : new Date(),
+        status: "ACTIVE",
+        emailVerifiedAt: new Date(),
       },
     });
 
-    if (!emailVerificationEnabled) {
-      await setSessionCookie(user);
-      redirect("/app");
-    }
-
-    const code = await upsertVerification(user.id);
-    try {
-      await sendVerificationEmail(user.email, code);
-      logger.info("Signup verification email sent", {
-        userId: user.id,
-        email: user.email,
-      });
-    } catch (error) {
-      try {
-        // Avoid leaving orphaned pending accounts when email delivery fails.
-        await prisma.user.delete({ where: { id: user.id } });
-      } catch (cleanupError) {
-        logger.error("Failed to cleanup pending user after email send failure", {
-          userId: user.id,
-          email: user.email,
-          cleanupError,
-        });
-      }
-
-      logger.error("Failed to send verification email", {
-        userId: user.id,
-        email: user.email,
-        error,
-      });
-      return { error: "Failed to send verification email." } satisfies AuthState;
-    }
-
-    redirect(`/auth/verify?email=${encodeURIComponent(user.email)}`);
+    await setSessionCookie(user);
+    redirect("/app");
   });
 
   const result = await execute(toSignupInput(formData));
@@ -253,7 +154,6 @@ export async function login(
 ): Promise<AuthState> {
   const clientIp = await getClientIp();
   const execute = safeAction(loginSchema, async (input) => {
-    const emailVerificationEnabled = getAuthEnv().EMAIL_VERIFICATION_ENABLED;
     const identifier = input.usernameOrEmail.toLowerCase();
     const rate = consumeRateLimit({
       ...LOGIN_LIMIT,
@@ -286,21 +186,13 @@ export async function login(
       return { error: "Invalid username or password." } satisfies AuthState;
     }
 
-    if (user.status === "PENDING_VERIFICATION" && emailVerificationEnabled) {
-      logger.warn("Login blocked: user not active", {
-        userId: user.id,
-        status: user.status,
-      });
-      return { error: "Invalid username or password." } satisfies AuthState;
-    }
-
     const matches = await bcrypt.compare(input.password, user.passwordHash);
     if (!matches) {
       logger.warn("Login failed: password mismatch", { userId: user.id });
       return { error: "Invalid username or password." } satisfies AuthState;
     }
 
-    if (user.status === "PENDING_VERIFICATION" && !emailVerificationEnabled) {
+    if (user.status === "PENDING_VERIFICATION") {
       await prisma.user.update({
         where: { id: user.id },
         data: {
@@ -329,158 +221,4 @@ export async function signOut() {
   cookieStore.delete(getSessionCookieName());
   logger.info("User signed out");
   redirect("/auth/login");
-}
-
-export async function verifyEmail(
-  _prevState: AuthState,
-  formData: FormData
-): Promise<AuthState> {
-  if (!getAuthEnv().EMAIL_VERIFICATION_ENABLED) {
-    return { error: "Email verification is disabled." } satisfies AuthState;
-  }
-
-  const clientIp = await getClientIp();
-  const execute = safeAction(verifySchema, async (input) => {
-    const email = input.email.toLowerCase();
-    const code = input.code.trim();
-    const rate = consumeRateLimit({
-      ...VERIFY_LIMIT,
-      key: makeRateLimitKey(clientIp, email),
-    });
-    if (!rate.ok) {
-      logger.warn("Verification rate limit exceeded", {
-        clientIp,
-        email,
-        retryAfterSeconds: rate.retryAfterSeconds,
-      });
-      return { error: "Too many attempts. Please try again later." } satisfies AuthState;
-    }
-
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return { error: "Invalid or expired verification code." } satisfies AuthState;
-    }
-
-    const verification = await prisma.emailVerificationCode.findUnique({
-      where: { userId: user.id },
-    });
-
-    if (!verification) {
-      return { error: "Invalid or expired verification code." } satisfies AuthState;
-    }
-
-    if (verification.attempts >= 5) {
-      return { error: "Invalid or expired verification code." } satisfies AuthState;
-    }
-
-    if (verification.expiresAt < new Date()) {
-      return { error: "Invalid or expired verification code." } satisfies AuthState;
-    }
-
-    const matches = await bcrypt.compare(code, verification.codeHash);
-    if (!matches) {
-      await prisma.emailVerificationCode.update({
-        where: { userId: user.id },
-        data: { attempts: verification.attempts + 1 },
-      });
-      logger.warn("Email verification failed: invalid code", { userId: user.id });
-      return { error: "Invalid code." } satisfies AuthState;
-    }
-
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: user.id },
-        data: { status: "ACTIVE", emailVerifiedAt: new Date() },
-      }),
-      prisma.emailVerificationCode.delete({ where: { userId: user.id } }),
-    ]);
-
-    logger.info("Email verified", { userId: user.id });
-    redirect("/auth/login");
-  });
-
-  const result = await execute(toVerifyInput(formData));
-  if (!result.ok) {
-    return { error: toAuthError(result.error, result.fieldErrors) };
-  }
-
-  return result.data;
-}
-
-export async function resendVerification(
-  _prevState: AuthState,
-  formData: FormData
-): Promise<AuthState> {
-  if (!getAuthEnv().EMAIL_VERIFICATION_ENABLED) {
-    return { error: "Email verification is disabled." } satisfies AuthState;
-  }
-
-  const clientIp = await getClientIp();
-  const execute = safeAction(resendVerificationSchema, async (input) => {
-    const email = input.email.toLowerCase();
-    const rate = consumeRateLimit({
-      ...RESEND_LIMIT,
-      key: makeRateLimitKey(clientIp, email),
-    });
-    if (!rate.ok) {
-      logger.warn("Resend verification rate limit exceeded", {
-        clientIp,
-        email,
-        retryAfterSeconds: rate.retryAfterSeconds,
-      });
-      return { error: "Too many attempts. Please try again later." } satisfies AuthState;
-    }
-
-    const genericResendSuccess = {
-      success: "If the email is eligible, a verification code will be sent.",
-    } satisfies AuthState;
-
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      return genericResendSuccess;
-    }
-
-    if (user.status === "ACTIVE") {
-      return genericResendSuccess;
-    }
-
-    const existing = await prisma.emailVerificationCode.findUnique({
-      where: { userId: user.id },
-    });
-
-    const now = new Date();
-    if (existing?.lastSentAt) {
-      const secondsSinceLast =
-        (now.getTime() - existing.lastSentAt.getTime()) / 1000;
-      if (secondsSinceLast < 60) {
-        return genericResendSuccess;
-      }
-    }
-
-    if (existing?.sendCount && existing.sendCount >= 10) {
-      return genericResendSuccess;
-    }
-
-    const code = await upsertVerification(user.id);
-    try {
-      await sendVerificationEmail(user.email, code);
-      logger.info("Verification email resent", { userId: user.id, email: user.email });
-    } catch (error) {
-      logger.error("Failed to resend verification email", {
-        userId: user.id,
-        email: user.email,
-        error,
-      });
-      return { error: "Failed to send verification email." } satisfies AuthState;
-    }
-
-    return genericResendSuccess;
-  });
-
-  const result = await execute(toResendVerificationInput(formData));
-  if (!result.ok) {
-    return { error: toAuthError(result.error, result.fieldErrors) };
-  }
-
-  return result.data;
 }
