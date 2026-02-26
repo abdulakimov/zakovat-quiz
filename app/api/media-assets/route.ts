@@ -52,10 +52,10 @@ export async function GET(request: Request) {
     },
   });
 
-  return NextResponse.json({
-    items: items.map((item) => ({
-      ...item,
-      url: `/api/media/${item.path}`,
-    })),
-  });
+  const responseItems = items.map((item) => ({
+    ...item,
+    url: `/api/media/${item.path}`,
+  }));
+
+  return NextResponse.json({ items: responseItems });
 }
