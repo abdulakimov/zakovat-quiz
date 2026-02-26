@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import VerifyForm from "@/app/auth/verify/verify-form";
 import { AuthLayout } from "@/src/components/layout/AuthLayout";
 import { getAuthEnv } from "@/src/env";
@@ -27,7 +28,11 @@ export default function VerifyPage() {
       title="Verify your email"
       description="Confirm your account with the code sent to your inbox."
     >
-      <VerifyForm />
+      <Suspense
+        fallback={<div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-500">Loading…</div>}
+      >
+        <VerifyForm />
+      </Suspense>
     </AuthLayout>
   );
 }
