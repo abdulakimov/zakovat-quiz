@@ -495,6 +495,10 @@ export function QuestionEditor({
             <div className="col-span-12 lg:col-span-8 xl:col-span-7">
               <form id="question-editor-form" onSubmit={submit} className="space-y-3" noValidate>
               <input type="hidden" {...form.register("roundId")} />
+              <input type="hidden" {...form.register("type")} />
+              <input type="hidden" {...form.register("answerType")} />
+              <input type="hidden" {...form.register("primaryMediaAssetId")} />
+              <input type="hidden" {...form.register("answerPrimaryMediaAssetId")} />
               {isEdit ? <input type="hidden" {...form.register("questionId")} /> : null}
 
               <div className="space-y-3">
