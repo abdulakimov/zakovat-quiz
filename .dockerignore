@@ -1,0 +1,10 @@
+.git
+.next
+node_modules
+.pnpm-store
+.env
+.env.*
+*.log
+test-results
+.tmp-tests
+coverage
