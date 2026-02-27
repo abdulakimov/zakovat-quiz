@@ -80,7 +80,7 @@ function CompactMediaCheck({
         onClick={onOpenField}
         className="mt-2 flex w-full items-center gap-2 rounded-md border border-dashed border-amber-200 bg-amber-50 px-2 py-2 text-left"
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded border border-amber-200 bg-white text-amber-700">
+        <div className="flex h-12 w-12 items-center justify-center rounded border border-amber-200 bg-background text-amber-700">
           <AlertTriangleIcon className="h-4 w-4" aria-hidden />
         </div>
         <div className="min-w-0">
@@ -95,12 +95,12 @@ function CompactMediaCheck({
 
   if (kind === "IMAGE") {
     return (
-      <button type="button" onClick={onOpenField} className="mt-2 flex w-full items-center gap-2 rounded-md border border-slate-200 bg-white p-2 text-left hover:border-slate-300">
+      <button type="button" onClick={onOpenField} className="mt-2 flex w-full items-center gap-2 rounded-md border border-border bg-card p-2 text-left hover:border-border/80">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={url} alt={`${label} preview`} className="h-16 w-16 rounded border border-slate-200 object-cover" />
+        <img src={url} alt={`${label} preview`} className="h-16 w-16 rounded border border-border object-cover" />
         <div className="min-w-0">
-          <p className="text-xs text-slate-500">Image</p>
-          <p className="truncate text-xs text-slate-800">{asset.originalName}</p>
+          <p className="text-xs text-muted-foreground">Image</p>
+          <p className="truncate text-xs text-foreground">{asset.originalName}</p>
         </div>
       </button>
     );
@@ -108,13 +108,13 @@ function CompactMediaCheck({
 
   if (kind === "VIDEO") {
     return (
-      <button type="button" onClick={onOpenField} className="mt-2 flex w-full items-center gap-2 rounded-md border border-slate-200 bg-white p-2 text-left hover:border-slate-300">
-        <div className="flex h-16 w-16 items-center justify-center rounded border border-slate-200 bg-slate-50 text-slate-500">
+      <button type="button" onClick={onOpenField} className="mt-2 flex w-full items-center gap-2 rounded-md border border-border bg-card p-2 text-left hover:border-border/80">
+        <div className="flex h-16 w-16 items-center justify-center rounded border border-border bg-muted text-muted-foreground">
           <FilmIcon className="h-4 w-4" aria-hidden />
         </div>
         <div className="min-w-0">
-          <p className="text-xs text-slate-500">Video</p>
-          <p className="truncate text-xs text-slate-800">{asset.originalName}</p>
+          <p className="text-xs text-muted-foreground">Video</p>
+          <p className="truncate text-xs text-foreground">{asset.originalName}</p>
         </div>
       </button>
     );
@@ -122,18 +122,18 @@ function CompactMediaCheck({
 
   if (kind === "AUDIO") {
     return (
-      <div className="mt-2 flex items-center gap-2 rounded-md border border-slate-200 bg-white p-2">
+      <div className="mt-2 flex items-center gap-2 rounded-md border border-border bg-card p-2">
         <button
           type="button"
           onClick={() => onOpenField()}
           className="flex min-w-0 flex-1 items-center gap-2 text-left"
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded border border-slate-200 bg-slate-50 text-slate-500">
+          <span className="flex h-8 w-8 items-center justify-center rounded border border-border bg-muted text-muted-foreground">
             <MusicIcon className="h-3.5 w-3.5" aria-hidden />
           </span>
           <span className="min-w-0">
-            <span className="block text-xs text-slate-500">Audio</span>
-            <span className="block truncate text-xs text-slate-800">{asset.originalName}</span>
+            <span className="block text-xs text-muted-foreground">Audio</span>
+            <span className="block truncate text-xs text-foreground">{asset.originalName}</span>
           </span>
         </button>
         <button
@@ -150,7 +150,7 @@ function CompactMediaCheck({
               await audioEl.play();
             } catch {}
           }}
-          className="inline-flex h-7 w-7 items-center justify-center rounded border border-slate-200 text-slate-600 hover:bg-slate-50"
+          className="inline-flex h-7 w-7 items-center justify-center rounded border border-border text-muted-foreground hover:bg-accent"
         >
           <PlayIcon className="h-3.5 w-3.5" aria-hidden />
         </button>
@@ -160,13 +160,13 @@ function CompactMediaCheck({
   }
 
   return (
-    <button type="button" onClick={onOpenField} className="mt-2 flex w-full items-center gap-2 rounded-md border border-slate-200 bg-white p-2 text-left hover:border-slate-300">
-      <div className="flex h-16 w-16 items-center justify-center rounded border border-slate-200 bg-slate-50 text-slate-500">
+    <button type="button" onClick={onOpenField} className="mt-2 flex w-full items-center gap-2 rounded-md border border-border bg-card p-2 text-left hover:border-border/80">
+      <div className="flex h-16 w-16 items-center justify-center rounded border border-border bg-muted text-muted-foreground">
         <ImageIcon className="h-4 w-4" aria-hidden />
       </div>
       <div className="min-w-0">
-        <p className="text-xs text-slate-500">Media</p>
-        <p className="truncate text-xs text-slate-800">{asset.originalName}</p>
+        <p className="text-xs text-muted-foreground">Media</p>
+        <p className="truncate text-xs text-foreground">{asset.originalName}</p>
       </div>
     </button>
   );
@@ -443,7 +443,7 @@ export function QuestionEditor({
   }, [confirmIfDirty, form.formState.isDirty]);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background" data-testid="question-editor">
       <div className="mx-auto w-full max-w-[1400px] px-4 pb-10 pt-6">
         <PageHeader
           title={isEdit ? "Edit question" : "New question"}
@@ -508,10 +508,10 @@ export function QuestionEditor({
               <div className="space-y-3">
                 <SettingsSectionCard icon={SettingsIcon} title="Basics">
                   <div className="space-y-1.5">
-                      <Label htmlFor="question-type" className="text-sm text-slate-500">Question type</Label>
+                      <Label htmlFor="question-type" className="text-sm text-muted-foreground">Question type</Label>
                       <select
                         id="question-type"
-                        className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm"
+                        className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
                         disabled={isPending}
                         value={selectedType}
                         onChange={(e) =>
@@ -529,15 +529,15 @@ export function QuestionEditor({
 
                 <SettingsSectionCard icon={ListChecksIcon} title="Question">
                   <div className="space-y-1.5">
-                    <Label htmlFor="question-text" className="text-sm text-slate-500">Question text</Label>
+                    <Label htmlFor="question-text" className="text-sm text-muted-foreground">Question text</Label>
                     <Textarea id="question-text" rows={4} {...form.register("text")} disabled={isPending} />
                     {form.formState.errors.text ? (
-                      <p className="text-xs text-red-600">{form.formState.errors.text.message}</p>
+                      <p className="text-xs text-destructive">{form.formState.errors.text.message}</p>
                     ) : null}
                   </div>
                   {showQuestionMedia ? (
                     <div id="question-media-field" className="space-y-2">
-                      <p className="text-xs font-medium text-slate-600">Question media</p>
+                      <p className="text-xs font-medium text-muted-foreground">Question media</p>
                       <MediaPickerSheet
                         title="Question media"
                         allowed={selectedType}
@@ -560,7 +560,7 @@ export function QuestionEditor({
                         }}
                       />
                       {form.formState.errors.primaryMediaAssetId ? (
-                        <p className="text-xs text-red-600">{form.formState.errors.primaryMediaAssetId.message as string}</p>
+                        <p className="text-xs text-destructive">{form.formState.errors.primaryMediaAssetId.message as string}</p>
                       ) : null}
                     </div>
                   ) : null}
@@ -595,7 +595,7 @@ export function QuestionEditor({
                       ))}
                     </div>
                     {form.formState.errors.options ? (
-                      <p className="text-xs text-red-600">{String(form.formState.errors.options.message ?? "Invalid options.")}</p>
+                      <p className="text-xs text-destructive">{String(form.formState.errors.options.message ?? "Invalid options.")}</p>
                     ) : null}
                   </SettingsSectionCard>
                 ) : null}
@@ -603,10 +603,10 @@ export function QuestionEditor({
                 <SettingsSectionCard icon={CheckCircle2Icon} title="Answer">
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="space-y-1.5">
-                      <Label htmlFor="answer-type" className="text-sm text-slate-500">Answer type</Label>
+                      <Label htmlFor="answer-type" className="text-sm text-muted-foreground">Answer type</Label>
                       <select
                         id="answer-type"
-                        className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm"
+                        className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
                         disabled={isPending}
                         value={selectedAnswerType}
                         onChange={(e) =>
@@ -621,18 +621,18 @@ export function QuestionEditor({
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <Label htmlFor="answer-text" className="text-sm text-slate-500">
+                      <Label htmlFor="answer-text" className="text-sm text-muted-foreground">
                         Answer
                       </Label>
                       <Input id="answer-text" {...form.register("answerText")} disabled={isPending} />
                       {form.formState.errors.answerText ? (
-                        <p className="text-xs text-red-600">{form.formState.errors.answerText.message as string}</p>
+                        <p className="text-xs text-destructive">{form.formState.errors.answerText.message as string}</p>
                       ) : null}
                     </div>
                   </div>
                   {showAnswerMedia ? (
                     <div id="answer-media-field" className="space-y-2">
-                      <p className="text-xs font-medium text-slate-600">Answer media</p>
+                      <p className="text-xs font-medium text-muted-foreground">Answer media</p>
                       <MediaPickerSheet
                         title="Answer media"
                         allowed={selectedAnswerType}
@@ -655,7 +655,7 @@ export function QuestionEditor({
                         }}
                       />
                       {form.formState.errors.answerPrimaryMediaAssetId ? (
-                        <p className="text-xs text-red-600">
+                        <p className="text-xs text-destructive">
                           {form.formState.errors.answerPrimaryMediaAssetId.message as string}
                         </p>
                       ) : null}
@@ -665,10 +665,10 @@ export function QuestionEditor({
                 </SettingsSectionCard>
 
                 <SettingsSectionCard icon={ClockIcon} title="Explanation">
-                  <Label htmlFor="question-explanation" className="text-sm text-slate-500">Explanation</Label>
+                  <Label htmlFor="question-explanation" className="text-sm text-muted-foreground">Explanation</Label>
                   <Textarea id="question-explanation" rows={3} {...form.register("explanation")} disabled={isPending} />
                   {form.formState.errors.explanation ? (
-                    <p className="text-xs text-red-600">{form.formState.errors.explanation.message as string}</p>
+                    <p className="text-xs text-destructive">{form.formState.errors.explanation.message as string}</p>
                   ) : null}
                 </SettingsSectionCard>
               </div>
@@ -690,9 +690,9 @@ export function QuestionEditor({
           </div>
 
             <aside className="col-span-12 lg:col-span-4 xl:col-span-5 lg:sticky lg:top-20 lg:self-start">
-              <div className="rounded-lg border border-slate-200 bg-white p-3">
+              <div className="rounded-lg border border-border bg-card p-3" data-testid="question-checks-card">
                 <div className="mb-3 flex items-center justify-between gap-2">
-                  <p className="text-sm font-medium text-slate-900">Checks</p>
+                  <p className="text-sm font-medium text-foreground">Checks</p>
                   <span
                     className={cn(
                       "rounded-full border px-2 py-0.5 text-xs",
@@ -704,11 +704,11 @@ export function QuestionEditor({
                 </div>
 
                 <div className="space-y-3 text-sm">
-                  <div className="rounded-md border border-slate-200 p-2">
-                    <p className="text-xs text-slate-500">Question</p>
+                  <div className="rounded-md border border-border p-2">
+                    <p className="text-xs text-muted-foreground">Question</p>
                     <div className="mt-2 flex flex-wrap gap-2">
-                      <span className="rounded-full border border-slate-200 px-2 py-0.5 text-xs text-slate-700">{selectedType}</span>
-                      <span className={cn("rounded-full border px-2 py-0.5 text-xs", showQuestionMedia ? (selectedQuestionAsset ? "border-emerald-200 text-emerald-700" : "border-amber-200 text-amber-700") : "border-slate-200 text-slate-600")}>
+                      <span className="rounded-full border border-border px-2 py-0.5 text-xs text-foreground">{selectedType}</span>
+                      <span className={cn("rounded-full border px-2 py-0.5 text-xs", showQuestionMedia ? (selectedQuestionAsset ? "border-emerald-200 text-emerald-700" : "border-amber-200 text-amber-700") : "border-border text-muted-foreground")}>
                         {showQuestionMedia ? (selectedQuestionAsset ? "Media attached" : "Media missing") : "No media"}
                       </span>
                       {showOptions ? (
@@ -727,13 +727,13 @@ export function QuestionEditor({
                     ) : null}
                   </div>
 
-                  <div className="rounded-md border border-slate-200 p-2">
-                    <p className="text-xs text-slate-500">Answer</p>
+                  <div className="rounded-md border border-border p-2">
+                    <p className="text-xs text-muted-foreground">Answer</p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       <span className={cn("rounded-full border px-2 py-0.5 text-xs", answerText.trim().length > 0 ? "border-emerald-200 text-emerald-700" : "border-amber-200 text-amber-700")}>
                         {answerText.trim().length > 0 ? "Text ok" : "Text missing"}
                       </span>
-                      <span className="rounded-full border border-slate-200 px-2 py-0.5 text-xs text-slate-700">{selectedAnswerType}</span>
+                      <span className="rounded-full border border-border px-2 py-0.5 text-xs text-foreground">{selectedAnswerType}</span>
                       {showAnswerMedia ? (
                         <span className={cn("rounded-full border px-2 py-0.5 text-xs", selectedAnswerAsset ? "border-emerald-200 text-emerald-700" : "border-amber-200 text-amber-700")}>
                           {selectedAnswerAsset ? "Media attached" : "Media missing"}
@@ -750,15 +750,15 @@ export function QuestionEditor({
                     ) : null}
                   </div>
 
-                  <div className="rounded-md border border-slate-200 p-2">
-                    <p className="text-xs text-slate-500">Timer</p>
-                    <p className="mt-2 text-sm text-slate-800">
+                  <div className="rounded-md border border-border p-2">
+                    <p className="text-xs text-muted-foreground">Timer</p>
+                    <p className="mt-2 text-sm text-foreground">
                       {packDefaultQuestionTimerPresetSec != null ? `Pack preset: ${packDefaultQuestionTimerPresetSec}s` : `Round default: ${round.defaultTimerSec}s`}
                     </p>
                   </div>
 
-                  <div className="rounded-md border border-slate-200 p-2">
-                    <p className="text-xs text-slate-500">Checks</p>
+                  <div className="rounded-md border border-border p-2">
+                    <p className="text-xs text-muted-foreground">Checks</p>
                     <div className="mt-2 space-y-2">
                       {checks.map((check) => (
                         <div key={check.key} className="flex items-start justify-between gap-2">
@@ -768,13 +768,13 @@ export function QuestionEditor({
                             ) : (
                               <AlertTriangleIcon className="mt-0.5 h-3.5 w-3.5 text-amber-600" aria-hidden />
                             )}
-                            <span className={cn("text-xs", check.ok ? "text-slate-700" : "text-amber-800")}>{check.label}</span>
+                            <span className={cn("text-xs", check.ok ? "text-foreground" : "text-amber-800")}>{check.label}</span>
                           </div>
                           {!check.ok ? (
                             <button
                               type="button"
                               onClick={() => scrollToField(check.focusId)}
-                              className="shrink-0 text-xs text-slate-600 underline underline-offset-2 hover:text-slate-900"
+                              className="shrink-0 text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
                             >
                               Fix
                             </button>
@@ -784,8 +784,8 @@ export function QuestionEditor({
                     </div>
                   </div>
 
-                  <div className="rounded-md border border-slate-200 p-2">
-                    <p className="text-xs text-slate-500">Warnings</p>
+                  <div className="rounded-md border border-border p-2">
+                    <p className="text-xs text-muted-foreground">Warnings</p>
                     <div className="mt-2 space-y-2">
                       {(selectedType === "AUDIO" || selectedType === "VIDEO") && !selectedQuestionAsset ? (
                         <button type="button" onClick={() => scrollToField("question-type")} className="block text-left text-xs text-amber-700 hover:underline">
@@ -811,7 +811,7 @@ export function QuestionEditor({
                       !(showOptions && options.filter((o) => o.text.trim().length > 0).length < 4) &&
                       !(answerText.trim().length < 1) &&
                       !(showAnswerMedia && !selectedAnswerAsset) ? (
-                        <p className="text-xs text-slate-500">No warnings</p>
+                        <p className="text-xs text-muted-foreground">No warnings</p>
                       ) : null}
                     </div>
                   </div>

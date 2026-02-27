@@ -45,8 +45,8 @@ export default async function TeamsPage() {
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center gap-4 p-8 text-center">
             <div className="space-y-1">
-              <p className="text-base font-medium text-slate-900">{tTeams("emptyTitle")}</p>
-              <p className="text-sm text-slate-600">{tTeams("emptyDescription")}</p>
+              <p className="text-base font-medium text-foreground">{tTeams("emptyTitle")}</p>
+              <p className="text-sm text-muted-foreground">{tTeams("emptyDescription")}</p>
             </div>
             <CreateTeamDialog />
           </CardContent>
@@ -59,12 +59,12 @@ export default async function TeamsPage() {
             const memberCount = team._count?.members ?? null;
 
             return (
-              <Card key={membership.id} className="transition hover:border-slate-300">
+              <Card key={membership.id} className="transition hover:border-ring/40" data-testid="teams-card">
                 <CardContent className="relative p-4">
                   <Link
                     href={localizeHref(locale, `/app/teams/${team.id}`)}
                     aria-label={tTeams("openTeam", { name: team.name })}
-                    className="absolute inset-0 z-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
+                    className="absolute inset-0 z-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   />
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div className="relative z-10 flex min-w-0 items-start gap-3">
@@ -73,21 +73,21 @@ export default async function TeamsPage() {
                           <AvatarImage src={`/api/media/${team.avatarAsset.path}`} alt={team.name} className="rounded-xl" />
                         ) : null}
                         {!team.avatarAsset?.path ? (
-                          <AvatarFallback className="rounded-xl bg-slate-100 text-sm">
+                          <AvatarFallback className="rounded-xl bg-muted text-sm text-muted-foreground">
                             {getTeamInitials(team.name)}
                           </AvatarFallback>
                         ) : null}
                       </Avatar>
                       <div className="min-w-0 space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <p className="truncate text-base font-semibold text-slate-900">{team.name}</p>
+                          <p className="truncate text-base font-semibold text-foreground">{team.name}</p>
                           {isOwner ? <Badge variant="success">{tTeams("ownerBadge")}</Badge> : null}
                         </div>
-                        <p className="text-sm text-slate-600">
+                        <p className="text-sm text-muted-foreground">
                           {memberCount !== null ? tTeams("membersCount", { count: memberCount }) : tTeams("membersUnavailable")}
                         </p>
-                        {team.slogan ? <p className="truncate text-xs text-slate-500">{team.slogan}</p> : null}
-                        <p className="truncate text-xs text-slate-500">
+                        {team.slogan ? <p className="truncate text-xs text-muted-foreground">{team.slogan}</p> : null}
+                        <p className="truncate text-xs text-muted-foreground">
                           {tTeams("ownerPrefix")}: {team.owner.name ?? team.owner.username}
                         </p>
                       </div>

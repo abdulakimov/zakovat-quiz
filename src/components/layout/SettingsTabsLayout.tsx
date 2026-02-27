@@ -61,7 +61,7 @@ export function SettingsTabsLayout({ items, paramKey = "tab", defaultKey }: Sett
 
   return (
     <div className="space-y-4">
-      <div className="border-b border-slate-200 pb-3">
+      <div className="border-b border-border pb-3">
         <div className="flex w-full gap-2 overflow-x-auto pb-1">
           {items.map((item) => {
             const Icon = ICONS[item.icon];
@@ -75,11 +75,11 @@ export function SettingsTabsLayout({ items, paramKey = "tab", defaultKey }: Sett
                 className={cn(
                   "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors duration-150 motion-reduce:transition-none",
                   active
-                    ? "border-slate-200 bg-slate-100 text-slate-900"
-                    : "border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900",
+                    ? "border-border bg-muted text-foreground"
+                    : "border-transparent text-muted-foreground hover:bg-accent hover:text-accent-foreground",
                 )}
               >
-                <span className={cn("inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-100 text-slate-500", active && "bg-white")}>
+                <span className={cn("inline-flex h-6 w-6 items-center justify-center rounded-full bg-muted text-muted-foreground", active && "bg-background")}>
                   <Icon className="h-3.5 w-3.5" />
                 </span>
                 {item.label}

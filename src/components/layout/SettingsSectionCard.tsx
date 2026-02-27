@@ -55,14 +55,14 @@ export function SettingsSectionCard({
       variants={variants.cardIn}
       transition={{ duration: reduceMotion ? 0 : durations.base / 1000, ease: easing }}
     >
-      <Card className={cn("border-slate-200", className)}>
+      <Card className={cn("border-border", className)}>
         <CardHeader className="flex flex-row items-start gap-3 pb-3">
-          <div className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-600">
+          <div className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground">
             <Icon className="h-4 w-4" />
           </div>
           <div className="space-y-1">
-            <p className="text-base font-semibold text-slate-900">{title}</p>
-            {subtitle ? <p className="text-xs text-slate-500">{subtitle}</p> : null}
+            <p className="text-base font-semibold text-foreground">{title}</p>
+            {subtitle ? <p className="text-xs text-muted-foreground">{subtitle}</p> : null}
           </div>
         </CardHeader>
         <CardContent className="space-y-4">{children}</CardContent>

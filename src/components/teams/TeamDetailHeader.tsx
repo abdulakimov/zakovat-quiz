@@ -116,7 +116,7 @@ export function TeamDetailHeader({
             </Avatar>
             {!isEditing ? (
               <>
-                <span className="truncate text-2xl font-semibold tracking-tight text-slate-900">{currentName}</span>
+                <span className="truncate text-2xl font-semibold tracking-tight text-foreground">{currentName}</span>
                 <Badge>{tTeams("membersCount", { count: memberCount })}</Badge>
                 {isOwner ? (
                   <IconButton
@@ -140,7 +140,7 @@ export function TeamDetailHeader({
                     className="h-10 text-base"
                   />
                   {form.formState.errors.name ? (
-                    <p className="mt-1 text-xs text-red-600">{form.formState.errors.name.message}</p>
+                    <p className="mt-1 text-xs text-destructive">{form.formState.errors.name.message}</p>
                   ) : null}
                 </div>
                 <Button type="submit" size="sm" disabled={isPending}>

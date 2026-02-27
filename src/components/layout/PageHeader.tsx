@@ -29,9 +29,9 @@ export function PageHeader({
   return (
     <div
       className={[
-        "flex flex-col border-b border-slate-200",
+        "flex flex-col border-b border-border",
         isCompact ? "gap-2 pb-3" : "gap-3 pb-5",
-        sticky ? "sticky top-0 z-30 -mx-4 bg-white/95 px-4 pt-2 backdrop-blur sm:-mx-6 sm:px-6" : "",
+        sticky ? "sticky top-0 z-30 -mx-4 bg-background/95 px-4 pt-2 backdrop-blur sm:-mx-6 sm:px-6" : "",
       ].join(" ")}
     >
       <div className="flex flex-wrap items-center gap-2">
@@ -41,7 +41,7 @@ export function PageHeader({
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1">
           {typeof title === "string" ? (
-            <h1 className={isCompact ? "text-lg font-semibold text-slate-900" : "text-2xl font-semibold tracking-tight text-slate-900"}>
+            <h1 className={isCompact ? "text-lg font-semibold text-foreground" : "text-2xl font-semibold tracking-tight text-foreground"}>
               {title}
             </h1>
           ) : (
@@ -49,8 +49,8 @@ export function PageHeader({
           )}
           {description
             ? typeof description === "string"
-              ? <p className={isCompact ? "text-xs text-slate-600" : "text-sm leading-6 text-slate-600"}>{description}</p>
-              : <div className={isCompact ? "text-xs text-slate-600" : "text-sm leading-6 text-slate-600"}>{description}</div>
+              ? <p className={isCompact ? "text-xs text-muted-foreground" : "text-sm leading-6 text-muted-foreground"}>{description}</p>
+              : <div className={isCompact ? "text-xs text-muted-foreground" : "text-sm leading-6 text-muted-foreground"}>{description}</div>
             : null}
         </div>
         {actions ? <div className="shrink-0">{actions}</div> : null}

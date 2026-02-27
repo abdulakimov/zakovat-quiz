@@ -224,15 +224,15 @@ export function TeamSettingsCard({ team }: Props) {
                 subtitle={tTeams("teamProfileSubtitle")}
               >
                 <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)]">
-                  <div className="space-y-3 rounded-lg border border-slate-200 p-4">
+                  <div className="space-y-3 rounded-lg border border-border p-4">
                     <div className="flex flex-col items-center gap-3 text-center">
-                      <Avatar className="h-20 w-20 rounded-2xl border-slate-300">
+                      <Avatar className="h-20 w-20 rounded-2xl border-border">
                         {previewUrl ? <AvatarImage src={previewUrl} alt={watchedName} className="rounded-2xl" /> : null}
                         {!previewUrl ? (
                           <AvatarFallback className="rounded-2xl text-lg">{getInitials(watchedName)}</AvatarFallback>
                         ) : null}
                       </Avatar>
-                      <p className="text-sm font-medium text-slate-900">{watchedName}</p>
+                      <p className="text-sm font-medium text-foreground">{watchedName}</p>
                     </div>
                     <div className="space-y-2">
                       <input
@@ -252,7 +252,7 @@ export function TeamSettingsCard({ team }: Props) {
                       >
                         {isUploading ? tTeams("uploadingWithProgress", { progress: uploadProgress }) : tTeams("uploadAvatar")}
                       </Button>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-muted-foreground">
                         {tTeams("imageHint")} {!isEditing ? tTeams("clickEditToChange") : ""}
                       </p>
                     </div>
@@ -260,23 +260,23 @@ export function TeamSettingsCard({ team }: Props) {
 
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="team-settings-name" className="text-sm text-slate-500">{tTeams("teamNameLabel")}</Label>
+                      <Label htmlFor="team-settings-name" className="text-sm text-muted-foreground">{tTeams("teamNameLabel")}</Label>
                       <Input
                         id="team-settings-name"
                         {...form.register("name")}
                         disabled={fieldsDisabled}
                         aria-invalid={form.formState.errors.name ? "true" : "false"}
-                        className={cn("h-10", form.formState.errors.name ? "border-red-300 focus-visible:ring-red-300" : "")}
+                        className={cn("h-10", form.formState.errors.name ? "border-destructive focus-visible:ring-destructive" : "")}
                       />
                       {form.formState.errors.name ? (
-                        <p className="text-xs text-red-600">{form.formState.errors.name.message}</p>
+                        <p className="text-xs text-destructive">{form.formState.errors.name.message}</p>
                       ) : null}
                     </div>
 
                     <div className="space-y-2">
                       <div className="flex items-center justify-between gap-2">
-                        <Label htmlFor="team-settings-slogan" className="text-sm text-slate-500">{tTeams("teamSloganLabel")}</Label>
-                        <span className="text-xs text-slate-500">{sloganValue.length}/80</span>
+                        <Label htmlFor="team-settings-slogan" className="text-sm text-muted-foreground">{tTeams("teamSloganLabel")}</Label>
+                        <span className="text-xs text-muted-foreground">{sloganValue.length}/80</span>
                       </div>
                       <Textarea
                         id="team-settings-slogan"
@@ -288,11 +288,11 @@ export function TeamSettingsCard({ team }: Props) {
                         aria-invalid={form.formState.errors.slogan ? "true" : "false"}
                         className={cn(
                           "min-h-[72px] resize-none",
-                          form.formState.errors.slogan ? "border-red-300 focus-visible:ring-red-300" : "",
+                          form.formState.errors.slogan ? "border-destructive focus-visible:ring-destructive" : "",
                         )}
                       />
                       {form.formState.errors.slogan ? (
-                        <p className="text-xs text-red-600">{form.formState.errors.slogan.message as string}</p>
+                        <p className="text-xs text-destructive">{form.formState.errors.slogan.message as string}</p>
                       ) : null}
                     </div>
                   </div>

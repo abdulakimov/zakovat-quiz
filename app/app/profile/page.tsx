@@ -41,22 +41,22 @@ export default async function ProfilePage() {
 
                 <section className="space-y-3">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <h2 className="text-lg font-semibold text-slate-900">{tProfile("activeTeamsTitle")}</h2>
+                    <h2 className="text-lg font-semibold text-foreground">{tProfile("activeTeamsTitle")}</h2>
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
                         activeTeams.length >= MAX_ACTIVE_TEAMS
-                          ? "bg-amber-100 text-amber-800"
-                          : "bg-slate-100 text-slate-700"
+                          ? "bg-destructive/10 text-destructive"
+                          : "bg-muted text-muted-foreground"
                       }`}
                     >
                       {tProfile("activeTeamsCount", { count: activeTeams.length, max: MAX_ACTIVE_TEAMS })}
                     </span>
                   </div>
                   {activeTeams.length >= MAX_ACTIVE_TEAMS ? (
-                    <p className="text-sm text-amber-700">{tProfile("activeTeamsLimitWarning")}</p>
+                    <p className="text-sm text-destructive">{tProfile("activeTeamsLimitWarning")}</p>
                   ) : null}
                   {activeTeams.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-600">
+                    <div className="rounded-xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground" data-testid="profile-card">
                       {tProfile("noActiveTeams")}
                     </div>
                   ) : (
@@ -65,13 +65,14 @@ export default async function ProfilePage() {
                         <Link
                           key={membership.id}
                           href={localizeHref(locale, `/app/teams/${membership.team.id}`)}
-                          className="block rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
+                          className="block rounded-xl border border-border bg-card p-4 shadow-sm transition hover:border-ring/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                           aria-label={`Open ${membership.team.name}`}
+                          data-testid="profile-card"
                         >
                           <div className="flex items-center justify-between gap-3">
                             <div>
-                              <p className="font-medium text-slate-900">{membership.team.name}</p>
-                              <p className="text-sm text-slate-600">
+                              <p className="font-medium text-foreground">{membership.team.name}</p>
+                              <p className="text-sm text-muted-foreground">
                                 {membership.role === "OWNER" ? tProfile("ownerRole") : tProfile("memberRole")} |{" "}
                                 {tProfile("activeMembers", { count: membership.team._count.members })}
                               </p>
@@ -84,22 +85,22 @@ export default async function ProfilePage() {
                 </section>
 
                 <section className="space-y-3">
-                  <h2 className="text-lg font-semibold text-slate-900">{tProfile("pendingInvitesTitle")}</h2>
+                  <h2 className="text-lg font-semibold text-foreground">{tProfile("pendingInvitesTitle")}</h2>
                   {pendingInvites.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-600">
+                    <div className="rounded-xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground" data-testid="profile-invites-card">
                       {tProfile("noPendingInvites")}
                     </div>
                   ) : (
                     <div className="space-y-2">
                       {pendingInvites.map((invite: PendingInvite) => (
-                        <div key={invite.id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                        <div key={invite.id} className="rounded-xl border border-border bg-card p-4 shadow-sm" data-testid="profile-invites-card">
                           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div>
-                              <p className="font-medium text-slate-900">{invite.team.name}</p>
-                              <p className="text-sm text-slate-600">
+                              <p className="font-medium text-foreground">{invite.team.name}</p>
+                              <p className="text-sm text-muted-foreground">
                                 {tProfile("invitedBy", { name: invite.invitedBy.name ?? invite.invitedBy.username })}
                               </p>
-                              <p className="text-xs text-slate-500">
+                              <p className="text-xs text-muted-foreground">
                                 {tProfile("expires", { date: invite.expiresAt.toLocaleDateString() })}
                               </p>
                             </div>

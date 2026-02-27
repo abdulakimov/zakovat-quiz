@@ -32,7 +32,7 @@ export function FormFieldText<TFieldValues extends FieldValues>({
 
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={id} className="text-sm text-slate-500">
+      <Label htmlFor={id} className="text-sm text-muted-foreground">
         {label}
       </Label>
       <Input

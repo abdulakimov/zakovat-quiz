@@ -247,7 +247,7 @@ export async function AppShell({ children, user }: AppShellProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-background text-foreground" data-testid="app-shell">
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
           <MobileNav
@@ -288,7 +288,7 @@ export async function AppShell({ children, user }: AppShellProps) {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10" data-testid="app-main">
         <PageMotion>{children}</PageMotion>
       </main>
     </div>

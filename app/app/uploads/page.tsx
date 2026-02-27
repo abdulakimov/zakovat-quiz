@@ -62,7 +62,7 @@ export default function UploadsPage() {
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+        className="space-y-4 rounded-xl border border-border bg-card p-4 shadow-sm"
       >
         <div className="space-y-2">
           <Label htmlFor="file">File</Label>
@@ -75,15 +75,15 @@ export default function UploadsPage() {
             required
           />
         </div>
-        {error ? <p className="text-sm text-red-600">{error}</p> : null}
+        {error ? <p className="text-sm text-destructive">{error}</p> : null}
         <Button type="submit" disabled={loading}>
           {loading ? "Uploading..." : "Upload"}
         </Button>
       </form>
 
       {asset && mediaUrl ? (
-        <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <div className="text-sm text-slate-600">{asset.originalName}</div>
+        <div className="space-y-2 rounded-xl border border-border bg-card p-4 shadow-sm">
+          <div className="text-sm text-muted-foreground">{asset.originalName}</div>
           {asset.type === "IMAGE" ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={mediaUrl} alt={asset.originalName} className="max-w-md rounded-lg" />

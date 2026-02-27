@@ -125,8 +125,8 @@ export function MusicPickerSheet({
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-slate-900">{title}</p>
-          <p className="text-xs text-slate-500">Choose an audio track from your library.</p>
+          <p className="text-sm font-medium text-foreground">{title}</p>
+          <p className="text-xs text-muted-foreground">Choose an audio track from your library.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button type="button" variant="outline" size="sm" disabled={disabled} onClick={() => setOpen(true)}>
@@ -146,11 +146,11 @@ export function MusicPickerSheet({
 
       <div className="flex flex-wrap items-center gap-2">
         {value ? (
-          <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700">
+          <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-foreground">
             <span className="truncate">{value.name}</span>
           </span>
         ) : (
-          <span className="text-xs text-slate-500">No music selected.</span>
+          <span className="text-xs text-muted-foreground">No music selected.</span>
         )}
         <Button
           type="button"
@@ -167,12 +167,12 @@ export function MusicPickerSheet({
 
       {open ? (
         <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-slate-900/35" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col gap-4 overflow-y-auto border-l border-slate-200 bg-white p-5 shadow-xl">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-0 flex h-full w-full max-w-md flex-col gap-4 overflow-y-auto border-l border-border bg-background p-5 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-slate-900">Choose music</p>
-                <p className="text-xs text-slate-500">Select an audio track for {title.toLowerCase()}.</p>
+                <p className="text-sm font-semibold text-foreground">Choose music</p>
+                <p className="text-xs text-muted-foreground">Select an audio track for {title.toLowerCase()}.</p>
               </div>
               <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
                 Close
@@ -212,14 +212,14 @@ export function MusicPickerSheet({
               />
             </div>
 
-            <div className="space-y-2 rounded-md border border-slate-200 bg-slate-50 p-3">
+            <div className="space-y-2 rounded-md border border-border bg-muted p-3">
               {value ? (
                 <>
-                  <p className="text-xs text-slate-500">Preview</p>
+                  <p className="text-xs text-muted-foreground">Preview</p>
                   <audio controls src={value.url} className="w-full" />
                 </>
               ) : (
-                <p className="text-xs text-slate-500">Select a track to preview.</p>
+                <p className="text-xs text-muted-foreground">Select a track to preview.</p>
               )}
             </div>
 
@@ -227,12 +227,12 @@ export function MusicPickerSheet({
               {loading ? (
                 <div className="space-y-2">
                   {Array.from({ length: 6 }).map((_, idx) => (
-                    <div key={`skeleton-${idx}`} className="h-12 animate-pulse rounded-md bg-slate-100" />
+                    <div key={`skeleton-${idx}`} className="h-12 animate-pulse rounded-md bg-muted/60" />
                   ))}
                 </div>
               ) : null}
               {!loading && items.length === 0 ? (
-                <div className="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+                <div className="rounded-md border border-border bg-muted p-4 text-sm text-muted-foreground">
                   No audio files yet.
                 </div>
               ) : null}
@@ -249,21 +249,21 @@ export function MusicPickerSheet({
                           setOpen(false);
                         }}
                         className={[
-                          "flex w-full items-start justify-between gap-3 rounded-md px-3 py-2 text-left hover:bg-slate-50",
-                          selected ? "bg-slate-100" : "",
+                          "flex w-full items-start justify-between gap-3 rounded-md px-3 py-2 text-left hover:bg-accent",
+                          selected ? "bg-muted" : "",
                         ].join(" ")}
                       >
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-slate-900">{item.name}</p>
-                          <p className="text-xs text-slate-500">{formatBytes(item.sizeBytes)}</p>
+                          <p className="truncate text-sm font-medium text-foreground">{item.name}</p>
+                          <p className="text-xs text-muted-foreground">{formatBytes(item.sizeBytes)}</p>
                         </div>
-                        {selected ? <span className="text-xs font-medium text-slate-700">Selected</span> : null}
+                        {selected ? <span className="text-xs font-medium text-foreground">Selected</span> : null}
                       </button>
                     );
                   })}
                 </div>
               ) : null}
-              {error ? <p className="text-sm text-red-600">{error}</p> : null}
+              {error ? <p className="text-sm text-destructive">{error}</p> : null}
             </div>
           </div>
         </div>

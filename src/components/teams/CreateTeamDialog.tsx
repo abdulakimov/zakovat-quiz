@@ -67,11 +67,11 @@ export function CreateTeamDialog() {
       </Button>
 
       {isOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 p-4">
-          <div className="w-full max-w-md rounded-xl border border-slate-200 bg-white p-5 shadow-xl">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="w-full max-w-md rounded-xl border border-border bg-card p-5 shadow-xl">
             <div className="mb-4">
-              <h2 className="text-lg font-semibold text-slate-900">{tTeams("create")}</h2>
-              <p className="text-sm text-slate-600">{tTeams("createDescription")}</p>
+              <h2 className="text-lg font-semibold text-foreground">{tTeams("create")}</h2>
+              <p className="text-sm text-muted-foreground">{tTeams("createDescription")}</p>
             </div>
 
             <form onSubmit={onSubmit} className="space-y-4" noValidate>

@@ -39,14 +39,14 @@ function formatBytes(bytes?: number | null) {
 
 function MediaThumb({ asset }: { asset: MediaPickerAsset | null }) {
   if (!asset) {
-    return <div className="rounded-md border border-dashed border-slate-200 p-3 text-xs text-slate-500">No media selected</div>;
+    return <div className="rounded-md border border-dashed border-border p-3 text-xs text-muted-foreground">No media selected</div>;
   }
   if (asset.type === "IMAGE") {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={asset.url} alt={asset.name} className="max-h-44 w-full rounded-md border border-slate-200 object-contain" />;
+    return <img src={asset.url} alt={asset.name} className="max-h-44 w-full rounded-md border border-border object-contain" />;
   }
   if (asset.type === "VIDEO") {
-    return <video controls src={asset.url} className="max-h-56 w-full rounded-md border border-slate-200" />;
+    return <video controls src={asset.url} className="max-h-56 w-full rounded-md border border-border" />;
   }
   return <audio controls src={asset.url} className="w-full" />;
 }
@@ -154,8 +154,8 @@ export function MediaPickerSheet({
     <div className="space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-slate-900">{title}</p>
-          <p className="text-xs text-slate-500">
+          <p className="text-sm font-medium text-foreground">{title}</p>
+          <p className="text-xs text-muted-foreground">
             {description ?? `Choose a ${allowed.toLowerCase()} asset from your library or upload a new one.`}
           </p>
         </div>
@@ -177,11 +177,11 @@ export function MediaPickerSheet({
 
       <div className="flex flex-wrap items-center gap-2">
         {value ? (
-          <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700">
+          <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-foreground">
             <span className="truncate">{value.name}</span>
           </span>
         ) : (
-          <span className="text-xs text-slate-500">No media selected.</span>
+          <span className="text-xs text-muted-foreground">No media selected.</span>
         )}
         <Button
           type="button"
@@ -198,19 +198,19 @@ export function MediaPickerSheet({
       </div>
 
       {showPreview && value ? (
-        <div className="rounded-lg border border-slate-200 bg-white p-3">
+        <div className="rounded-lg border border-border bg-card p-3">
           <MediaThumb asset={value} />
         </div>
       ) : null}
 
       {open ? (
         <div className="fixed inset-0 z-50">
-          <div className="absolute inset-0 bg-slate-900/35" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-0 flex h-full w-full max-w-lg flex-col gap-4 overflow-y-auto border-l border-slate-200 bg-white p-5 shadow-xl">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-0 flex h-full w-full max-w-lg flex-col gap-4 overflow-y-auto border-l border-border bg-background p-5 shadow-xl">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-semibold text-slate-900">Choose media</p>
-                <p className="text-xs text-slate-500">Select an asset for {title.toLowerCase()}.</p>
+                <p className="text-sm font-semibold text-foreground">Choose media</p>
+                <p className="text-xs text-muted-foreground">Select an asset for {title.toLowerCase()}.</p>
               </div>
               <Button type="button" variant="ghost" size="sm" onClick={() => setOpen(false)}>
                 Close
@@ -253,7 +253,7 @@ export function MediaPickerSheet({
             </div>
 
             <div className="space-y-2">
-              <div className="rounded-md border border-slate-200 bg-slate-50 p-3">
+              <div className="rounded-md border border-border bg-muted p-3">
                 <MediaThumb asset={value} />
               </div>
             </div>
@@ -262,12 +262,12 @@ export function MediaPickerSheet({
               {loading ? (
                 <div className="space-y-2">
                   {Array.from({ length: 6 }).map((_, idx) => (
-                    <div key={`skeleton-${idx}`} className="h-12 animate-pulse rounded-md bg-slate-100" />
+                    <div key={`skeleton-${idx}`} className="h-12 animate-pulse rounded-md bg-muted/60" />
                   ))}
                 </div>
               ) : null}
               {!loading && items.length === 0 ? (
-                <div className="rounded-md border border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+                <div className="rounded-md border border-border bg-muted p-4 text-sm text-muted-foreground">
                   No matching assets.
                 </div>
               ) : null}
@@ -284,23 +284,23 @@ export function MediaPickerSheet({
                           setOpen(false);
                         }}
                         className={[
-                          "flex w-full items-start justify-between gap-3 rounded-md px-3 py-2 text-left hover:bg-slate-50",
-                          selected ? "bg-slate-100" : "",
+                          "flex w-full items-start justify-between gap-3 rounded-md px-3 py-2 text-left hover:bg-accent",
+                          selected ? "bg-muted" : "",
                         ].join(" ")}
                       >
                         <div className="min-w-0">
-                          <p className="truncate text-sm font-medium text-slate-900">{item.name}</p>
-                          <p className="text-xs text-slate-500">
+                          <p className="truncate text-sm font-medium text-foreground">{item.name}</p>
+                          <p className="text-xs text-muted-foreground">
                             {item.type} | {formatBytes(item.sizeBytes)}
                           </p>
                         </div>
-                        {selected ? <span className="text-xs font-medium text-slate-700">Selected</span> : null}
+                        {selected ? <span className="text-xs font-medium text-foreground">Selected</span> : null}
                       </button>
                     );
                   })}
                 </div>
               ) : null}
-              {error ? <p className="text-sm text-red-600">{error}</p> : null}
+              {error ? <p className="text-sm text-destructive">{error}</p> : null}
             </div>
           </div>
         </div>

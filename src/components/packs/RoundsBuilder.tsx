@@ -81,7 +81,7 @@ type RoundFormValues = {
 
 function MetaPill({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs text-slate-600">
+    <span className="inline-flex items-center gap-1 rounded-full border border-border bg-muted px-2 py-0.5 text-xs text-muted-foreground">
       {children}
     </span>
   );
@@ -146,11 +146,12 @@ function RoundRow({
     >
       <Card
         className={cn(
-          "transition hover:border-slate-300",
-          reorderMode && "border-dashed border-slate-300 reorder-wiggle cursor-grab active:cursor-grabbing",
-          isDragging && "z-50 scale-[1.01] shadow-lg ring-2 ring-slate-200",
+          "transition hover:border-border/80",
+          reorderMode && "border-dashed border-border reorder-wiggle cursor-grab active:cursor-grabbing",
+          isDragging && "z-50 scale-[1.01] shadow-lg ring-2 ring-ring",
         )}
         {...(reorderMode ? { ...attributes, ...listeners } : {})}
+        data-testid="round-card"
       >
         <CardContent className="relative flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
           <Link
@@ -162,8 +163,8 @@ function RoundRow({
             {reorderMode ? (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-slate-200 bg-white text-slate-500 shadow-sm">
-                    <GripVerticalIcon className={cn("h-4 w-4", isDragging && "text-slate-900")} />
+                  <span className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-muted text-muted-foreground shadow-sm">
+                    <GripVerticalIcon className={cn("h-4 w-4", isDragging && "text-foreground")} />
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>{tPacks("dragToReorder")}</TooltipContent>
@@ -171,7 +172,7 @@ function RoundRow({
             ) : null}
             <div className="min-w-0 space-y-2">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="flex items-center gap-2 truncate text-base font-semibold text-slate-900">
+                <p className="flex items-center gap-2 truncate text-base font-semibold text-foreground">
                   {round.order}. {round.title}
                   {showDirty ? <span className="h-2 w-2 rounded-full bg-amber-400" /> : null}
                 </p>
@@ -183,14 +184,14 @@ function RoundRow({
                 <MetaPill>{tPacks("timerWithSeconds", { count: round.defaultTimerSec })}</MetaPill>
                 {round.recapEnabled ? <MetaPill>Recap</MetaPill> : null}
               </div>
-              <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+              <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span>{tPacks("questionsCount", { count: round._count.questions })}</span>
                 <span className="inline-flex items-center gap-1">
                   <MusicIcon className="h-3.5 w-3.5" aria-hidden />
                   <span className="max-w-[220px] truncate">{tPacks("noMusic")}</span>
                 </span>
               </div>
-              {round.description ? <p className="text-xs text-slate-500">{round.description}</p> : null}
+              {round.description ? <p className="text-xs text-muted-foreground">{round.description}</p> : null}
             </div>
           </div>
 
@@ -206,7 +207,7 @@ function RoundRow({
             <IconButton
               label={tPacks("deleteRound")}
               tooltip={tCommon("delete")}
-              className={cn("text-red-600 hover:text-red-700", reorderMode && "opacity-40")}
+              className={cn("text-destructive hover:text-destructive/80", reorderMode && "opacity-40")}
               disabled={pendingAction !== null || reorderMode}
               onPointerDown={(event) => event.stopPropagation()}
               onClick={onDelete}
@@ -336,13 +337,13 @@ function RoundFormDialog({
             {mode === "edit" ? <input type="hidden" {...form.register("roundId")} /> : null}
 
             <div className="space-y-3">
-              <SettingsSectionCard
-                icon={SlidersIcon}
-                title="Basics"
-                subtitle="Round title and description."
-              >
+                <SettingsSectionCard
+                  icon={SlidersIcon}
+                  title="Basics"
+                  subtitle="Round title and description."
+                >
                 <div className="space-y-2">
-                  <Label htmlFor={`${mode}-round-title`} className="text-sm text-slate-500">Title</Label>
+                  <Label htmlFor={`${mode}-round-title`} className="text-sm text-muted-foreground">Title</Label>
                   <Input
                     id={`${mode}-round-title`}
                     {...form.register("title")}
@@ -350,11 +351,11 @@ function RoundFormDialog({
                     aria-invalid={form.formState.errors.title ? "true" : "false"}
                     className="h-10"
                   />
-                  {form.formState.errors.title ? <p className="text-xs text-red-600">{form.formState.errors.title.message}</p> : null}
+                  {form.formState.errors.title ? <p className="text-xs text-destructive">{form.formState.errors.title.message}</p> : null}
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor={`${mode}-round-description`} className="text-sm text-slate-500">Description</Label>
+                  <Label htmlFor={`${mode}-round-description`} className="text-sm text-muted-foreground">Description</Label>
                   <Input
                     id={`${mode}-round-description`}
                     {...form.register("description")}
@@ -364,7 +365,7 @@ function RoundFormDialog({
                     className="h-10"
                   />
                   {form.formState.errors.description ? (
-                    <p className="text-xs text-red-600">{form.formState.errors.description.message as string}</p>
+                    <p className="text-xs text-destructive">{form.formState.errors.description.message as string}</p>
                   ) : null}
                 </div>
               </SettingsSectionCard>
@@ -376,13 +377,13 @@ function RoundFormDialog({
               >
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor={`${mode}-round-type`} className="text-sm text-slate-500">Default question type</Label>
+                    <Label htmlFor={`${mode}-round-type`} className="text-sm text-muted-foreground">Default question type</Label>
                     <select
                       id={`${mode}-round-type`}
                       value={selectedType}
                       onChange={(e) => onTypeChange(questionTypeSchema.parse(e.target.value))}
                       disabled={isPending}
-                      className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900"
+                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
                     >
                       {questionTypeSchema.options.map((type) => (
                         <option key={type} value={type}>
@@ -392,7 +393,7 @@ function RoundFormDialog({
                     </select>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor={`${mode}-round-timer`} className="text-sm text-slate-500">Default timer (sec)</Label>
+                    <Label htmlFor={`${mode}-round-timer`} className="text-sm text-muted-foreground">Default timer (sec)</Label>
                     <Input
                       id={`${mode}-round-timer`}
                       type="number"
@@ -403,7 +404,7 @@ function RoundFormDialog({
                       className="h-10"
                     />
                     {form.formState.errors.defaultTimerSec ? (
-                      <p className="text-xs text-red-600">{form.formState.errors.defaultTimerSec.message}</p>
+                      <p className="text-xs text-destructive">{form.formState.errors.defaultTimerSec.message}</p>
                     ) : null}
                   </div>
                 </div>
@@ -420,7 +421,7 @@ function RoundFormDialog({
               ]}
             />
             {showSchemaError ? (
-              <p className="text-xs text-red-600">Form schema is missing. Check round form setup.</p>
+              <p className="text-xs text-destructive">Form schema is missing. Check round form setup.</p>
             ) : null}
 
             <div className="flex items-center justify-between">
@@ -580,9 +581,9 @@ export function RoundsBuilder({
       <section className="space-y-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-slate-900">{tPacks("tabs.rounds")}</h2>
-            <span className="text-sm text-slate-500">{tPacks("roundsTotal", { count: rounds.length })}</span>
-            {reorderMode ? <span className="text-xs text-slate-500">{tPacks("dragRoundsToReorder")}</span> : null}
+            <h2 className="text-lg font-semibold text-foreground">{tPacks("tabs.rounds")}</h2>
+            <span className="text-sm text-muted-foreground">{tPacks("roundsTotal", { count: rounds.length })}</span>
+            {reorderMode ? <span className="text-xs text-muted-foreground">{tPacks("dragRoundsToReorder")}</span> : null}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Button
@@ -617,11 +618,11 @@ export function RoundsBuilder({
       {rounds.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="p-6 text-center">
-            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
               <ListChecksIcon className="h-4 w-4" />
             </div>
-            <p className="mt-3 text-sm font-medium text-slate-900">{tPacks("emptyRoundsTitle")}</p>
-            <p className="mt-1 text-sm text-slate-600">{tPacks("emptyRoundsDescription")}</p>
+            <p className="mt-3 text-sm font-medium text-foreground">{tPacks("emptyRoundsTitle")}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{tPacks("emptyRoundsDescription")}</p>
             <Button type="button" className="mt-4" onClick={() => setCreateOpen(true)}>
               <PlusIcon className="mr-2 h-4 w-4" aria-hidden />
               {tPacks("addRound")}
@@ -649,7 +650,7 @@ export function RoundsBuilder({
           onDragCancel={() => setActiveId(null)}
         >
           <SortableContext items={orderedRounds.map((round) => round.id)} strategy={verticalListSortingStrategy}>
-            <motion.div layout className={cn("space-y-2", reorderMode && "rounded-lg border border-dashed border-slate-200 p-2")}>
+            <motion.div layout className={cn("space-y-2", reorderMode && "rounded-lg border border-dashed border-border p-2")}>
               <AnimatePresence initial={false}>
                 {orderedRounds.map((round, index) => {
                   const showDirty = editRound?.id === round.id && editDirty;
@@ -711,7 +712,7 @@ export function RoundsBuilder({
             <AlertDialogAction asChild>
               <Button
                 type="button"
-                className="bg-red-700 text-white hover:bg-red-800"
+                className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 disabled={pendingAction !== null}
                 onClick={confirmDelete}
               >

@@ -21,7 +21,7 @@ function NotAuthorized({ locale, tCommon, tPacks, tPresenter }: { locale: AppLoc
           { label: tPresenter("title") },
         ]}
       />
-      <Link href={localizeHref(locale, "/app/packs")} className="text-sm font-medium text-slate-900 underline">
+      <Link href={localizeHref(locale, "/app/packs")} className="text-sm font-medium text-foreground underline">
         {tPacks("backToPacks")}
       </Link>
     </div>
@@ -53,9 +53,12 @@ function EmptyPresenterState({
           { label: tPresenter("title") },
         ]}
       />
-      <div className="flex min-h-[50vh] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
-        <h2 className="text-2xl font-semibold text-slate-900">{tPresenter("emptyTitle")}</h2>
-        <p className="mt-2 text-sm text-slate-600">
+      <div
+        className="flex min-h-[50vh] flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-card p-8 text-center"
+        data-testid="presenter-empty-card"
+      >
+        <h2 className="text-2xl font-semibold text-foreground">{tPresenter("emptyTitle")}</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
           {tPresenter("emptyDescription")}
         </p>
         <Button asChild className="mt-5">

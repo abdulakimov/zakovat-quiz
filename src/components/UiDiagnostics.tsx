@@ -50,15 +50,15 @@ export function UiDiagnostics() {
   }
 
   return (
-    <div className="fixed bottom-3 right-3 z-[1000] max-w-xs rounded-md border border-slate-300 bg-white/95 p-3 text-xs text-slate-700 shadow-lg backdrop-blur">
-      <p className="font-semibold text-slate-900">UI diagnostics</p>
+    <div className="fixed bottom-3 right-3 z-[1000] max-w-xs rounded-md border border-border bg-popover/95 p-3 text-xs text-popover-foreground shadow-lg backdrop-blur">
+      <p className="font-semibold text-foreground">UI diagnostics</p>
       <p>host: {snapshot.host}</p>
       <p>devicePixelRatio: {snapshot.dpr}</p>
       <p>html font-size: {snapshot.htmlFontSize}</p>
       <p>body font-size: {snapshot.bodyFontSize}</p>
       <p>body font-family: {snapshot.bodyFontFamily}</p>
       <p>body line-height: {snapshot.bodyLineHeight}</p>
-      <p className="mt-2 text-[11px] text-slate-500">
+      <p className="mt-2 text-[11px] text-muted-foreground">
         If devicePixelRatio differs, reset Chrome zoom to 100% (Ctrl+0).
       </p>
     </div>

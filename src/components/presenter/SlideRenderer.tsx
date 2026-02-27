@@ -16,15 +16,15 @@ function QuestionText({ question }: { question: QuestionSlide }) {
   const letters = ["A", "B", "C", "D"];
   return (
     <div className="space-y-6">
-      <div className="text-sm text-slate-500">Q{question.questionOrder}</div>
-      <p className="whitespace-pre-wrap text-3xl font-semibold leading-relaxed text-slate-900 sm:text-4xl">
+      <div className="text-sm text-muted-foreground">Q{question.questionOrder}</div>
+      <p className="whitespace-pre-wrap text-3xl font-semibold leading-relaxed text-foreground sm:text-4xl">
         {question.text}
       </p>
       {question.questionType === "OPTIONS" ? (
         <div className="grid gap-3 sm:grid-cols-2">
           {question.options.map((opt, idx) => (
-            <div key={opt.order} className="rounded-lg border border-slate-200 px-4 py-3 text-lg text-slate-800">
-              <span className="mr-2 text-xs font-semibold text-slate-400">{letters[idx] ?? opt.order}</span>
+            <div key={opt.order} className="rounded-lg border border-border px-4 py-3 text-lg text-foreground">
+              <span className="mr-2 text-xs font-semibold text-muted-foreground">{letters[idx] ?? opt.order}</span>
               {opt.text}
             </div>
           ))}
@@ -87,33 +87,33 @@ export function SlideRenderer({
 
       {item.kind === "ROUND_INTRO" ? (
         <div className="flex h-full flex-col items-center justify-center text-center">
-          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">{tPresenter("phaseRound")}</p>
-          <h1 className="mt-3 text-4xl font-semibold text-slate-900 sm:text-6xl">{roundTitle}</h1>
+          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{tPresenter("phaseRound")}</p>
+          <h1 className="mt-3 text-4xl font-semibold text-foreground sm:text-6xl">{roundTitle}</h1>
         </div>
       ) : null}
 
       {item.kind === "RECAP_INTRO" ? (
         <div className="flex h-full flex-col items-center justify-center text-center">
-          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">{tPresenter("phaseRecap")}</p>
-          <h2 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-5xl">{tPresenter("recapTitle")}</h2>
-          <p className="mt-3 text-sm text-slate-500">{roundTitle}</p>
+          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{tPresenter("phaseRecap")}</p>
+          <h2 className="mt-3 text-3xl font-semibold text-foreground sm:text-5xl">{tPresenter("recapTitle")}</h2>
+          <p className="mt-3 text-sm text-muted-foreground">{roundTitle}</p>
         </div>
       ) : null}
 
       {item.kind === "WRITE_ANSWERS" ? (
         <div className="flex h-full flex-col items-center justify-center text-center">
-          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">{tPresenter("phaseWrite")}</p>
-          <h2 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-5xl">{tPresenter("writeAnswersTitle")}</h2>
-          <p className="mt-3 text-sm text-slate-500">{roundTitle}</p>
-          <p className="mt-2 text-2xl text-slate-900">{tPresenter("seconds", { count: writeDurationSec })}</p>
+          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{tPresenter("phaseWrite")}</p>
+          <h2 className="mt-3 text-3xl font-semibold text-foreground sm:text-5xl">{tPresenter("writeAnswersTitle")}</h2>
+          <p className="mt-3 text-sm text-muted-foreground">{roundTitle}</p>
+          <p className="mt-2 text-2xl text-foreground">{tPresenter("seconds", { count: writeDurationSec })}</p>
         </div>
       ) : null}
 
       {item.kind === "REVEAL_INTRO" ? (
         <div className="flex h-full flex-col items-center justify-center text-center">
-          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">{tPresenter("phaseReveal")}</p>
-          <h2 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-5xl">{tPresenter("revealTitle")}</h2>
-          <p className="mt-3 text-sm text-slate-500">{roundTitle}</p>
+          <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">{tPresenter("phaseReveal")}</p>
+          <h2 className="mt-3 text-3xl font-semibold text-foreground sm:text-5xl">{tPresenter("revealTitle")}</h2>
+          <p className="mt-3 text-sm text-muted-foreground">{roundTitle}</p>
         </div>
       ) : null}
 
@@ -124,11 +124,11 @@ export function SlideRenderer({
 
             {item.kind === "REVEAL_ANSWER" ? (
               <div className="mt-8 space-y-2">
-                <p className="text-xs text-slate-500">{tPresenter("answer")}</p>
-                <p className="text-2xl font-semibold text-slate-900">
+                <p className="text-xs text-muted-foreground">{tPresenter("answer")}</p>
+                <p className="text-2xl font-semibold text-foreground">
                   {question?.answerText ?? question?.answer ?? ""}
                 </p>
-                {question?.explanation ? <p className="text-sm text-slate-500">{question.explanation}</p> : null}
+                {question?.explanation ? <p className="text-sm text-muted-foreground">{question.explanation}</p> : null}
               </div>
             ) : null}
           </div>

@@ -206,13 +206,13 @@ export function PackSettingsCard({ pack, audioAssets }: Props) {
             >
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <Label htmlFor="pack-question-timer-preset" className="text-sm text-slate-500">
+                  <Label htmlFor="pack-question-timer-preset" className="text-sm text-muted-foreground">
                     {tPacks("settings.questionTimerPreset")}
                   </Label>
                   <select
                     id="pack-question-timer-preset"
                     disabled={isPending}
-                    className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm"
+                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
                     value={form.watch("defaultQuestionTimerPresetSec") == null ? "" : String(form.watch("defaultQuestionTimerPresetSec"))}
                     onChange={(e) => {
                       const next = e.target.value === "" ? null : Number(e.target.value);
@@ -226,11 +226,11 @@ export function PackSettingsCard({ pack, audioAssets }: Props) {
                     <option value="60">{tPacks("settings.secondsOption", { count: 60 })}</option>
                   </select>
                   {form.formState.errors.defaultQuestionTimerPresetSec ? (
-                    <p className="text-xs text-red-600">{form.formState.errors.defaultQuestionTimerPresetSec.message as string}</p>
+                    <p className="text-xs text-destructive">{form.formState.errors.defaultQuestionTimerPresetSec.message as string}</p>
                   ) : null}
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="pack-break-timer" className="text-sm text-slate-500">
+                  <Label htmlFor="pack-break-timer" className="text-sm text-muted-foreground">
                     {tPacks("settings.writeAnswersTime")}
                   </Label>
                   <Input
@@ -242,7 +242,7 @@ export function PackSettingsCard({ pack, audioAssets }: Props) {
                     disabled={isPending}
                   />
                   {form.formState.errors.breakTimerSec ? (
-                    <p className="text-xs text-red-600">{form.formState.errors.breakTimerSec.message}</p>
+                    <p className="text-xs text-destructive">{form.formState.errors.breakTimerSec.message}</p>
                   ) : null}
                 </div>
               </div>
@@ -280,14 +280,14 @@ export function PackSettingsCard({ pack, audioAssets }: Props) {
                   setSelectedTimerAudio(asset);
                 }}
               />
-              <div className="flex items-center gap-2 text-xs text-slate-500">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 {timerMusicName ? (
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <div className="flex max-w-full items-center gap-2">
                           <MusicIcon className="h-3.5 w-3.5" aria-hidden />
-                          <span className="max-w-[200px] truncate text-slate-700">{timerMusicName}</span>
+                          <span className="max-w-[200px] truncate text-foreground">{timerMusicName}</span>
                         </div>
                       </TooltipTrigger>
                       <TooltipContent>{timerMusicName}</TooltipContent>
@@ -311,7 +311,7 @@ export function PackSettingsCard({ pack, audioAssets }: Props) {
           />
 
           {form.formState.isDirty && !form.formState.isValid ? (
-            <p className="text-xs text-red-600">{tPacks("settings.fixValidationErrors")}</p>
+            <p className="text-xs text-destructive">{tPacks("settings.fixValidationErrors")}</p>
           ) : null}
 
           <StickySaveBar

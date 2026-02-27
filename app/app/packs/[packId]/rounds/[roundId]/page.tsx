@@ -21,7 +21,7 @@ async function NotAuthorized({ locale }: { locale: AppLocale }) {
           { label: tCommon("notAuthorized") },
         ]}
       />
-      <Link href={localizeHref(locale, "/app/packs")} className="text-sm font-medium text-slate-900 underline">
+      <Link href={localizeHref(locale, "/app/packs")} className="text-sm font-medium text-foreground underline">
         {tPacks("backToPacks")}
       </Link>
     </div>

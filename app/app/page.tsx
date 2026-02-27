@@ -20,10 +20,10 @@ export default async function AppHomePage() {
         breadcrumbs={[{ label: tCommon("app") }]}
       />
       <div className="flex flex-wrap gap-4 text-sm">
-        <Link className="font-medium text-slate-900 underline" href={localizeHref(locale, "/app/teams")}>
+        <Link className="font-medium text-foreground underline" href={localizeHref(locale, "/app/teams")}>
           {tNav("teams")}
         </Link>
-        <Link className="font-medium text-slate-900 underline" href={localizeHref(locale, "/app/profile")}>
+        <Link className="font-medium text-foreground underline" href={localizeHref(locale, "/app/profile")}>
           {tCommon("profile")}
         </Link>
       </div>

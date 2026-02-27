@@ -120,12 +120,12 @@ export function InviteMemberForm({ teamId }: { teamId: string }) {
   });
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" noValidate>
+    <form onSubmit={onSubmit} className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm" noValidate>
       <div className="space-y-2">
-        <Label htmlFor="invite-username-or-email" className="text-sm text-slate-500">{tTeams("inviteMember")}</Label>
+        <Label htmlFor="invite-username-or-email" className="text-sm text-muted-foreground">{tTeams("inviteMember")}</Label>
 
         {selectedUser ? (
-          <div className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-2">
+          <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-muted p-2">
             <Badge variant="secondary" className="rounded-md px-2 py-1">
               {tTeams("selectedUser")}
             </Badge>
@@ -134,10 +134,10 @@ export function InviteMemberForm({ teamId }: { teamId: string }) {
                 <AvatarFallback className="text-[10px]">{initials(selectedUser.name ?? selectedUser.username)}</AvatarFallback>
               </Avatar>
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-slate-900">
+                <p className="truncate text-sm font-medium text-foreground">
                   {selectedUser.name ?? selectedUser.username}
                 </p>
-                <p className="truncate text-xs text-slate-500">
+                <p className="truncate text-xs text-muted-foreground">
                   @{selectedUser.username} - {selectedUser.email}
                 </p>
               </div>
@@ -203,10 +203,10 @@ export function InviteMemberForm({ teamId }: { teamId: string }) {
                             <AvatarFallback className="text-[10px]">{initials(user.name ?? user.username)}</AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-medium text-slate-900">
+                            <p className="truncate text-sm font-medium text-foreground">
                               {user.name ?? user.username}
                             </p>
-                            <p className="truncate text-xs text-slate-500">
+                            <p className="truncate text-xs text-muted-foreground">
                               @{user.username} - {user.email}
                             </p>
                           </div>
@@ -221,17 +221,17 @@ export function InviteMemberForm({ teamId }: { teamId: string }) {
         </Popover>
 
         {form.formState.errors.usernameOrEmail ? (
-          <p className="text-xs text-red-600" role="alert">
+          <p className="text-xs text-destructive" role="alert">
             {form.formState.errors.usernameOrEmail.message}
           </p>
         ) : null}
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-muted-foreground">
           {tTeams("inviteHint")}
         </p>
       </div>
 
       <FormErrorSummary serverError={serverState.error} errors={[form.formState.errors.usernameOrEmail?.message]} />
-      {serverState.success ? <p className="text-sm text-green-700">{serverState.success}</p> : null}
+      {serverState.success ? <p className="text-sm text-primary">{serverState.success}</p> : null}
 
       <Button type="submit" disabled={!canSubmit}>
         {isPending ? tTeams("sending") : tTeams("sendInvite")}

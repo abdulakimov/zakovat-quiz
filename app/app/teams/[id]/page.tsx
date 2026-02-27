@@ -53,7 +53,7 @@ function NotAuthorizedState({ locale, tCommon, tTeams }: { locale: AppLocale; tC
           { label: tCommon("notAuthorized") },
         ]}
       />
-      <Link href={localizeHref(locale, "/app/teams")} className="text-sm font-medium text-slate-900 underline">
+      <Link href={localizeHref(locale, "/app/teams")} className="text-sm font-medium text-foreground underline">
         {tTeams("backToTeams")}
       </Link>
     </div>
@@ -87,7 +87,7 @@ export default async function TeamDetailPage({
             { label: tTeams("teamNotFound") },
           ]}
         />
-        <Link href={localizeHref(locale, "/app/teams")} className="text-sm font-medium text-slate-900 underline">
+        <Link href={localizeHref(locale, "/app/teams")} className="text-sm font-medium text-foreground underline">
           {tTeams("backToTeams")}
         </Link>
       </div>
@@ -103,13 +103,13 @@ export default async function TeamDetailPage({
       content: (
         <div className="space-y-6">
           <section className="space-y-3">
-            <h2 className="text-lg font-semibold text-slate-900">{tTeams("membersTab")}</h2>
+            <h2 className="text-lg font-semibold text-foreground">{tTeams("membersTab")}</h2>
             {team.members.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-600">
+              <div className="rounded-xl border border-dashed border-border bg-card p-6 text-sm text-muted-foreground" data-testid="team-members-card">
                 {tTeams("noActiveMembers")}
               </div>
             ) : (
-              <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+              <div className="space-y-2 rounded-xl border border-border bg-card p-4 shadow-sm" data-testid="team-members-card">
                 {team.members.map((member: TeamMember) => (
                   <div
                     key={member.id}
@@ -120,8 +120,8 @@ export default async function TeamDetailPage({
                         <AvatarFallback>{initials(member.user.name ?? member.user.username)}</AvatarFallback>
                       </Avatar>
                       <div className="min-w-0">
-                        <p className="truncate font-medium text-slate-900">{member.user.name ?? member.user.username}</p>
-                        <p className="truncate text-sm text-slate-500">
+                        <p className="truncate font-medium text-foreground">{member.user.name ?? member.user.username}</p>
+                        <p className="truncate text-sm text-muted-foreground">
                           @{member.user.username} - {member.user.email}
                         </p>
                       </div>
@@ -148,42 +148,42 @@ export default async function TeamDetailPage({
             <>
               <Separator />
               <section className="space-y-3">
-                <h2 className="text-lg font-semibold text-slate-900">{tTeams("inviteMember")}</h2>
+                <h2 className="text-lg font-semibold text-foreground">{tTeams("inviteMember")}</h2>
                 <InviteMemberForm teamId={team.id} />
               </section>
 
               <Separator />
               <section className="space-y-3">
-                <h2 className="text-lg font-semibold text-slate-900">{tTeams("pendingInvites")}</h2>
+                <h2 className="text-lg font-semibold text-foreground">{tTeams("pendingInvites")}</h2>
                 {team.invites.length === 0 ? (
-                  <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-center">
-                    <div className="mx-auto mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+                  <div className="rounded-xl border border-dashed border-border bg-card p-6 text-center" data-testid="team-invites-card">
+                    <div className="mx-auto mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
                       <UserPlusIcon className="h-5 w-5" />
                     </div>
-                    <p className="text-sm font-medium text-slate-900">{tTeams("noPendingInvites")}</p>
-                    <p className="mt-1 text-sm text-slate-600">{tTeams("inviteTeammatesHint")}</p>
+                    <p className="text-sm font-medium text-foreground">{tTeams("noPendingInvites")}</p>
+                    <p className="mt-1 text-sm text-muted-foreground">{tTeams("inviteTeammatesHint")}</p>
                   </div>
                 ) : (
-                  <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <div className="space-y-2 rounded-xl border border-border bg-card p-4 shadow-sm" data-testid="team-invites-card">
                     {team.invites.map((invite: TeamInvite) => (
                       <div
                         key={invite.id}
-                        className="flex flex-col gap-3 rounded-lg border border-slate-100 p-3 sm:flex-row sm:items-center sm:justify-between"
+                        className="flex flex-col gap-3 rounded-lg border border-border/60 p-3 sm:flex-row sm:items-center sm:justify-between"
                       >
                         <div className="flex min-w-0 items-center gap-3">
                           <Avatar className="h-9 w-9">
                             <AvatarFallback>{initials(invite.invitedUser.name ?? invite.invitedUser.username)}</AvatarFallback>
                           </Avatar>
                           <div className="min-w-0">
-                            <p className="truncate font-medium text-slate-900">
+                            <p className="truncate font-medium text-foreground">
                               {invite.invitedUser.name ?? invite.invitedUser.username}
                             </p>
-                            <p className="truncate text-sm text-slate-500">
+                            <p className="truncate text-sm text-muted-foreground">
                               @{invite.invitedUser.username} - {invite.invitedUser.email}
                             </p>
                             <div className="mt-1 flex flex-wrap items-center gap-2">
                               <Badge variant="secondary">{tTeams("pendingBadge")}</Badge>
-                              <span className="text-xs text-slate-500">{expiresInLabel(invite.expiresAt, tTeams)}</span>
+                              <span className="text-xs text-muted-foreground">{expiresInLabel(invite.expiresAt, tTeams)}</span>
                             </div>
                           </div>
                         </div>
@@ -208,7 +208,7 @@ export default async function TeamDetailPage({
           icon: "settings",
           content: (
             <section className="space-y-3">
-              <h2 className="text-lg font-semibold text-slate-900">{tTeams("teamSettings")}</h2>
+              <h2 className="text-lg font-semibold text-foreground">{tTeams("teamSettings")}</h2>
               <TeamSettingsCard
                 team={{
                   id: team.id,
@@ -227,9 +227,9 @@ export default async function TeamDetailPage({
           icon: "danger",
           content: (
             <section className="space-y-3">
-              <h2 className="text-lg font-semibold text-red-700">{tTeams("dangerZone")}</h2>
-              <div className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm leading-6 text-red-700">
+              <h2 className="text-lg font-semibold text-destructive">{tTeams("dangerZone")}</h2>
+              <div className="flex flex-col gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+                <p className="text-sm leading-6 text-destructive">
                   {tTeams("deleteTeamHint")}
                 </p>
                 <div className="shrink-0">

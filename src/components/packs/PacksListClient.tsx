@@ -54,8 +54,8 @@ export function PacksListClient({ packs }: { packs: PackListItem[] }) {
               <BoxIcon className="h-5 w-5" />
             </div>
             <div className="space-y-1">
-              <p className="font-medium text-slate-900">{tPacks("empty.title")}</p>
-              <p className="text-sm text-slate-600">{tPacks("empty.description")}</p>
+              <p className="font-medium text-foreground">{tPacks("empty.title")}</p>
+              <p className="text-sm text-muted-foreground">{tPacks("empty.description")}</p>
             </div>
             <CreatePackDialog />
           </CardContent>
@@ -66,30 +66,30 @@ export function PacksListClient({ packs }: { packs: PackListItem[] }) {
             <div className={`inline-flex h-10 w-10 items-center justify-center rounded-full ${accent.background} ${accent.icon}`}>
               <BoxIcon className="h-4 w-4" />
             </div>
-            <p className="text-sm text-slate-600">{tPacks("searchEmpty")}</p>
+            <p className="text-sm text-muted-foreground">{tPacks("searchEmpty")}</p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map((pack) => (
             <Link key={pack.id} href={localizeHref(locale, `/app/packs/${pack.id}`)} className="block">
-              <Card className="h-full transition hover:border-slate-300">
+              <Card className="h-full transition hover:border-border/80" data-testid="packs-card">
                 <CardContent className="space-y-3 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3">
                       <div className={`inline-flex h-9 w-9 items-center justify-center rounded-full ${accent.background} ${accent.icon}`}>
                         <BoxIcon className="h-4 w-4" />
                       </div>
-                      <p className="line-clamp-2 text-base font-semibold text-slate-900">{pack.title}</p>
+                      <p className="line-clamp-2 text-base font-semibold text-foreground">{pack.title}</p>
                     </div>
                     <PackVisibilityBadge visibility={pack.visibility} />
                   </div>
                   {pack.description ? (
-                    <p className="line-clamp-2 text-sm text-slate-600">{pack.description}</p>
+                    <p className="line-clamp-2 text-sm text-muted-foreground">{pack.description}</p>
                   ) : (
-                    <p className="text-sm text-slate-400">{tPacks("noDescription")}</p>
+                    <p className="text-sm text-muted-foreground/70">{tPacks("noDescription")}</p>
                   )}
-                  <div className="flex items-center justify-between text-xs text-slate-500">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>{tPacks("roundsCount", { count: pack.roundsCount })}</span>
                     <span>{tPacks("updatedAt", { date: pack.updatedAtLabel })}</span>
                   </div>

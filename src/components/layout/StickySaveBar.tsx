@@ -26,12 +26,12 @@ export function StickySaveBar({
   return (
     <div
       className={cn(
-        "fixed inset-x-0 bottom-0 z-30 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur md:static md:border md:border-slate-200 md:rounded-lg",
+        "fixed inset-x-0 bottom-0 z-30 border-t border-border bg-background/95 px-4 py-3 backdrop-blur md:static md:border md:border-border md:rounded-lg",
         className,
       )}
     >
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <p className="text-sm text-slate-600">{tCommon("unsavedChanges")}</p>
+        <p className="text-sm text-muted-foreground">{tCommon("unsavedChanges")}</p>
         <div className="flex items-center gap-2">
           {onCancel ? (
             <Button type="button" variant="outline" size="sm" disabled={pending} onClick={onCancel}>

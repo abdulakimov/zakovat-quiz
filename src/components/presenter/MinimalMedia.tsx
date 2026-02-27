@@ -34,21 +34,20 @@ export function MinimalMedia({
           data-clip-media
           src={media.url}
           controls
-          className="w-full rounded-md border border-slate-200 bg-white"
+          className="w-full rounded-md border border-border bg-background"
         />
-        {hint ? <p className="mt-2 text-xs text-slate-500">{hint}</p> : null}
+        {hint ? <p className="mt-2 text-xs text-muted-foreground">{hint}</p> : null}
       </div>
     );
   }
 
   return (
     <div className={cn("w-full", className)}>
-      <div className="flex items-center gap-2 rounded-md border border-slate-200 px-3 py-2">
-        <PlayIcon className="h-4 w-4 text-slate-500" aria-hidden />
+      <div className="flex items-center gap-2 rounded-md border border-border px-3 py-2">
+        <PlayIcon className="h-4 w-4 text-muted-foreground" aria-hidden />
         <audio ref={setClipRef} data-clip-media src={media.url} controls className="w-full" />
       </div>
-      {hint ? <p className="mt-2 text-xs text-slate-500">{hint}</p> : null}
+      {hint ? <p className="mt-2 text-xs text-muted-foreground">{hint}</p> : null}
     </div>
   );
 }
-

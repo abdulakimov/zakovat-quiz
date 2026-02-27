@@ -151,6 +151,6 @@ test("Questions reorder mode persists after refresh", async ({ page }) => {
   await page.getByRole("button", { name: /^done$/i }).click();
   await page.reload();
 
-  const rows = await page.locator("p.truncate.font-medium.text-slate-900").allTextContents();
+  const rows = await page.locator("p.truncate.font-medium.text-foreground").allTextContents();
   expect(rows.slice(0, 2)).toEqual(["1. Question two text", "2. Question one text"]);
 });

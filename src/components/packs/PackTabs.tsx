@@ -36,14 +36,14 @@ export function PackTabs({ rounds, settings }: PackTabsProps) {
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-3">
-        <div className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-200 bg-white p-1 text-slate-600">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-3">
+        <div className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-background p-1 text-muted-foreground">
           <button
             type="button"
             onClick={() => handleChange("rounds")}
             className={cn(
               "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition",
-              value === "rounds" ? "bg-slate-900 text-white" : "text-slate-600",
+              value === "rounds" ? "bg-primary text-primary-foreground" : "text-muted-foreground",
             )}
           >
             Rounds
@@ -53,7 +53,7 @@ export function PackTabs({ rounds, settings }: PackTabsProps) {
             onClick={() => handleChange("settings")}
             className={cn(
               "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium transition",
-              value === "settings" ? "bg-slate-900 text-white" : "text-slate-600",
+              value === "settings" ? "bg-primary text-primary-foreground" : "text-muted-foreground",
             )}
           >
             Settings

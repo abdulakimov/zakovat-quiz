@@ -70,7 +70,7 @@ export function DeleteTeamButton({ teamId, teamName }: DeleteTeamButtonProps) {
           type="button"
           variant="outline"
           size="sm"
-          className="border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800"
+          className="border-destructive/40 text-destructive hover:bg-destructive/10"
         >
           {tTeams("deleteTeam")}
         </Button>
@@ -78,14 +78,14 @@ export function DeleteTeamButton({ teamId, teamName }: DeleteTeamButtonProps) {
 
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-red-700">{tTeams("deleteTeamConfirmTitle")}</AlertDialogTitle>
+          <AlertDialogTitle className="text-destructive">{tTeams("deleteTeamConfirmTitle")}</AlertDialogTitle>
           <AlertDialogDescription>
             {tTeams("deleteTeamConfirmDescription")}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <div className="space-y-2">
-          <Label htmlFor="delete-team-confirm" className="text-sm text-slate-700">
+          <Label htmlFor="delete-team-confirm" className="text-sm text-muted-foreground">
             {tTeams("typeToConfirm", { teamName })}
           </Label>
           <Input
@@ -95,7 +95,7 @@ export function DeleteTeamButton({ teamId, teamName }: DeleteTeamButtonProps) {
             placeholder={teamName}
             autoComplete="off"
             disabled={isSubmitting}
-            className="border-red-200 focus-visible:ring-red-300"
+            className="border-destructive/40 focus-visible:ring-destructive"
           />
         </div>
 
@@ -111,7 +111,7 @@ export function DeleteTeamButton({ teamId, teamName }: DeleteTeamButtonProps) {
               size="sm"
               disabled={!isConfirmed || isSubmitting}
               onClick={submitDelete}
-              className="bg-red-700 text-white hover:bg-red-800"
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {isSubmitting ? tTeams("deleting") : tTeams("deletePermanently")}
             </Button>

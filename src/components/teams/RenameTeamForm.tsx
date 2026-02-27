@@ -39,7 +39,7 @@ export function RenameTeamForm({ teamId, initialName }: Props) {
   });
 
   return (
-    <form onSubmit={onSubmit} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" noValidate>
+    <form onSubmit={onSubmit} className="space-y-3 rounded-xl border border-border bg-card p-4 shadow-sm" noValidate>
       <FormFieldText
         id="rename-team-name"
         name="name"

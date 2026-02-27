@@ -38,14 +38,14 @@ function formatBytes(bytes?: number | null) {
 
 function MediaThumb({ asset }: { asset: MediaPickerAsset | null }) {
   if (!asset) {
-    return <div className="rounded-md border border-dashed border-slate-200 p-3 text-xs text-slate-500">No media selected</div>;
+    return <div className="rounded-md border border-dashed border-border p-3 text-xs text-muted-foreground">No media selected</div>;
   }
   if (asset.type === "IMAGE") {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={asset.url} alt={asset.name} className="max-h-40 rounded-md border border-slate-200 object-contain" />;
+    return <img src={asset.url} alt={asset.name} className="max-h-40 rounded-md border border-border object-contain" />;
   }
   if (asset.type === "VIDEO") {
-    return <video controls src={asset.url} className="max-h-48 w-full rounded-md border border-slate-200" />;
+    return <video controls src={asset.url} className="max-h-48 w-full rounded-md border border-border" />;
   }
   return <audio controls src={asset.url} className="w-full" />;
 }
@@ -118,15 +118,15 @@ export function PrimaryMediaPicker({
   const selected = value ?? uploadedAsset;
 
   return (
-    <div className="space-y-3 rounded-lg border border-slate-200 p-3">
+    <div className="space-y-3 rounded-lg border border-border p-3">
       <div className="flex items-center justify-between gap-2">
         <div>
-          <p className="text-sm font-medium text-slate-900">{title}</p>
-          <p className="text-xs text-slate-500">
+          <p className="text-sm font-medium text-foreground">{title}</p>
+          <p className="text-xs text-muted-foreground">
             {description ?? `Upload a new ${allowed.toLowerCase()} or pick from your library.`}
           </p>
         </div>
-        <div className="inline-flex rounded-md border border-slate-200 p-0.5">
+        <div className="inline-flex rounded-md border border-border p-0.5">
           <Button
             type="button"
             variant={tab === "upload" ? "default" : "ghost"}
@@ -169,7 +169,7 @@ export function PrimaryMediaPicker({
             }}
             onError={(message) => setError(message)}
           />
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted-foreground">
             {allowed === "IMAGE" ? "JPEG/PNG/WEBP up to 3MB." : allowed === "AUDIO" ? "Audio up to 15MB." : "Video up to 40MB."}
           </p>
         </div>
@@ -187,9 +187,9 @@ export function PrimaryMediaPicker({
               disabled={disabled}
             />
           </div>
-          <div className="max-h-56 space-y-1 overflow-y-auto rounded-md border border-slate-200 p-2">
-            {loading ? <p className="text-sm text-slate-500">Loading media...</p> : null}
-            {!loading && items.length === 0 ? <p className="text-sm text-slate-500">No matching assets.</p> : null}
+          <div className="max-h-56 space-y-1 overflow-y-auto rounded-md border border-border p-2">
+            {loading ? <p className="text-sm text-muted-foreground">Loading media...</p> : null}
+            {!loading && items.length === 0 ? <p className="text-sm text-muted-foreground">No matching assets.</p> : null}
             {items.map((item) => (
               <button
                 key={item.id}
@@ -197,25 +197,25 @@ export function PrimaryMediaPicker({
                 disabled={disabled}
                 onClick={() => onChange(item.id, item)}
                 className={[
-                  "flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm hover:bg-slate-50",
-                  value?.id === item.id ? "bg-slate-100" : "",
+                  "flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm hover:bg-accent",
+                  value?.id === item.id ? "bg-muted" : "",
                 ].join(" ")}
               >
                 <div className="min-w-0">
-                  <p className="truncate font-medium text-slate-900">{item.name}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="truncate font-medium text-foreground">{item.name}</p>
+                  <p className="text-xs text-muted-foreground">
                     {item.type}
                     {formatBytes(item.sizeBytes) ? ` | ${formatBytes(item.sizeBytes)}` : ""}
                   </p>
                 </div>
-                {value?.id === item.id ? <span className="text-xs text-slate-700">Selected</span> : null}
+                {value?.id === item.id ? <span className="text-xs text-foreground">Selected</span> : null}
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
       <MediaThumb asset={selected} />
     </div>
   );

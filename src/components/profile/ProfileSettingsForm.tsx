@@ -264,15 +264,15 @@ export function ProfileSettingsForm({ user }: Props) {
                 subtitle={tProfile("profileSectionSubtitle")}
               >
               <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start">
-                <div className="space-y-4 rounded-lg border border-slate-200 p-4">
+                <div className="space-y-4 rounded-lg border border-border p-4">
                   <div className="flex flex-col items-center gap-3 text-center">
-                    <Avatar className="h-24 w-24 border-slate-300">
+                    <Avatar className="h-24 w-24 border-border">
                       {previewUrl ? <AvatarImage src={previewUrl} alt={String(displayNameValue)} /> : null}
                       {!previewUrl ? <AvatarFallback className="text-xl">{initials(user)}</AvatarFallback> : null}
                     </Avatar>
                     <div>
-                      <p className="text-sm font-semibold text-slate-900">{displayNameValue}</p>
-                      <p className="text-xs text-slate-500">@{watchedUsername}</p>
+                      <p className="text-sm font-semibold text-foreground">{displayNameValue}</p>
+                      <p className="text-xs text-muted-foreground">@{watchedUsername}</p>
                     </div>
                   </div>
 
@@ -294,7 +294,7 @@ export function ProfileSettingsForm({ user }: Props) {
                     >
                       {isUploading ? `Uploading... ${uploadProgress}%` : tProfile("changePhoto")}
                     </Button>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-muted-foreground">
                       {tProfile("photoHint")} {!isProfileEditing ? tProfile("photoHintEdit") : ""}
                     </p>
                   </div>
@@ -322,7 +322,7 @@ export function ProfileSettingsForm({ user }: Props) {
                     autoCapitalize="none"
                     autoCorrect="off"
                   />
-                  <p className="-mt-2 text-xs text-slate-500">
+                  <p className="-mt-2 text-xs text-muted-foreground">
                     {tProfile("usernameHint")}
                   </p>
 
@@ -335,7 +335,7 @@ export function ProfileSettingsForm({ user }: Props) {
                     error={form.formState.errors.displayName}
                     disabled={profileInputsDisabled}
                   />
-                  <p className="-mt-2 text-xs text-slate-500">{tProfile("displayNameHint")}</p>
+                  <p className="-mt-2 text-xs text-muted-foreground">{tProfile("displayNameHint")}</p>
                 </div>
               </div>
 
@@ -420,7 +420,7 @@ export function ProfileSecurityForm() {
 
     return (
       <div className="space-y-1.5">
-        <Label htmlFor={id} className="text-sm text-slate-500">
+        <Label htmlFor={id} className="text-sm text-muted-foreground">
           {label}
         </Label>
         <div className="relative">
@@ -432,13 +432,13 @@ export function ProfileSecurityForm() {
             disabled={isChangingPassword}
             placeholder={placeholder}
             aria-invalid={error ? "true" : "false"}
-            className={cn("pr-10", error ? "border-red-300 focus-visible:ring-red-300" : "")}
+            className={cn("pr-10", error ? "border-destructive focus-visible:ring-destructive" : "")}
           />
           <Button
             type="button"
             variant="ghost"
             size="icon"
-            className="absolute right-1 top-1 h-8 w-8 text-slate-500"
+            className="absolute right-1 top-1 h-8 w-8 text-muted-foreground"
             disabled={isChangingPassword}
             onClick={() => setShowPasswords((s) => ({ ...s, [fieldKey]: !s[fieldKey] }))}
             title={isVisible ? tSecurity("hidePassword") : tSecurity("showPassword")}
@@ -447,7 +447,7 @@ export function ProfileSecurityForm() {
             <span className="sr-only">{isVisible ? tSecurity("hidePassword") : tSecurity("showPassword")}</span>
           </Button>
         </div>
-        {error ? <p className="text-xs text-red-600">{error}</p> : null}
+        {error ? <p className="text-xs text-destructive">{error}</p> : null}
       </div>
     );
   }
@@ -534,7 +534,7 @@ export function ProfileSecurityForm() {
               autoComplete="new-password"
               error={passwordForm.formState.errors.newPassword?.message}
             />
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               {tSecurity("passwordHint")}
             </p>
 

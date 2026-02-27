@@ -16,7 +16,7 @@ function NotAuthorized() {
           { label: "Not authorized" },
         ]}
       />
-      <Link href="/app/packs" className="text-sm font-medium text-slate-900 underline">
+      <Link href="/app/packs" className="text-sm font-medium text-foreground underline">
         Back to packs
       </Link>
     </div>

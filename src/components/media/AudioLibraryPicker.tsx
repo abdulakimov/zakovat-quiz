@@ -102,13 +102,13 @@ export function AudioLibraryPicker({
   }, [query]);
 
   return (
-    <div className="space-y-3 rounded-lg border border-slate-200 p-3">
+    <div className="space-y-3 rounded-lg border border-border p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="text-sm font-medium text-slate-900">{label}</p>
-          <p className="text-xs text-slate-500">Upload or choose an audio file from your library.</p>
+          <p className="text-sm font-medium text-foreground">{label}</p>
+          <p className="text-xs text-muted-foreground">Upload or choose an audio file from your library.</p>
         </div>
-        <div className="inline-flex rounded-md border border-slate-200 p-0.5">
+        <div className="inline-flex rounded-md border border-border p-0.5">
           <Button type="button" size="sm" variant={tab === "library" ? "default" : "ghost"} disabled={disabled} onClick={() => setTab("library")}>
             Library
           </Button>
@@ -138,7 +138,7 @@ export function AudioLibraryPicker({
             }}
             onError={(message) => setError(message)}
           />
-          <p className="text-xs text-slate-500">Supports MP3/WAV/OGG up to 15MB.</p>
+          <p className="text-xs text-muted-foreground">Supports MP3/WAV/OGG up to 15MB.</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -154,9 +154,9 @@ export function AudioLibraryPicker({
               disabled={disabled}
             />
           </div>
-          <div className="max-h-60 space-y-1 overflow-y-auto rounded-md border border-slate-200 p-2">
-            {loading ? <p className="text-sm text-slate-500">Loading audio...</p> : null}
-            {!loading && items.length === 0 ? <p className="text-sm text-slate-500">No matching audio files.</p> : null}
+          <div className="max-h-60 space-y-1 overflow-y-auto rounded-md border border-border p-2">
+            {loading ? <p className="text-sm text-muted-foreground">Loading audio...</p> : null}
+            {!loading && items.length === 0 ? <p className="text-sm text-muted-foreground">No matching audio files.</p> : null}
             {items.map((item) => {
               const selected = value?.id === item.id;
               return (
@@ -166,18 +166,18 @@ export function AudioLibraryPicker({
                   disabled={disabled}
                   onClick={() => onChange(item.id, item)}
                   className={[
-                    "flex w-full items-start justify-between gap-3 rounded-md px-2 py-2 text-left hover:bg-slate-50",
-                    selected ? "bg-slate-100" : "",
+                    "flex w-full items-start justify-between gap-3 rounded-md px-2 py-2 text-left hover:bg-accent",
+                    selected ? "bg-muted" : "",
                   ].join(" ")}
                 >
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-slate-900">{item.name}</p>
-                    <p className="text-xs text-slate-500">
+                    <p className="truncate text-sm font-medium text-foreground">{item.name}</p>
+                    <p className="text-xs text-muted-foreground">
                       {formatBytes(item.sizeBytes)}
                       {formatDate(item.createdAt) ? ` | ${formatDate(item.createdAt)}` : ""}
                     </p>
                   </div>
-                  {selected ? <span className="text-xs font-medium text-slate-700">Selected</span> : null}
+                  {selected ? <span className="text-xs font-medium text-foreground">Selected</span> : null}
                 </button>
               );
             })}
@@ -185,15 +185,15 @@ export function AudioLibraryPicker({
         </div>
       )}
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
 
-      <div className="space-y-2 rounded-md border border-slate-200 p-3">
-        <p className="text-xs font-medium uppercase tracking-wide text-slate-500">Selected</p>
+      <div className="space-y-2 rounded-md border border-border p-3">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Selected</p>
         {value ? (
           <>
             <div className="min-w-0">
-              <p className="truncate text-sm font-medium text-slate-900">{value.name}</p>
-              <p className="text-xs text-slate-500">{formatBytes(value.sizeBytes)}</p>
+              <p className="truncate text-sm font-medium text-foreground">{value.name}</p>
+              <p className="text-xs text-muted-foreground">{formatBytes(value.sizeBytes)}</p>
             </div>
             <audio controls src={value.url} className="w-full" />
             <Button type="button" size="sm" variant="ghost" disabled={disabled} onClick={() => onChange("")}>
@@ -201,7 +201,7 @@ export function AudioLibraryPicker({
             </Button>
           </>
         ) : (
-          <p className="text-sm text-slate-500">No audio selected.</p>
+          <p className="text-sm text-muted-foreground">No audio selected.</p>
         )}
       </div>
     </div>

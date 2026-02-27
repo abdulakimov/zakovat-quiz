@@ -97,9 +97,9 @@ export function CreatePackDialog() {
                 disabled={isPending}
               />
               {form.formState.errors.description ? (
-                <p className="text-sm text-red-600">{form.formState.errors.description.message as string}</p>
+                <p className="text-sm text-destructive">{form.formState.errors.description.message as string}</p>
               ) : null}
-              <p className="text-xs text-slate-500">{descriptionValue.length}/240</p>
+              <p className="text-xs text-muted-foreground">{descriptionValue.length}/240</p>
             </div>
 
             <div className="space-y-2">
@@ -108,7 +108,7 @@ export function CreatePackDialog() {
                 id="pack-visibility"
                 {...form.register("visibility")}
                 disabled={isPending}
-                className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900"
+                className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm text-foreground"
               >
                 <option value="DRAFT">{packVisibilityLabel(tPacks, "DRAFT")}</option>
                 <option value="PRIVATE">{packVisibilityLabel(tPacks, "PRIVATE")}</option>

@@ -105,9 +105,9 @@ export default function LoginForm() {
             {isPending ? tAuth("signingIn") : tAuth("signIn")}
           </Button>
 
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-muted-foreground">
             {tAuth("needAccount")}{" "}
-            <Link href={localizeHref(locale, "/auth/signup")} className="font-medium text-slate-900 underline">
+            <Link href={localizeHref(locale, "/auth/signup")} className="font-medium text-foreground underline">
               {tAuth("signUp")}
             </Link>
           </p>

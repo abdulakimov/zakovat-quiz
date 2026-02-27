@@ -145,15 +145,15 @@ function QuestionRow({
     >
       <Card
         className={cn(
-          "transition hover:border-slate-300",
-          reorderMode && "border-dashed border-slate-300 reorder-wiggle cursor-grab active:cursor-grabbing",
-          isDragging && "z-50 scale-[1.01] shadow-lg ring-2 ring-slate-200",
+          "transition hover:border-border/80",
+          reorderMode && "border-dashed border-border reorder-wiggle cursor-grab active:cursor-grabbing",
+          isDragging && "z-50 scale-[1.01] shadow-lg ring-2 ring-ring",
         )}
         {...(reorderMode ? { ...attributes, ...listeners } : {})}
       >
         <CardContent className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0 space-y-2">
-            <p className="truncate font-medium text-slate-900">
+            <p className="truncate font-medium text-foreground">
               {q.order}. {q.text}
             </p>
             <div className="flex flex-wrap items-center gap-2">
@@ -176,7 +176,7 @@ function QuestionRow({
                 {q.answerType}
               </Badge>
             </div>
-            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
               {primary ? <span className="truncate">Q media: {primary.originalName}</span> : null}
               {answerPrimary ? <span className="truncate">A media: {answerPrimary.originalName}</span> : null}
             </div>
@@ -197,7 +197,7 @@ function QuestionRow({
             <IconButton
               label="Delete question"
               tooltip="Delete"
-              className="text-red-600 hover:text-red-700"
+              className="text-destructive hover:text-destructive/80"
               disabled={pendingAction !== null || reorderMode}
               onPointerDown={(event) => event.stopPropagation()}
               onClick={() => onDelete(q)}
@@ -285,20 +285,20 @@ export function RoundQuestionsBuilder({
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card data-testid="round-header-card">
         <CardHeader className="pb-3">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle className="text-lg">
                 {round.order}. {round.title}
               </CardTitle>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-muted-foreground">
                 Default type: {round.defaultQuestionType} | Default timer: {round.defaultTimerSec}s
               </p>
-              {round.description ? <p className="text-xs text-slate-500">{round.description}</p> : null}
+              {round.description ? <p className="text-xs text-muted-foreground">{round.description}</p> : null}
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              {reorderMode ? <span className="text-xs text-slate-500">Drag questions to reorder</span> : null}
+              {reorderMode ? <span className="text-xs text-muted-foreground">Drag questions to reorder</span> : null}
               <Button asChild variant="outline" size="sm">
                 <Link href={`/app/packs/${packId}`}>
                   <ArrowUpRightIcon className="mr-1 h-4 w-4 rotate-180" />
@@ -328,11 +328,11 @@ export function RoundQuestionsBuilder({
       {questions.length === 0 ? (
         <Card className="border-dashed">
           <CardContent className="p-6 text-center">
-            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500">
+            <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-muted text-muted-foreground">
               <ListChecksIcon className="h-4 w-4" />
             </div>
-            <p className="mt-3 text-sm font-medium text-slate-900">No questions yet</p>
-            <p className="mt-1 text-sm text-slate-600">Create the first question for this round.</p>
+            <p className="mt-3 text-sm font-medium text-foreground">No questions yet</p>
+            <p className="mt-1 text-sm text-muted-foreground">Create the first question for this round.</p>
             <Button asChild type="button" className="mt-4">
               <Link href={`/app/packs/${packId}/rounds/${round.id}/questions/new`}>
                 <PlusIcon className="mr-2 h-4 w-4" aria-hidden />
@@ -358,7 +358,7 @@ export function RoundQuestionsBuilder({
           }}
         >
           <SortableContext items={orderedQuestions.map((q) => q.id)} strategy={verticalListSortingStrategy}>
-            <motion.div layout className={cn("space-y-2", reorderMode && "rounded-lg border border-dashed border-slate-200 p-2")}>
+            <motion.div layout className={cn("space-y-2", reorderMode && "rounded-lg border border-dashed border-border p-2")}>
               <AnimatePresence initial={false}>
                 {orderedQuestions.map((q, index) => (
                   <QuestionRow
@@ -395,7 +395,7 @@ export function RoundQuestionsBuilder({
               </Button>
             </AlertDialogCancel>
             <AlertDialogAction asChild>
-              <Button className="bg-red-700 text-white hover:bg-red-800" onClick={confirmDelete} disabled={pendingAction !== null}>
+              <Button className="bg-destructive text-destructive-foreground hover:bg-destructive/90" onClick={confirmDelete} disabled={pendingAction !== null}>
                 {pendingAction?.startsWith("delete:") ? "Deleting..." : "Delete question"}
               </Button>
             </AlertDialogAction>
