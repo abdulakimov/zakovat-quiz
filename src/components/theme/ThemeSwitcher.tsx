@@ -19,7 +19,7 @@ type ThemeMode = "light" | "dark" | "system";
 
 export function ThemeSwitcher() {
   const tCommon = useTranslations("common");
-  const { theme, setTheme } = useTheme();
+  const { theme, resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
 
   React.useEffect(() => {
@@ -27,6 +27,8 @@ export function ThemeSwitcher() {
   }, []);
 
   const currentTheme = mounted && theme ? (theme as ThemeMode) : "system";
+  const effectiveTheme = mounted && resolvedTheme ? resolvedTheme : theme;
+  const iconTheme = effectiveTheme === "dark" ? "dark" : "light";
 
   const options: Array<{ value: ThemeMode; label: string; icon: React.ComponentType<{ className?: string }> }> = [
     { value: "light", label: tCommon("themeLight"), icon: Sun },
@@ -35,7 +37,7 @@ export function ThemeSwitcher() {
   ];
 
   const activeOption = options.find((option) => option.value === currentTheme) ?? options[2];
-  const ActiveIcon = activeOption.icon;
+  const ActiveIcon = iconTheme === "dark" ? Moon : Sun;
 
   return (
     <DropdownMenu>

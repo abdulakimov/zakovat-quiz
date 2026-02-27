@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Check } from "lucide-react";
+import { Check, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -21,18 +21,6 @@ import {
   normalizeLocale,
   type AppLocale,
 } from "@/src/i18n/config";
-
-const localeShortLabels: Record<AppLocale, string> = {
-  uz: "UZ",
-  ru: "RU",
-  en: "EN",
-};
-
-const localeFlags: Record<AppLocale, string> = {
-  uz: "????",
-  ru: "????",
-  en: "????",
-};
 
 function buildLocalizedPath(pathname: string, locale: AppLocale) {
   const normalized = getPathWithoutLocale(pathname);
@@ -76,22 +64,18 @@ export function LanguageSwitcher() {
                 type="button"
                 variant="outline"
                 size="sm"
-                className="h-9 gap-2 px-2"
+                className="h-9 w-9 p-0"
                 data-testid="lang-switcher"
-                aria-label={tCommon("language")}
+                aria-label={tCommon("changeLanguage")}
               >
-                <span className="text-base" aria-hidden>
-                  {localeFlags[currentLocale]}
-                </span>
-                <span className="text-xs font-semibold hidden md:inline">{localeShortLabels[currentLocale]}</span>
-                <span className="sr-only">{localeNames[currentLocale]}</span>
+                <Globe className="h-4 w-4" aria-hidden />
               </Button>
             </DropdownMenuTrigger>
           </TooltipTrigger>
-          <TooltipContent>{`${tCommon("language")}: ${localeNames[currentLocale]}`}</TooltipContent>
+          <TooltipContent>{tCommon("language")}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <DropdownMenuContent align="end" className="min-w-40">
+      <DropdownMenuContent align="end" className="min-w-44">
         <DropdownMenuLabel>{tCommon("language")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {locales.map((item) => {
@@ -103,17 +87,8 @@ export function LanguageSwitcher() {
               onSelect={() => changeLocale(item)}
               className="justify-between"
             >
-              <span className="inline-flex items-center gap-2">
-                <span className="text-base" aria-hidden>
-                  {localeFlags[item]}
-                </span>
-                <span>{localeNames[item]}</span>
-                <span className="sr-only">{localeShortLabels[item]}</span>
-              </span>
-              <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">
-                <span>{localeShortLabels[item]}</span>
-                {active ? <Check className="h-4 w-4 text-foreground" aria-hidden /> : null}
-              </span>
+              <span>{localeNames[item]}</span>
+              {active ? <Check className="h-4 w-4" aria-hidden /> : null}
             </DropdownMenuItem>
           );
         })}

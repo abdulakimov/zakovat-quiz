@@ -181,14 +181,13 @@ function ProfileMenu({
               <Button
                 type="button"
                 variant="outline"
-                className="h-9 gap-2 rounded-full px-2"
+                className="h-9 gap-1 rounded-full px-2"
               >
-                <Avatar className="h-7 w-7">
+                <Avatar className="h-8 w-8">
                   {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName} /> : null}
                   {!avatarUrl ? <AvatarFallback>{getInitials(user)}</AvatarFallback> : null}
                 </Avatar>
-                <span className="hidden max-w-36 truncate text-sm md:inline">{displayName}</span>
-                <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
+                <ChevronDownIcon className="h-3.5 w-3.5 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
           </TooltipTrigger>

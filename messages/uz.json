@@ -2,6 +2,7 @@
   "common": {
     "app": "Ilova",
     "language": "Til",
+    "changeLanguage": "Tilni o'zgartirish",
     "languageUz": "Oʻzbek",
     "languageRu": "Rus",
     "languageEn": "Ingliz",

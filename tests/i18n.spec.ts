@@ -99,9 +99,8 @@ async function createPackWithRound(userId: string) {
 }
 
 async function switchLocale(page: import("@playwright/test").Page, locale: "uz" | "ru" | "en") {
-  const target = locale.toUpperCase();
   await page.getByTestId("lang-switcher").click();
-  const item = page.getByRole("menuitem", { name: target }).first();
+  const item = page.getByTestId(`lang-${locale}`);
   await expect(item).toBeVisible();
   await item.click();
 }
