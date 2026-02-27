@@ -1,5 +1,5 @@
 import { cookies, headers } from "next/headers";
-import { getRequestConfig } from "next-intl/server";
+import { getRequestConfig, IntlErrorCode } from "next-intl/server";
 import { defaultLocale, isAppLocale, localeCookieName } from "@/src/i18n/config";
 
 export default getRequestConfig(async () => {
@@ -15,5 +15,24 @@ export default getRequestConfig(async () => {
   return {
     locale,
     messages,
+    onError(error) {
+      const messagePath = [error.namespace, error.key].filter(Boolean).join(".");
+      if (error.code === IntlErrorCode.MISSING_MESSAGE) {
+        const warning = `[i18n] Missing message: ${error.locale ?? locale} ${messagePath}`;
+        if (process.env.NODE_ENV === "development") {
+          console.warn(warning, error.stack ?? error);
+        } else {
+          console.warn(warning);
+        }
+        if (process.env.NEXT_PUBLIC_I18N_STRICT === "true") {
+          throw error;
+        }
+        return;
+      }
+      throw error;
+    },
+    getMessageFallback({ namespace, key }) {
+      return namespace ? `⟦${namespace}.${key}⟧` : `⟦${key}⟧`;
+    },
   };
 });
