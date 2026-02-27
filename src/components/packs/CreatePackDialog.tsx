@@ -3,6 +3,7 @@
 import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import { useForm, useWatch } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -11,12 +12,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { createPackAction, type PackActionState } from "@/src/actions/packs";
 import { FormErrorSummary } from "@/src/components/form/FormErrorSummary";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
+import { localizeHref, normalizeLocale } from "@/src/i18n/config";
+import { useTranslations } from "@/src/i18n/client";
 import { toast } from "@/src/components/ui/sonner";
 import { createPackSchema, type CreatePackInput } from "@/src/schemas/packs";
 import { PlusIcon } from "@/src/ui/icons";
+import { packVisibilityLabel } from "@/src/i18n/labels";
 
 export function CreatePackDialog() {
+  const tCommon = useTranslations("common");
+  const tPacks = useTranslations("packs");
   const router = useRouter();
+  const locale = normalizeLocale(useLocale());
   const [open, setOpen] = React.useState(false);
   const [isPending, startTransition] = React.useTransition();
   const [serverState, setServerState] = React.useState<PackActionState>({});
@@ -45,11 +52,11 @@ export function CreatePackDialog() {
           toast.error(result.error);
           return;
         }
-        toast.success(result?.success ?? "Pack created.");
+        toast.success(result?.success ?? tPacks("toastCreated"));
         setOpen(false);
         form.reset({ title: "", description: "", visibility: "DRAFT" });
         if (result?.packId) {
-          router.push(`/app/packs/${result.packId}`);
+          router.push(localizeHref(locale, `/app/packs/${result.packId}`));
           router.refresh();
         }
       })();
@@ -60,32 +67,32 @@ export function CreatePackDialog() {
     <>
       <Button type="button" onClick={() => setOpen(true)}>
         <PlusIcon className="mr-2 h-4 w-4" aria-hidden />
-        Create pack
+        {tPacks("createButton")}
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-xl">
           <DialogHeader>
-            <DialogTitle>Create pack</DialogTitle>
-            <DialogDescription>Create a quiz pack and configure rounds next.</DialogDescription>
+            <DialogTitle>{tPacks("createDialog.title")}</DialogTitle>
+            <DialogDescription>{tPacks("createDialog.description")}</DialogDescription>
           </DialogHeader>
           <form onSubmit={onSubmit} className="space-y-4" noValidate>
             <FormFieldText
               id="pack-title"
               name="title"
-              label="Title"
-              placeholder="Zakovat Friday #12"
+              label={tPacks("form.titleLabel")}
+              placeholder={tPacks("form.titlePlaceholder")}
               register={form.register}
               error={form.formState.errors.title}
               disabled={isPending}
             />
 
             <div className="space-y-2">
-              <Label htmlFor="pack-description">Description</Label>
+              <Label htmlFor="pack-description">{tPacks("form.descriptionLabel")}</Label>
               <Textarea
                 id="pack-description"
                 rows={3}
                 maxLength={240}
-                placeholder="Optional short description"
+                placeholder={tPacks("form.descriptionPlaceholder")}
                 {...form.register("description")}
                 disabled={isPending}
               />
@@ -96,16 +103,16 @@ export function CreatePackDialog() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="pack-visibility">Visibility</Label>
+              <Label htmlFor="pack-visibility">{tPacks("form.visibilityLabel")}</Label>
               <select
                 id="pack-visibility"
                 {...form.register("visibility")}
                 disabled={isPending}
                 className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-900"
               >
-                <option value="DRAFT">Draft</option>
-                <option value="PRIVATE">Private</option>
-                <option value="PUBLIC">Public</option>
+                <option value="DRAFT">{packVisibilityLabel(tPacks, "DRAFT")}</option>
+                <option value="PRIVATE">{packVisibilityLabel(tPacks, "PRIVATE")}</option>
+                <option value="PUBLIC">{packVisibilityLabel(tPacks, "PUBLIC")}</option>
               </select>
             </div>
 
@@ -120,10 +127,10 @@ export function CreatePackDialog() {
 
             <div className="flex justify-end gap-2">
               <Button type="button" variant="outline" disabled={isPending} onClick={() => setOpen(false)}>
-                Cancel
+                {tCommon("cancel")}
               </Button>
               <Button type="submit" disabled={isPending}>
-                {isPending ? "Creating..." : "Create pack"}
+                {isPending ? tPacks("createDialog.creating") : tPacks("createDialog.create")}
               </Button>
             </div>
           </form>

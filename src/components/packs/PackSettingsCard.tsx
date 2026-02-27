@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { updatePackSettingsAction, type PackActionState } from "@/src/actions/packs";
+import { useTranslations } from "@/src/i18n/client";
 import { FormErrorSummary } from "@/src/components/form/FormErrorSummary";
 import { SettingsSectionCard, SettingsSectionGroup } from "@/src/components/layout/SettingsSectionCard";
 import { StickySaveBar } from "@/src/components/layout/StickySaveBar";
@@ -53,6 +54,7 @@ type FormValues = {
 };
 
 export function PackSettingsCard({ pack, audioAssets }: Props) {
+  const tPacks = useTranslations("packs");
   const [isPending, startTransition] = React.useTransition();
   const [serverState, setServerState] = React.useState<PackActionState>({});
   const [selectedBreakAudio, setSelectedBreakAudio] = React.useState<MusicAsset | null>(null);
@@ -180,17 +182,17 @@ export function PackSettingsCard({ pack, audioAssets }: Props) {
           toast.error(result.error);
           return;
         }
-        toast.success(result?.success ?? "Pack settings updated.");
+        toast.success(result?.success ?? tPacks("settings.updatedToast"));
         form.reset(values);
       })();
     });
   });
 
   return (
-    <Card id="pack-settings">
+      <Card id="pack-settings">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Settings</CardTitle>
-        <CardDescription>Timers and music.</CardDescription>
+        <CardTitle className="text-base font-semibold">{tPacks("tabs.settings")}</CardTitle>
+        <CardDescription>{tPacks("settings.description")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-3" noValidate>
@@ -199,13 +201,13 @@ export function PackSettingsCard({ pack, audioAssets }: Props) {
           <SettingsSectionGroup>
             <SettingsSectionCard
               icon={ClockIcon}
-              title="Timers"
-              subtitle="Question timer preset and write answers time."
+              title={tPacks("settings.timersTitle")}
+              subtitle={tPacks("settings.timersSubtitle")}
             >
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label htmlFor="pack-question-timer-preset" className="text-sm text-slate-500">
-                    Question timer preset
+                    {tPacks("settings.questionTimerPreset")}
                   </Label>
                   <select
                     id="pack-question-timer-preset"
@@ -217,11 +219,11 @@ export function PackSettingsCard({ pack, audioAssets }: Props) {
                       form.setValue("defaultQuestionTimerPresetSec", next, { shouldDirty: true, shouldValidate: true });
                     }}
                   >
-                    <option value="">None (use round default)</option>
-                    <option value="30">30 sec</option>
-                    <option value="40">40 sec</option>
-                    <option value="45">45 sec</option>
-                    <option value="60">60 sec</option>
+                    <option value="">{tPacks("settings.noneUseRoundDefault")}</option>
+                    <option value="30">{tPacks("settings.secondsOption", { count: 30 })}</option>
+                    <option value="40">{tPacks("settings.secondsOption", { count: 40 })}</option>
+                    <option value="45">{tPacks("settings.secondsOption", { count: 45 })}</option>
+                    <option value="60">{tPacks("settings.secondsOption", { count: 60 })}</option>
                   </select>
                   {form.formState.errors.defaultQuestionTimerPresetSec ? (
                     <p className="text-xs text-red-600">{form.formState.errors.defaultQuestionTimerPresetSec.message as string}</p>
@@ -229,7 +231,7 @@ export function PackSettingsCard({ pack, audioAssets }: Props) {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="pack-break-timer" className="text-sm text-slate-500">
-                    Write answers time (sec)
+                    {tPacks("settings.writeAnswersTime")}
                   </Label>
                   <Input
                     id="pack-break-timer"
@@ -248,12 +250,12 @@ export function PackSettingsCard({ pack, audioAssets }: Props) {
 
             <SettingsSectionCard
               icon={MusicIcon}
-              title="Break music"
-              subtitle="Played during write breaks."
+              title={tPacks("settings.breakMusicTitle")}
+              subtitle={tPacks("settings.breakMusicSubtitle")}
             >
               <input type="hidden" {...form.register("breakMusicAssetId")} />
               <MusicPickerSheet
-                title="Break music"
+                title={tPacks("settings.breakMusicTitle")}
                 value={selectedBreakAudio}
                 disabled={isPending}
                 onChange={(asset) => {
@@ -265,12 +267,12 @@ export function PackSettingsCard({ pack, audioAssets }: Props) {
 
             <SettingsSectionCard
               icon={MusicIcon}
-              title="Timer music"
-              subtitle="Played during question timers."
+              title={tPacks("settings.timerMusicTitle")}
+              subtitle={tPacks("settings.timerMusicSubtitle")}
             >
               <input type="hidden" {...form.register("timerMusicAssetId")} />
               <MusicPickerSheet
-                title="Timer music"
+                title={tPacks("settings.timerMusicTitle")}
                 value={selectedTimerAudio}
                 disabled={isPending}
                 onChange={(asset) => {
@@ -292,7 +294,7 @@ export function PackSettingsCard({ pack, audioAssets }: Props) {
                     </Tooltip>
                   </TooltipProvider>
                 ) : (
-                  <span>No music selected</span>
+                  <span>{tPacks("settings.noMusicSelected")}</span>
                 )}
               </div>
             </SettingsSectionCard>
@@ -309,7 +311,7 @@ export function PackSettingsCard({ pack, audioAssets }: Props) {
           />
 
           {form.formState.isDirty && !form.formState.isValid ? (
-            <p className="text-xs text-red-600">Fix validation errors to save.</p>
+            <p className="text-xs text-red-600">{tPacks("settings.fixValidationErrors")}</p>
           ) : null}
 
           <StickySaveBar

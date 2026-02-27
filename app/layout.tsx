@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { cn } from "@/lib/utils";
+import { IntlProvider } from "@/src/components/IntlProvider";
 import { fontSans } from "@/src/lib/fonts";
 import { Toaster } from "@/src/components/ui/sonner";
 import "./globals.css";
@@ -24,12 +24,9 @@ export default async function RootLayout({
         className={cn(fontSans.variable, "font-sans bg-slate-50 text-slate-900 antialiased")}
         suppressHydrationWarning
       >
-        <NextIntlClientProvider
-          locale={locale}
-          messages={messages}
-        >
+        <IntlProvider locale={locale} messages={messages}>
           {children}
-        </NextIntlClientProvider>
+        </IntlProvider>
         <Toaster
           position="top-right"
           richColors

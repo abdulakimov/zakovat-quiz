@@ -1,9 +1,10 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import { useForm, useWatch } from "react-hook-form";
 import {
   AlertDialog,
@@ -38,6 +39,9 @@ import { createRoundSchema, questionTypeSchema, updateRoundSchema } from "@/src/
 import { ListChecksIcon, MusicIcon, PencilIcon, PlusIcon, TrashIcon, ClockIcon, SlidersIcon } from "@/src/ui/icons";
 import { cn } from "@/lib/utils";
 import { getFeatureAccent } from "@/src/lib/featureAccent";
+import { localizeHref, normalizeLocale, type AppLocale } from "@/src/i18n/config";
+import { useTranslations } from "@/src/i18n/client";
+import { questionTypeLabel } from "@/src/i18n/labels";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { DndContext, KeyboardSensor, PointerSensor, closestCenter, useSensor, useSensors } from "@dnd-kit/core";
 import { SortableContext, arrayMove, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
@@ -93,6 +97,9 @@ function RoundRow({
   index,
   onEdit,
   onDelete,
+  locale,
+  tPacks,
+  tCommon,
 }: {
   round: RoundItem;
   packId: string;
@@ -103,6 +110,9 @@ function RoundRow({
   index: number;
   onEdit: () => void;
   onDelete: () => void;
+  locale: AppLocale;
+  tPacks: ReturnType<typeof useTranslations>;
+  tCommon: ReturnType<typeof useTranslations>;
 }) {
   const accent = getFeatureAccent("packs");
   const {
@@ -144,7 +154,7 @@ function RoundRow({
       >
         <CardContent className="relative flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
           <Link
-            href={`/app/packs/${packId}/rounds/${round.id}`}
+            href={localizeHref(locale, `/app/packs/${packId}/rounds/${round.id}`)}
             aria-label={`Open ${round.title}`}
             className={cn("absolute inset-0 z-0", reorderMode && "pointer-events-none")}
           />
@@ -156,7 +166,7 @@ function RoundRow({
                     <GripVerticalIcon className={cn("h-4 w-4", isDragging && "text-slate-900")} />
                   </span>
                 </TooltipTrigger>
-                <TooltipContent>Drag to reorder</TooltipContent>
+                <TooltipContent>{tPacks("dragToReorder")}</TooltipContent>
               </Tooltip>
             ) : null}
             <div className="min-w-0 space-y-2">
@@ -167,15 +177,17 @@ function RoundRow({
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="secondary" className={cn("border", accent.badge)}>{round.defaultQuestionType}</Badge>
-                <MetaPill>{round.defaultTimerSec}s timer</MetaPill>
+                <Badge data-testid="roundtype-badge" variant="secondary" className={cn("border", accent.badge)}>
+                  {questionTypeLabel(tPacks, round.defaultQuestionType)}
+                </Badge>
+                <MetaPill>{tPacks("timerWithSeconds", { count: round.defaultTimerSec })}</MetaPill>
                 {round.recapEnabled ? <MetaPill>Recap</MetaPill> : null}
               </div>
               <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
-                <span>{round._count.questions} questions</span>
+                <span>{tPacks("questionsCount", { count: round._count.questions })}</span>
                 <span className="inline-flex items-center gap-1">
                   <MusicIcon className="h-3.5 w-3.5" aria-hidden />
-                  <span className="max-w-[220px] truncate">No music</span>
+                  <span className="max-w-[220px] truncate">{tPacks("noMusic")}</span>
                 </span>
               </div>
               {round.description ? <p className="text-xs text-slate-500">{round.description}</p> : null}
@@ -184,16 +196,16 @@ function RoundRow({
 
           <ActionGroup className="relative z-10">
             <IconButton
-              label="Edit round"
-              tooltip="Edit"
+              label={tPacks("editRound")}
+              tooltip={tCommon("edit")}
               onPointerDown={(event) => event.stopPropagation()}
               onClick={onEdit}
             >
               <PencilIcon className="h-4 w-4" />
             </IconButton>
             <IconButton
-              label="Delete round"
-              tooltip="Delete"
+              label={tPacks("deleteRound")}
+              tooltip={tCommon("delete")}
               className={cn("text-red-600 hover:text-red-700", reorderMode && "opacity-40")}
               disabled={pendingAction !== null || reorderMode}
               onPointerDown={(event) => event.stopPropagation()}
@@ -476,6 +488,9 @@ export function RoundsBuilder({
   packId: string;
   rounds: RoundItem[];
 }) {
+  const tPacks = useTranslations("packs");
+  const tCommon = useTranslations("common");
+  const locale = normalizeLocale(useLocale());
   const router = useRouter();
   const [reorderMode, setReorderMode] = React.useState(false);
   const [orderedRounds, setOrderedRounds] = React.useState<RoundItem[]>(rounds);
@@ -511,7 +526,7 @@ export function RoundsBuilder({
             toast.error(result.error);
             setOrderedRounds(rounds);
           } else {
-            toast.success(result?.success ?? "Round order updated.");
+            toast.success(result?.success ?? tPacks("reorderUpdated"));
             router.refresh();
           }
           setPendingAction(null);
@@ -551,7 +566,7 @@ export function RoundsBuilder({
         if (result?.error) {
           toast.error(result.error);
         } else {
-          toast.success(result?.success ?? "Template generated.");
+          toast.success(result?.success ?? tPacks("template.generated"));
           setGenerateConfirmOpen(false);
           router.refresh();
         }
@@ -565,12 +580,13 @@ export function RoundsBuilder({
       <section className="space-y-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
-            <h2 className="text-lg font-semibold text-slate-900">Rounds</h2>
-            <span className="text-sm text-slate-500">{rounds.length} total</span>
-            {reorderMode ? <span className="text-xs text-slate-500">Drag rounds to reorder</span> : null}
+            <h2 className="text-lg font-semibold text-slate-900">{tPacks("tabs.rounds")}</h2>
+            <span className="text-sm text-slate-500">{tPacks("roundsTotal", { count: rounds.length })}</span>
+            {reorderMode ? <span className="text-xs text-slate-500">{tPacks("dragRoundsToReorder")}</span> : null}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Button
+              data-testid="btn-generate-template"
               type="button"
               size="sm"
               variant="outline"
@@ -580,19 +596,20 @@ export function RoundsBuilder({
                 else runGenerateTemplate();
               }}
             >
-              {pendingAction === "generate-template" ? "Generating..." : "Generate Zakovat template (7 rounds)"}
+              {pendingAction === "generate-template" ? tPacks("template.generating") : tPacks("template.generate", { count: 7 })}
             </Button>
             <Button
+              data-testid="btn-reorder"
               type="button"
               size="sm"
               variant={reorderMode ? "default" : "outline"}
               onClick={() => setReorderMode((value) => !value)}
             >
-              {reorderMode ? "Done" : "Reorder"}
+              {reorderMode ? tCommon("done") : tPacks("reorder")}
             </Button>
-            <Button type="button" size="sm" onClick={() => setCreateOpen(true)} disabled={reorderMode}>
+            <Button data-testid="btn-add-round" type="button" size="sm" onClick={() => setCreateOpen(true)} disabled={reorderMode}>
               <PlusIcon className="mr-2 h-4 w-4" aria-hidden />
-              Add round
+              {tPacks("addRound")}
             </Button>
           </div>
         </div>
@@ -603,11 +620,11 @@ export function RoundsBuilder({
             <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500">
               <ListChecksIcon className="h-4 w-4" />
             </div>
-            <p className="mt-3 text-sm font-medium text-slate-900">No rounds yet</p>
-            <p className="mt-1 text-sm text-slate-600">Add your first round to start building the pack.</p>
+            <p className="mt-3 text-sm font-medium text-slate-900">{tPacks("emptyRoundsTitle")}</p>
+            <p className="mt-1 text-sm text-slate-600">{tPacks("emptyRoundsDescription")}</p>
             <Button type="button" className="mt-4" onClick={() => setCreateOpen(true)}>
               <PlusIcon className="mr-2 h-4 w-4" aria-hidden />
-              Add round
+              {tPacks("addRound")}
             </Button>
           </CardContent>
         </Card>
@@ -646,6 +663,9 @@ export function RoundsBuilder({
                       reorderMode={reorderMode}
                       reducedMotion={reducedMotion}
                       index={index}
+                      locale={locale}
+                      tPacks={tPacks}
+                      tCommon={tCommon}
                       onEdit={() => setEditRound(round)}
                       onDelete={() => setDeleteRound(round)}
                     />
@@ -675,17 +695,17 @@ export function RoundsBuilder({
       <AlertDialog open={Boolean(deleteRound)} onOpenChange={(open) => !open && setDeleteRound(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete round?</AlertDialogTitle>
+            <AlertDialogTitle>{tPacks("deleteRoundTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
               {deleteRound
-                ? `This will remove "${deleteRound.title}" and all questions in this round.`
-                : "This action is irreversible."}
+                ? tPacks("deleteRoundDescriptionWithName", { title: deleteRound.title })
+                : tPacks("irreversibleAction")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel asChild>
               <Button type="button" variant="outline" disabled={pendingAction !== null}>
-                Cancel
+                {tCommon("cancel")}
               </Button>
             </AlertDialogCancel>
             <AlertDialogAction asChild>
@@ -695,7 +715,7 @@ export function RoundsBuilder({
                 disabled={pendingAction !== null}
                 onClick={confirmDelete}
               >
-                {pendingAction?.startsWith("delete:") ? "Deleting..." : "Delete round"}
+                {pendingAction?.startsWith("delete:") ? tPacks("deleting") : tPacks("deleteRound")}
               </Button>
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -705,15 +725,15 @@ export function RoundsBuilder({
       <AlertDialog open={generateConfirmOpen} onOpenChange={setGenerateConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Overwrite existing rounds?</AlertDialogTitle>
+            <AlertDialogTitle>{tPacks("template.overwriteTitle")}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will overwrite existing rounds in this pack with the standard Zakovat 7-round template.
+              {tPacks("template.overwriteDescription", { count: 7 })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel asChild>
               <Button type="button" variant="outline" disabled={pendingAction !== null}>
-                Cancel
+                {tCommon("cancel")}
               </Button>
             </AlertDialogCancel>
             <AlertDialogAction asChild>
@@ -722,7 +742,7 @@ export function RoundsBuilder({
                 disabled={pendingAction !== null}
                 onClick={runGenerateTemplate}
               >
-                {pendingAction === "generate-template" ? "Generating..." : "Overwrite and generate"}
+                {pendingAction === "generate-template" ? tPacks("template.generating") : tPacks("template.overwriteAndGenerate")}
               </Button>
             </AlertDialogAction>
           </AlertDialogFooter>

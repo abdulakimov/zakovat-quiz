@@ -1,29 +1,34 @@
 import Link from "next/link";
+import { getLocale } from "next-intl/server";
 import { Button } from "@/components/ui/button";
-import { PageHeader } from "@/src/components/layout/PageHeader";
 import { getPackDetails } from "@/src/actions/packs";
+import { PageHeader } from "@/src/components/layout/PageHeader";
+import { SettingsTabsLayout } from "@/src/components/layout/SettingsTabsLayout";
 import { DeletePackButton } from "@/src/components/packs/DeletePackButton";
 import { PackSettingsCard } from "@/src/components/packs/PackSettingsCard";
-import { SettingsTabsLayout } from "@/src/components/layout/SettingsTabsLayout";
 import { PackVisibilityBadge } from "@/src/components/packs/PackVisibilityBadge";
 import { RoundsBuilder } from "@/src/components/packs/RoundsBuilder";
+import { localizeHref, type AppLocale } from "@/src/i18n/config";
+import { getTranslations } from "@/src/i18n/server";
 import { PlayIcon } from "@/src/ui/icons";
 
-function NotAuthorized() {
+async function NotAuthorized({ locale }: { locale: AppLocale }) {
+  const [tCommon, tPacks] = await Promise.all([getTranslations("common"), getTranslations("packs")]);
+
   return (
     <div className="space-y-4">
       <PageHeader
-        title="Not authorized"
-        description="You do not have access to this pack."
-        backHref="/app/packs"
+        title={tCommon("notAuthorized")}
+        description={tPacks("notAuthorizedDescription")}
+        backHref={localizeHref(locale, "/app/packs")}
         breadcrumbs={[
-          { label: "App", href: "/app" },
-          { label: "Packs", href: "/app/packs" },
-          { label: "Not authorized" },
+          { label: tCommon("app"), href: localizeHref(locale, "/app") },
+          { label: tPacks("title"), href: localizeHref(locale, "/app/packs") },
+          { label: tCommon("notAuthorized") },
         ]}
       />
-      <Link href="/app/packs" className="text-sm font-medium text-slate-900 underline">
-        Back to packs
+      <Link href={localizeHref(locale, "/app/packs")} className="text-sm font-medium text-slate-900 underline">
+        {tPacks("backToPacks")}
       </Link>
     </div>
   );
@@ -34,35 +39,38 @@ export default async function PackOverviewPage({
 }: {
   params: Promise<{ packId?: string | string[] }>;
 }) {
+  const locale = (await getLocale()) as AppLocale;
+  const [tPacks, tCommon] = await Promise.all([getTranslations("packs"), getTranslations("common")]);
+
   const resolved = await params;
   const packId = Array.isArray(resolved.packId) ? resolved.packId[0] : resolved.packId;
-  if (!packId) return <NotAuthorized />;
+  if (!packId) return <NotAuthorized locale={locale} />;
 
   const { pack, isOwner, audioAssets } = await getPackDetails(packId);
-  if (!pack || !isOwner) return <NotAuthorized />;
+  if (!pack || !isOwner) return <NotAuthorized locale={locale} />;
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6">
       <PageHeader
         title={pack.title}
-        description={pack.description ?? "Pack overview and round structure."}
-        backHref="/app/packs"
+        description={pack.description ?? tPacks("overviewDescription")}
+        backHref={localizeHref(locale, "/app/packs")}
         breadcrumbs={[
-          { label: "App", href: "/app" },
-          { label: "Packs", href: "/app/packs" },
+          { label: tCommon("app"), href: localizeHref(locale, "/app") },
+          { label: tPacks("title"), href: localizeHref(locale, "/app/packs") },
           { label: pack.title },
         ]}
         actions={
           <div className="flex flex-wrap items-center gap-2">
             <PackVisibilityBadge visibility={pack.visibility} />
             <Button asChild type="button" variant="outline" size="sm">
-              <Link href={`/app/presenter/${pack.id}?new=1`}>
+              <Link href={localizeHref(locale, `/app/presenter/${pack.id}?new=1`)}>
                 <PlayIcon className="mr-2 h-4 w-4" aria-hidden />
-                Run presenter
+                {tPacks("runPresenter")}
               </Link>
             </Button>
             <Button asChild type="button" variant="outline" size="sm">
-              <Link href={`/app/packs/${pack.id}?tab=settings`}>Edit</Link>
+              <Link href={localizeHref(locale, `/app/packs/${pack.id}?tab=settings`)}>{tCommon("edit")}</Link>
             </Button>
             <DeletePackButton packId={pack.id} packTitle={pack.title} />
           </div>
@@ -74,14 +82,16 @@ export default async function PackOverviewPage({
         items={[
           {
             key: "rounds",
-            label: "Rounds",
+            label: tPacks("tabs.rounds"),
             icon: "rounds",
+            testId: "tab-rounds",
             content: <RoundsBuilder packId={pack.id} rounds={pack.rounds} />,
           },
           {
             key: "settings",
-            label: "Settings",
+            label: tPacks("tabs.settings"),
             icon: "settings",
+            testId: "tab-settings",
             content: (
               <div id="pack-settings">
                 <PackSettingsCard

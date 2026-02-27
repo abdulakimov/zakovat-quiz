@@ -1,23 +1,28 @@
 import Link from "next/link";
-import { PageHeader } from "@/src/components/layout/PageHeader";
+import { getLocale } from "next-intl/server";
 import { getRoundQuestionBuilderData } from "@/src/actions/questions";
+import { PageHeader } from "@/src/components/layout/PageHeader";
 import { RoundQuestionsBuilder } from "@/src/components/packs/RoundQuestionsBuilder";
+import { localizeHref, type AppLocale } from "@/src/i18n/config";
+import { getTranslations } from "@/src/i18n/server";
 
-function NotAuthorized() {
+async function NotAuthorized({ locale }: { locale: AppLocale }) {
+  const [tCommon, tPacks] = await Promise.all([getTranslations("common"), getTranslations("packs")]);
+
   return (
     <div className="mx-auto w-full max-w-5xl space-y-4">
       <PageHeader
-        title="Not authorized"
-        description="You do not have access to this round."
-        backHref="/app/packs"
+        title={tCommon("notAuthorized")}
+        description={tPacks("roundNotAuthorizedDescription")}
+        backHref={localizeHref(locale, "/app/packs")}
         breadcrumbs={[
-          { label: "App", href: "/app" },
-          { label: "Packs", href: "/app/packs" },
-          { label: "Not authorized" },
+          { label: tCommon("app"), href: localizeHref(locale, "/app") },
+          { label: tPacks("title"), href: localizeHref(locale, "/app/packs") },
+          { label: tCommon("notAuthorized") },
         ]}
       />
-      <Link href="/app/packs" className="text-sm font-medium text-slate-900 underline">
-        Back to packs
+      <Link href={localizeHref(locale, "/app/packs")} className="text-sm font-medium text-slate-900 underline">
+        {tPacks("backToPacks")}
       </Link>
     </div>
   );
@@ -28,24 +33,27 @@ export default async function RoundQuestionsPage({
 }: {
   params: Promise<{ packId?: string | string[]; roundId?: string | string[] }>;
 }) {
+  const locale = (await getLocale()) as AppLocale;
+  const [tCommon, tPacks] = await Promise.all([getTranslations("common"), getTranslations("packs")]);
+
   const resolved = await params;
   const packId = Array.isArray(resolved.packId) ? resolved.packId[0] : resolved.packId;
   const roundId = Array.isArray(resolved.roundId) ? resolved.roundId[0] : resolved.roundId;
-  if (!packId || !roundId) return <NotAuthorized />;
+  if (!packId || !roundId) return <NotAuthorized locale={locale} />;
 
   const { round, pack } = await getRoundQuestionBuilderData(packId, roundId);
-  if (!round || !pack) return <NotAuthorized />;
+  if (!round || !pack) return <NotAuthorized locale={locale} />;
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6">
       <PageHeader
         title={round.title}
-        description="Build questions for this round. Question type is selected per question."
-        backHref={`/app/packs/${pack.id}`}
+        description={tPacks("roundBuilderDescription")}
+        backHref={localizeHref(locale, `/app/packs/${pack.id}`)}
         breadcrumbs={[
-          { label: "App", href: "/app" },
-          { label: "Packs", href: "/app/packs" },
-          { label: pack.title, href: `/app/packs/${pack.id}` },
+          { label: tCommon("app"), href: localizeHref(locale, "/app") },
+          { label: tPacks("title"), href: localizeHref(locale, "/app/packs") },
+          { label: pack.title, href: localizeHref(locale, `/app/packs/${pack.id}`) },
           { label: round.title },
         ]}
       />

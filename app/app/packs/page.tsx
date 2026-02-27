@@ -1,10 +1,18 @@
+import { getLocale } from "next-intl/server";
 import { PageHeader } from "@/src/components/layout/PageHeader";
 import { getMyPacks } from "@/src/actions/packs";
 import { PacksListClient } from "@/src/components/packs/PacksListClient";
+import { localizeHref, type AppLocale } from "@/src/i18n/config";
+import { getTranslations } from "@/src/i18n/server";
 
 type PackListItem = Awaited<ReturnType<typeof getMyPacks>>["packs"][number];
 
 export default async function PacksPage() {
+  const locale = (await getLocale()) as AppLocale;
+  const [tPacks, tCommon] = await Promise.all([
+    getTranslations("packs"),
+    getTranslations("common"),
+  ]);
   const { packs } = await getMyPacks();
 
   const items = packs.map((pack: PackListItem) => ({
@@ -19,11 +27,11 @@ export default async function PacksPage() {
   return (
     <div className="mx-auto w-full max-w-6xl space-y-6">
       <PageHeader
-        title="Packs"
-        description="Create and manage quiz packs, rounds, and question sets."
+        title={tPacks("title")}
+        description={tPacks("pageDescription")}
         breadcrumbs={[
-          { label: "App", href: "/app" },
-          { label: "Packs" },
+          { label: tCommon("app"), href: localizeHref(locale, "/app") },
+          { label: tPacks("title") },
         ]}
       />
       <PacksListClient packs={items} />

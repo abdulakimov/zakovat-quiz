@@ -2,10 +2,13 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useLocale } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { CreatePackDialog } from "@/src/components/packs/CreatePackDialog";
 import { PackVisibilityBadge } from "@/src/components/packs/PackVisibilityBadge";
+import { localizeHref, normalizeLocale } from "@/src/i18n/config";
+import { useTranslations } from "@/src/i18n/client";
 import { BoxIcon } from "@/src/ui/icons";
 import { getFeatureAccent } from "@/src/lib/featureAccent";
 
@@ -19,6 +22,8 @@ type PackListItem = {
 };
 
 export function PacksListClient({ packs }: { packs: PackListItem[] }) {
+  const tPacks = useTranslations("packs");
+  const locale = normalizeLocale(useLocale());
   const [query, setQuery] = React.useState("");
   const accent = getFeatureAccent("packs");
   const normalized = query.trim().toLowerCase();
@@ -36,7 +41,7 @@ export function PacksListClient({ packs }: { packs: PackListItem[] }) {
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search packs by title or description"
+          placeholder={tPacks("searchPlaceholder")}
           className="sm:max-w-sm"
         />
         <CreatePackDialog />
@@ -49,8 +54,8 @@ export function PacksListClient({ packs }: { packs: PackListItem[] }) {
               <BoxIcon className="h-5 w-5" />
             </div>
             <div className="space-y-1">
-              <p className="font-medium text-slate-900">No packs yet</p>
-              <p className="text-sm text-slate-600">Create your first pack to start building rounds and questions.</p>
+              <p className="font-medium text-slate-900">{tPacks("empty.title")}</p>
+              <p className="text-sm text-slate-600">{tPacks("empty.description")}</p>
             </div>
             <CreatePackDialog />
           </CardContent>
@@ -61,13 +66,13 @@ export function PacksListClient({ packs }: { packs: PackListItem[] }) {
             <div className={`inline-flex h-10 w-10 items-center justify-center rounded-full ${accent.background} ${accent.icon}`}>
               <BoxIcon className="h-4 w-4" />
             </div>
-            <p className="text-sm text-slate-600">No packs match your search.</p>
+            <p className="text-sm text-slate-600">{tPacks("searchEmpty")}</p>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.map((pack) => (
-            <Link key={pack.id} href={`/app/packs/${pack.id}`} className="block">
+            <Link key={pack.id} href={localizeHref(locale, `/app/packs/${pack.id}`)} className="block">
               <Card className="h-full transition hover:border-slate-300">
                 <CardContent className="space-y-3 p-4">
                   <div className="flex items-start justify-between gap-3">
@@ -82,11 +87,11 @@ export function PacksListClient({ packs }: { packs: PackListItem[] }) {
                   {pack.description ? (
                     <p className="line-clamp-2 text-sm text-slate-600">{pack.description}</p>
                   ) : (
-                    <p className="text-sm text-slate-400">No description</p>
+                    <p className="text-sm text-slate-400">{tPacks("noDescription")}</p>
                   )}
                   <div className="flex items-center justify-between text-xs text-slate-500">
-                    <span>{pack.roundsCount} rounds</span>
-                    <span>Updated {pack.updatedAtLabel}</span>
+                    <span>{tPacks("roundsCount", { count: pack.roundsCount })}</span>
+                    <span>{tPacks("updatedAt", { date: pack.updatedAtLabel })}</span>
                   </div>
                 </CardContent>
               </Card>

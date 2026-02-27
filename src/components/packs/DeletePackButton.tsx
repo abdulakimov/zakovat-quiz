@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,10 +18,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { deletePackAction } from "@/src/actions/packs";
+import { localizeHref, normalizeLocale } from "@/src/i18n/config";
+import { useTranslations } from "@/src/i18n/client";
 import { toast } from "@/src/components/ui/sonner";
 
 export function DeletePackButton({ packId, packTitle }: { packId: string; packTitle: string }) {
+  const tCommon = useTranslations("common");
+  const tPacks = useTranslations("packs");
   const router = useRouter();
+  const locale = normalizeLocale(useLocale());
   const [open, setOpen] = React.useState(false);
   const [value, setValue] = React.useState("");
   const [isPending, startTransition] = React.useTransition();
@@ -30,20 +36,16 @@ export function DeletePackButton({ packId, packTitle }: { packId: string; packTi
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
         <Button type="button" variant="outline" size="sm" className="border-red-300 text-red-700 hover:bg-red-50">
-          Delete
+          {tCommon("delete")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-red-700">Delete pack?</AlertDialogTitle>
-          <AlertDialogDescription>
-            This permanently removes the pack, rounds, questions, and linked options/media mappings.
-          </AlertDialogDescription>
+          <AlertDialogTitle className="text-red-700">{tPacks("delete.confirmTitle")}</AlertDialogTitle>
+          <AlertDialogDescription>{tPacks("delete.confirmDescription")}</AlertDialogDescription>
         </AlertDialogHeader>
         <div className="space-y-2">
-          <Label htmlFor="delete-pack-confirm">
-            Type <span className="font-semibold">{packTitle}</span> to confirm
-          </Label>
+          <Label htmlFor="delete-pack-confirm">{tPacks("delete.typeToConfirm", { title: packTitle })}</Label>
           <Input
             id="delete-pack-confirm"
             value={value}
@@ -56,7 +58,7 @@ export function DeletePackButton({ packId, packTitle }: { packId: string; packTi
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
             <Button type="button" variant="outline" size="sm" disabled={isPending}>
-              Cancel
+              {tCommon("cancel")}
             </Button>
           </AlertDialogCancel>
           <AlertDialogAction asChild>
@@ -75,15 +77,15 @@ export function DeletePackButton({ packId, packTitle }: { packId: string; packTi
                       toast.error(result.error);
                       return;
                     }
-                    toast.success(result?.success ?? "Pack deleted.");
+                    toast.success(result?.success ?? tPacks("delete.deletedToast"));
                     setOpen(false);
-                    router.push("/app/packs");
+                    router.push(localizeHref(locale, "/app/packs"));
                     router.refresh();
                   })();
                 });
               }}
             >
-              {isPending ? "Deleting..." : "Delete pack"}
+              {isPending ? tPacks("delete.deleting") : tPacks("delete.deleteButton")}
             </Button>
           </AlertDialogAction>
         </AlertDialogFooter>

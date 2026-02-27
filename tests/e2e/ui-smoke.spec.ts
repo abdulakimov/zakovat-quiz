@@ -4,6 +4,7 @@ import path from "path";
 import { SignJWT } from "jose";
 
 const SESSION_COOKIE_NAME = "zakovat_session";
+const LOCALE_COOKIE_NAME = "NEXT_LOCALE";
 
 async function authSession(page: import("@playwright/test").Page) {
   const secret = process.env.SESSION_SECRET;
@@ -29,6 +30,12 @@ async function authSession(page: import("@playwright/test").Page) {
       value: token,
       url: "http://localhost:3000/",
       httpOnly: true,
+      sameSite: "Lax",
+    },
+    {
+      name: LOCALE_COOKIE_NAME,
+      value: "en",
+      url: "http://localhost:3000/",
       sameSite: "Lax",
     },
   ]);

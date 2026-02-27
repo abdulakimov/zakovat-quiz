@@ -9,6 +9,7 @@ type TabItem = {
   label: string;
   icon: "users" | "settings" | "danger" | "profile" | "security" | "rounds";
   content: React.ReactNode;
+  testId?: string;
 };
 
 type SettingsTabsLayoutProps = {
@@ -69,6 +70,7 @@ export function SettingsTabsLayout({ items, paramKey = "tab", defaultKey }: Sett
               <button
                 key={item.key}
                 type="button"
+                data-testid={item.testId}
                 onClick={() => handleChange(item.key)}
                 className={cn(
                   "inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium transition-colors duration-150 motion-reduce:transition-none",

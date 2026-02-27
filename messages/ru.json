@@ -1,5 +1,6 @@
 {
   "common": {
+    "app": "Приложение",
     "language": "Язык",
     "navigation": "Навигация",
     "openNavigation": "Открыть навигацию",
@@ -12,7 +13,12 @@
     "save": "Сохранить",
     "saving": "Сохранение...",
     "cancel": "Отмена",
-    "unsavedChanges": "Есть несохраненные изменения"
+    "unsavedChanges": "Есть несохраненные изменения",
+    "edit": "Изменить",
+    "delete": "Удалить",
+    "done": "Готово",
+    "back": "Назад",
+    "notAuthorized": "Нет доступа"
   },
   "nav": {
     "teams": "Команды",
@@ -53,7 +59,7 @@
     "expires": "Истекает {date}",
     "ownerRole": "Владелец",
     "memberRole": "Участник",
-    "activeMembers": "{count} активных участников"
+    "activeMembers": "Активных участников: {count}"
   },
   "security": {
     "sectionTitle": "Безопасность",
@@ -72,6 +78,102 @@
     "showPassword": "Показать пароль"
   },
   "packs": {
-    "title": "Паки"
+    "title": "Паки",
+    "pageDescription": "Создавайте и управляйте паками, раундами и вопросами.",
+    "searchPlaceholder": "Поиск паков по названию или описанию",
+    "searchEmpty": "По вашему запросу паки не найдены.",
+    "noDescription": "Без описания",
+    "updatedAt": "Обновлено {date}",
+    "roundsCount": "{count, plural, one {# раунд} few {# раунда} many {# раундов} other {# раунда}}",
+    "createButton": "Создать пак",
+    "toastCreated": "Пак создан.",
+    "createDialog": {
+      "title": "Создать пак",
+      "description": "Создайте квиз-пак и затем настройте раунды.",
+      "create": "Создать пак",
+      "creating": "Создание..."
+    },
+    "form": {
+      "titleLabel": "Название",
+      "titlePlaceholder": "Zakovat Friday #12",
+      "descriptionLabel": "Описание",
+      "descriptionPlaceholder": "Короткое описание (необязательно)",
+      "visibilityLabel": "Видимость"
+    },
+    "visibility": {
+      "draft": "Черновик",
+      "private": "Приватный",
+      "public": "Публичный"
+    },
+    "delete": {
+      "confirmTitle": "Удалить пак?",
+      "confirmDescription": "Пак, раунды, вопросы и связанные медиа будут удалены безвозвратно.",
+      "typeToConfirm": "Введите {title} для подтверждения",
+      "deleteButton": "Удалить пак",
+      "deleting": "Удаление...",
+      "deletedToast": "Пак удален."
+    },
+    "tabs": {
+      "rounds": "Раунды",
+      "settings": "Настройки"
+    },
+    "runPresenter": "Запустить презентер",
+    "overviewDescription": "Обзор пака и структуры раундов.",
+    "notAuthorizedDescription": "У вас нет доступа к этому паку.",
+    "backToPacks": "Назад к пакам",
+    "roundNotAuthorizedDescription": "У вас нет доступа к этому раунду.",
+    "roundBuilderDescription": "Собирайте вопросы для этого раунда. Тип выбирается для каждого вопроса.",
+    "settings": {
+      "description": "Таймеры и музыка.",
+      "timersTitle": "Таймеры",
+      "timersSubtitle": "Пресет таймера вопроса и время записи ответов.",
+      "questionTimerPreset": "Пресет таймера вопроса",
+      "noneUseRoundDefault": "Нет (использовать значение раунда)",
+      "secondsOption": "{count} сек",
+      "writeAnswersTime": "Время на запись ответов (сек)",
+      "breakMusicTitle": "Музыка перерыва",
+      "breakMusicSubtitle": "Проигрывается во время записи ответов.",
+      "timerMusicTitle": "Музыка таймера",
+      "timerMusicSubtitle": "Проигрывается во время таймера вопроса.",
+      "noMusicSelected": "Музыка не выбрана",
+      "fixValidationErrors": "Исправьте ошибки валидации, чтобы сохранить.",
+      "updatedToast": "Настройки пака обновлены."
+    },
+    "roundType": {
+      "text": "Текст",
+      "image": "Изображение",
+      "video": "Видео",
+      "audio": "Аудио",
+      "options": "Варианты"
+    },
+    "timerWithSeconds": "Таймер {count}с",
+    "questionsCount": "{count, plural, one {# вопрос} few {# вопроса} many {# вопросов} other {# вопроса}}",
+    "noMusic": "Без музыки",
+    "editRound": "Изменить раунд",
+    "deleteRound": "Удалить раунд",
+    "dragToReorder": "Перетащите для сортировки",
+    "roundsTotal": "{count, plural, one {# всего} other {# всего}}",
+    "dragRoundsToReorder": "Перетащите раунды для сортировки",
+    "reorder": "Сортировать",
+    "addRound": "Добавить раунд",
+    "empty": {
+      "title": "Паков пока нет",
+      "description": "Создайте первый пак, чтобы начать добавлять раунды и вопросы."
+    },
+    "emptyRoundsTitle": "Раундов пока нет",
+    "emptyRoundsDescription": "Добавьте первый раунд, чтобы начать собирать пак.",
+    "reorderUpdated": "Порядок раундов обновлен.",
+    "deleteRoundTitle": "Удалить раунд?",
+    "deleteRoundDescriptionWithName": "Раунд \"{title}\" и все его вопросы будут удалены.",
+    "irreversibleAction": "Это действие необратимо.",
+    "deleting": "Удаление...",
+    "template": {
+      "generate": "Сгенерировать шаблон Zakovat ({count} раундов)",
+      "generating": "Генерация...",
+      "generated": "Шаблон создан.",
+      "overwriteTitle": "Перезаписать существующие раунды?",
+      "overwriteDescription": "Текущие раунды будут заменены стандартным шаблоном Zakovat из {count} раундов.",
+      "overwriteAndGenerate": "Перезаписать и сгенерировать"
+    }
   }
 }

@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "@/src/i18n/client";
 import { ChevronLeftIcon } from "@/src/ui/icons";
 
 type BackButtonProps = {
@@ -11,6 +12,7 @@ type BackButtonProps = {
 };
 
 export function BackButton({ href, onBeforeBack }: BackButtonProps) {
+  const tCommon = useTranslations("common");
   const router = useRouter();
 
   return (
@@ -29,7 +31,7 @@ export function BackButton({ href, onBeforeBack }: BackButtonProps) {
       }}
     >
       <ChevronLeftIcon className="mr-1 h-4 w-4" aria-hidden />
-      Back
+      {tCommon("back")}
     </Button>
   );
 }

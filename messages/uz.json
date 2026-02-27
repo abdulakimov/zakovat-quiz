@@ -1,5 +1,6 @@
 {
   "common": {
+    "app": "Ilova",
     "language": "Til",
     "navigation": "Navigatsiya",
     "openNavigation": "Navigatsiyani ochish",
@@ -12,7 +13,12 @@
     "save": "Saqlash",
     "saving": "Saqlanmoqda...",
     "cancel": "Bekor qilish",
-    "unsavedChanges": "Saqlanmagan o'zgarishlar bor"
+    "unsavedChanges": "Saqlanmagan o'zgarishlar bor",
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "done": "Tayyor",
+    "back": "Orqaga",
+    "notAuthorized": "Ruxsat yo'q"
   },
   "nav": {
     "teams": "Jamoalar",
@@ -72,6 +78,102 @@
     "showPassword": "Parolni ko'rsatish"
   },
   "packs": {
-    "title": "Paketlar"
+    "title": "Paketlar",
+    "pageDescription": "Viktorina paketlari, raundlar va savollarni yarating hamda boshqaring.",
+    "searchPlaceholder": "Paketlarni nomi yoki tavsifi bo'yicha qidiring",
+    "searchEmpty": "Qidiruv bo'yicha paket topilmadi.",
+    "noDescription": "Tavsif yo'q",
+    "updatedAt": "Yangilangan sana: {date}",
+    "roundsCount": "{count, plural, one {# raund} other {# raund}}",
+    "createButton": "Paket yaratish",
+    "toastCreated": "Paket yaratildi.",
+    "createDialog": {
+      "title": "Paket yaratish",
+      "description": "Viktorina paketi yarating va keyin raundlarni sozlang.",
+      "create": "Paket yaratish",
+      "creating": "Yaratilmoqda..."
+    },
+    "form": {
+      "titleLabel": "Nomi",
+      "titlePlaceholder": "Zakovat Friday #12",
+      "descriptionLabel": "Tavsif",
+      "descriptionPlaceholder": "Qisqa tavsif (ixtiyoriy)",
+      "visibilityLabel": "Ko'rinish"
+    },
+    "visibility": {
+      "draft": "Qoralama",
+      "private": "Shaxsiy",
+      "public": "Ommaviy"
+    },
+    "delete": {
+      "confirmTitle": "Paket o'chirilsinmi?",
+      "confirmDescription": "Paket, raundlar, savollar va bog'liq media butunlay o'chiriladi.",
+      "typeToConfirm": "Tasdiqlash uchun {title} matnini kiriting",
+      "deleteButton": "Paketni o'chirish",
+      "deleting": "O'chirilmoqda...",
+      "deletedToast": "Paket o'chirildi."
+    },
+    "tabs": {
+      "rounds": "Raundlar",
+      "settings": "Sozlamalar"
+    },
+    "runPresenter": "Prezenterni ishga tushirish",
+    "overviewDescription": "Paket ko'rinishi va raundlar tuzilmasi.",
+    "notAuthorizedDescription": "Bu paketga kirish huquqingiz yo'q.",
+    "backToPacks": "Paketlarga qaytish",
+    "roundNotAuthorizedDescription": "Bu raundga kirish huquqingiz yo'q.",
+    "roundBuilderDescription": "Ushbu raund uchun savollarni tuzing. Savol turi har bir savol uchun alohida tanlanadi.",
+    "settings": {
+      "description": "Taymerlar va musiqa.",
+      "timersTitle": "Taymerlar",
+      "timersSubtitle": "Savol taymeri preseti va javob yozish vaqti.",
+      "questionTimerPreset": "Savol taymeri preseti",
+      "noneUseRoundDefault": "Yo'q (raund standartidan foydalanish)",
+      "secondsOption": "{count} soniya",
+      "writeAnswersTime": "Javob yozish vaqti (soniya)",
+      "breakMusicTitle": "Tanaffus musiqasi",
+      "breakMusicSubtitle": "Javob yozish vaqtida yangraydi.",
+      "timerMusicTitle": "Taymer musiqasi",
+      "timerMusicSubtitle": "Savol taymeri ishlaganda yangraydi.",
+      "noMusicSelected": "Musiqa tanlanmagan",
+      "fixValidationErrors": "Saqlash uchun validatsiya xatolarini tuzating.",
+      "updatedToast": "Paket sozlamalari yangilandi."
+    },
+    "roundType": {
+      "text": "Matn",
+      "image": "Rasm",
+      "video": "Video",
+      "audio": "Audio",
+      "options": "Variant"
+    },
+    "timerWithSeconds": "{count} soniyalik taymer",
+    "questionsCount": "{count, plural, one {# savol} other {# savol}}",
+    "noMusic": "Musiqa yo'q",
+    "editRound": "Raundni tahrirlash",
+    "deleteRound": "Raundni o'chirish",
+    "dragToReorder": "Saralash uchun sudrang",
+    "roundsTotal": "Jami: {count}",
+    "dragRoundsToReorder": "Raundlarni saralash uchun sudrang",
+    "reorder": "Saralash",
+    "addRound": "Raund qo'shish",
+    "empty": {
+      "title": "Hali paketlar yo'q",
+      "description": "Raund va savollarni tuzishni boshlash uchun birinchi paketni yarating."
+    },
+    "emptyRoundsTitle": "Hali raundlar yo'q",
+    "emptyRoundsDescription": "Paketni tuzishni boshlash uchun birinchi raundni qo'shing.",
+    "reorderUpdated": "Raund tartibi yangilandi.",
+    "deleteRoundTitle": "Raund o'chirilsinmi?",
+    "deleteRoundDescriptionWithName": "\"{title}\" raundi va undagi barcha savollar o'chiriladi.",
+    "irreversibleAction": "Bu amalni ortga qaytarib bo'lmaydi.",
+    "deleting": "O'chirilmoqda...",
+    "template": {
+      "generate": "Zakovat shablonini yaratish ({count} raund)",
+      "generating": "Yaratilmoqda...",
+      "generated": "Shablon yaratildi.",
+      "overwriteTitle": "Mavjud raundlar ustidan yozilsinmi?",
+      "overwriteDescription": "Paketdagi mavjud raundlar Zakovat standart {count} raundli shabloni bilan almashtiriladi.",
+      "overwriteAndGenerate": "Ustidan yozib yaratish"
+    }
   }
 }

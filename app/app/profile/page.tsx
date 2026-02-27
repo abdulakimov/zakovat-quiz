@@ -14,7 +14,7 @@ type PendingInvite = Awaited<ReturnType<typeof getMyTeamsAndInvites>>["pendingIn
 
 export default async function ProfilePage() {
   const locale = (await getLocale()) as AppLocale;
-  const tProfile = await getTranslations("profile");
+  const [tProfile, tCommon] = await Promise.all([getTranslations("profile"), getTranslations("common")]);
   const { user, activeTeams, pendingInvites } = await getMyTeamsAndInvites();
 
   return (
@@ -23,7 +23,7 @@ export default async function ProfilePage() {
         title={tProfile("pageTitle")}
         description={tProfile("pageDescription", { name: user.displayName ?? user.name ?? user.username })}
         breadcrumbs={[
-          { label: "App", href: localizeHref(locale, "/app") },
+          { label: tCommon("app"), href: localizeHref(locale, "/app") },
           { label: tProfile("pageTitle") },
         ]}
       />

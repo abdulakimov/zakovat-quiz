@@ -1,5 +1,6 @@
 {
   "common": {
+    "app": "App",
     "language": "Language",
     "navigation": "Navigation",
     "openNavigation": "Open navigation",
@@ -12,7 +13,12 @@
     "save": "Save",
     "saving": "Saving...",
     "cancel": "Cancel",
-    "unsavedChanges": "Unsaved changes"
+    "unsavedChanges": "Unsaved changes",
+    "edit": "Edit",
+    "delete": "Delete",
+    "done": "Done",
+    "back": "Back",
+    "notAuthorized": "Not authorized"
   },
   "nav": {
     "teams": "Teams",
@@ -72,6 +78,102 @@
     "showPassword": "Show password"
   },
   "packs": {
-    "title": "Packs"
+    "title": "Packs",
+    "pageDescription": "Create and manage quiz packs, rounds, and question sets.",
+    "searchPlaceholder": "Search packs by title or description",
+    "searchEmpty": "No packs match your search.",
+    "noDescription": "No description",
+    "updatedAt": "Updated {date}",
+    "roundsCount": "{count, plural, one {# round} other {# rounds}}",
+    "createButton": "Create pack",
+    "toastCreated": "Pack created.",
+    "createDialog": {
+      "title": "Create pack",
+      "description": "Create a quiz pack and configure rounds next.",
+      "create": "Create pack",
+      "creating": "Creating..."
+    },
+    "form": {
+      "titleLabel": "Title",
+      "titlePlaceholder": "Zakovat Friday #12",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Optional short description",
+      "visibilityLabel": "Visibility"
+    },
+    "visibility": {
+      "draft": "Draft",
+      "private": "Private",
+      "public": "Public"
+    },
+    "delete": {
+      "confirmTitle": "Delete pack?",
+      "confirmDescription": "This permanently removes the pack, rounds, questions, and linked options/media mappings.",
+      "typeToConfirm": "Type {title} to confirm",
+      "deleteButton": "Delete pack",
+      "deleting": "Deleting...",
+      "deletedToast": "Pack deleted."
+    },
+    "tabs": {
+      "rounds": "Rounds",
+      "settings": "Settings"
+    },
+    "runPresenter": "Run presenter",
+    "overviewDescription": "Pack overview and round structure.",
+    "notAuthorizedDescription": "You do not have access to this pack.",
+    "backToPacks": "Back to packs",
+    "roundNotAuthorizedDescription": "You do not have access to this round.",
+    "roundBuilderDescription": "Build questions for this round. Question type is selected per question.",
+    "settings": {
+      "description": "Timers and music.",
+      "timersTitle": "Timers",
+      "timersSubtitle": "Question timer preset and write answers time.",
+      "questionTimerPreset": "Question timer preset",
+      "noneUseRoundDefault": "None (use round default)",
+      "secondsOption": "{count} sec",
+      "writeAnswersTime": "Write answers time (sec)",
+      "breakMusicTitle": "Break music",
+      "breakMusicSubtitle": "Played during write breaks.",
+      "timerMusicTitle": "Timer music",
+      "timerMusicSubtitle": "Played during question timers.",
+      "noMusicSelected": "No music selected",
+      "fixValidationErrors": "Fix validation errors to save.",
+      "updatedToast": "Pack settings updated."
+    },
+    "roundType": {
+      "text": "Text",
+      "image": "Image",
+      "video": "Video",
+      "audio": "Audio",
+      "options": "Options"
+    },
+    "timerWithSeconds": "{count}s timer",
+    "questionsCount": "{count, plural, one {# question} other {# questions}}",
+    "noMusic": "No music",
+    "editRound": "Edit round",
+    "deleteRound": "Delete round",
+    "dragToReorder": "Drag to reorder",
+    "roundsTotal": "{count, plural, one {# total} other {# total}}",
+    "dragRoundsToReorder": "Drag rounds to reorder",
+    "reorder": "Reorder",
+    "addRound": "Add round",
+    "empty": {
+      "title": "No packs yet",
+      "description": "Create your first pack to start building rounds and questions."
+    },
+    "emptyRoundsTitle": "No rounds yet",
+    "emptyRoundsDescription": "Add your first round to start building the pack.",
+    "reorderUpdated": "Round order updated.",
+    "deleteRoundTitle": "Delete round?",
+    "deleteRoundDescriptionWithName": "This will remove \"{title}\" and all questions in this round.",
+    "irreversibleAction": "This action is irreversible.",
+    "deleting": "Deleting...",
+    "template": {
+      "generate": "Generate Zakovat template ({count} rounds)",
+      "generating": "Generating...",
+      "generated": "Template generated.",
+      "overwriteTitle": "Overwrite existing rounds?",
+      "overwriteDescription": "This will overwrite existing rounds in this pack with the standard Zakovat {count}-round template.",
+      "overwriteAndGenerate": "Overwrite and generate"
+    }
   }
 }
