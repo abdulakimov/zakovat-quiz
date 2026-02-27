@@ -27,22 +27,6 @@ export default async function RootLayout({
         <NextIntlClientProvider
           locale={locale}
           messages={messages}
-          onError={(error) => {
-            if (process.env.NODE_ENV === "development") {
-              console.error(error);
-              return;
-            }
-
-            throw error;
-          }}
-          getMessageFallback={({ namespace, key }) => {
-            const messagePath = [namespace, key].filter(Boolean).join(".");
-            if (process.env.NODE_ENV === "development") {
-              return messagePath;
-            }
-
-            throw new Error(`Missing translation key: ${messagePath}`);
-          }}
         >
           {children}
         </NextIntlClientProvider>
