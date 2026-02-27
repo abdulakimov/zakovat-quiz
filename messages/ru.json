@@ -2,6 +2,9 @@
   "common": {
     "app": "Приложение",
     "language": "Язык",
+    "languageUz": "Узбекский",
+    "languageRu": "Русский",
+    "languageEn": "Английский",
     "navigation": "Навигация",
     "openNavigation": "Открыть навигацию",
     "comingSoon": "Скоро",

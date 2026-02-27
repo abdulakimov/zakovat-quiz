@@ -181,14 +181,14 @@ function ProfileMenu({
               <Button
                 type="button"
                 variant="outline"
-                className="h-10 gap-2 rounded-full px-2 sm:px-3"
+                className="h-9 gap-2 rounded-full px-2"
               >
                 <Avatar className="h-7 w-7">
                   {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName} /> : null}
                   {!avatarUrl ? <AvatarFallback>{getInitials(user)}</AvatarFallback> : null}
                 </Avatar>
-                <span className="hidden max-w-36 truncate text-sm sm:inline">{displayName}</span>
-                <ChevronDownIcon className="hidden h-4 w-4 text-muted-foreground sm:block" />
+                <span className="hidden max-w-36 truncate text-sm md:inline">{displayName}</span>
+                <ChevronDownIcon className="h-4 w-4 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>
           </TooltipTrigger>
@@ -273,7 +273,7 @@ export async function AppShell({ children, user }: AppShellProps) {
 
           <DesktopNav items={navItems} comingSoon={tCommon("comingSoon")} />
 
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-2 flex-nowrap">
             <ThemeSwitcher />
             <LanguageSwitcher />
             <ProfileMenu

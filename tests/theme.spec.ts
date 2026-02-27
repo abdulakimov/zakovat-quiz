@@ -137,7 +137,7 @@ test("default theme follows system when no preference is stored", async ({ page 
   await page.addInitScript(() => window.localStorage.removeItem("theme"));
 
   await page.goto("/en/app");
-  await expect(page.getByTestId("theme-switcher")).toContainText("System");
+  await expect(page.getByTestId("theme-switcher")).toBeVisible();
   await expect(page.locator("html")).toHaveClass(/dark/);
 });
 

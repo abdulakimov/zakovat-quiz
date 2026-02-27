@@ -2,6 +2,9 @@
   "common": {
     "app": "App",
     "language": "Language",
+    "languageUz": "Uzbek",
+    "languageRu": "Russian",
+    "languageEn": "English",
     "navigation": "Navigation",
     "openNavigation": "Open navigation",
     "comingSoon": "Coming soon",
