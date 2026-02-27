@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,6 +18,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { deleteTeam } from "@/src/actions/teams";
+import { useTranslations } from "@/src/i18n/client";
+import { localizeHref, normalizeLocale } from "@/src/i18n/config";
 import { toast } from "@/src/components/ui/sonner";
 
 type DeleteTeamButtonProps = {
@@ -25,6 +28,9 @@ type DeleteTeamButtonProps = {
 };
 
 export function DeleteTeamButton({ teamId, teamName }: DeleteTeamButtonProps) {
+  const locale = normalizeLocale(useLocale());
+  const tTeams = useTranslations("teams");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [confirmation, setConfirmation] = React.useState("");
@@ -46,12 +52,12 @@ export function DeleteTeamButton({ teamId, teamName }: DeleteTeamButtonProps) {
             return;
           }
 
-          toast.success(result?.success ?? "Team deleted.");
+          toast.success(result?.success ?? tTeams("teamDeleted"));
           setOpen(false);
-          router.push("/app/teams");
+          router.push(localizeHref(locale, "/app/teams"));
           router.refresh();
         } catch {
-          toast.error("Failed to delete team.");
+          toast.error(tTeams("deleteTeamFailed"));
         }
       })();
     });
@@ -66,21 +72,21 @@ export function DeleteTeamButton({ teamId, teamName }: DeleteTeamButtonProps) {
           size="sm"
           className="border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800"
         >
-          Delete team
+          {tTeams("deleteTeam")}
         </Button>
       </AlertDialogTrigger>
 
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-red-700">Delete team?</AlertDialogTitle>
+          <AlertDialogTitle className="text-red-700">{tTeams("deleteTeamConfirmTitle")}</AlertDialogTitle>
           <AlertDialogDescription>
-            This action is irreversible. The team, members, and pending invites will be permanently removed.
+            {tTeams("deleteTeamConfirmDescription")}
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <div className="space-y-2">
           <Label htmlFor="delete-team-confirm" className="text-sm text-slate-700">
-            Type <span className="font-semibold">{teamName}</span> to confirm
+            {tTeams("typeToConfirm", { teamName })}
           </Label>
           <Input
             id="delete-team-confirm"
@@ -96,7 +102,7 @@ export function DeleteTeamButton({ teamId, teamName }: DeleteTeamButtonProps) {
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
             <Button type="button" variant="outline" size="sm" disabled={isSubmitting}>
-              Cancel
+              {tCommon("cancel")}
             </Button>
           </AlertDialogCancel>
           <AlertDialogAction asChild>
@@ -107,7 +113,7 @@ export function DeleteTeamButton({ teamId, teamName }: DeleteTeamButtonProps) {
               onClick={submitDelete}
               className="bg-red-700 text-white hover:bg-red-800"
             >
-              {isSubmitting ? "Deleting..." : "Delete permanently"}
+              {isSubmitting ? tTeams("deleting") : tTeams("deletePermanently")}
             </Button>
           </AlertDialogAction>
         </AlertDialogFooter>

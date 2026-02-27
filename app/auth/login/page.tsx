@@ -1,11 +1,14 @@
+import { getTranslations } from "@/src/i18n/server";
 import LoginForm from "@/app/auth/login/login-form";
 import { AuthLayout } from "@/src/components/layout/AuthLayout";
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const tAuth = await getTranslations("auth");
+
   return (
     <AuthLayout
-      title="Welcome back"
-      description="Sign in to manage quizzes, assets, and workspace settings."
+      title={tAuth("loginTitle")}
+      description={tAuth("loginDescription")}
     >
       <LoginForm />
     </AuthLayout>

@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { ActionGroup } from "@/src/components/ui/action-group";
 import { IconButton } from "@/src/components/ui/icon-button";
 import { removeMemberAction } from "@/src/actions/teams";
+import { useTranslations } from "@/src/i18n/client";
 import { toast } from "@/src/components/ui/sonner";
 import { CrownIcon, TrashIcon } from "@/src/ui/icons";
 
@@ -26,6 +27,8 @@ type Props = {
 };
 
 export function MemberRowActions({ teamId, memberId, memberLabel }: Props) {
+  const tTeams = useTranslations("teams");
+  const tCommon = useTranslations("common");
   const router = useRouter();
   const [removeOpen, setRemoveOpen] = React.useState(false);
   const [isPending, startTransition] = React.useTransition();
@@ -50,12 +53,12 @@ export function MemberRowActions({ teamId, memberId, memberLabel }: Props) {
   return (
     <AlertDialog open={removeOpen} onOpenChange={setRemoveOpen}>
       <ActionGroup>
-        <IconButton label="Transfer ownership" tooltip="Coming soon" disabled>
+        <IconButton label={tTeams("transferOwnership")} tooltip={tCommon("comingSoon")} disabled>
           <CrownIcon className="h-4 w-4" />
         </IconButton>
         <IconButton
-          label="Remove member"
-          tooltip="Remove"
+          label={tTeams("removeMember")}
+          tooltip={tTeams("remove")}
           className="text-red-600 hover:text-red-700"
           onClick={() => setRemoveOpen(true)}
         >
@@ -65,15 +68,15 @@ export function MemberRowActions({ teamId, memberId, memberLabel }: Props) {
 
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Remove member?</AlertDialogTitle>
+          <AlertDialogTitle>{tTeams("removeMemberConfirmTitle")}</AlertDialogTitle>
           <AlertDialogDescription>
-            This will remove <span className="font-medium text-slate-900">{memberLabel}</span> from the team.
+            {tTeams("removeMemberConfirmDescription", { memberLabel })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel asChild>
             <Button type="button" variant="outline" disabled={isPending}>
-              Cancel
+              {tCommon("cancel")}
             </Button>
           </AlertDialogCancel>
           <AlertDialogAction asChild>
@@ -83,7 +86,7 @@ export function MemberRowActions({ teamId, memberId, memberLabel }: Props) {
               disabled={isPending}
               onClick={handleRemove}
             >
-              {isPending ? "Removing..." : "Remove"}
+              {isPending ? tTeams("removing") : tTeams("remove")}
             </Button>
           </AlertDialogAction>
         </AlertDialogFooter>

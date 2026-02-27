@@ -4,10 +4,13 @@ import * as React from "react";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useLocale } from "next-intl";
 import { signup, type AuthState } from "@/app/auth/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormErrorSummary } from "@/src/components/form/FormErrorSummary";
+import { useTranslations } from "@/src/i18n/client";
+import { localizeHref, normalizeLocale } from "@/src/i18n/config";
 import { FormFieldPassword } from "@/src/components/form/FormFieldPassword";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
 import { toast } from "@/src/components/ui/sonner";
@@ -32,6 +35,8 @@ function toFormData(values: SignupInput) {
 }
 
 export default function SignupForm() {
+  const locale = normalizeLocale(useLocale());
+  const tAuth = useTranslations("auth");
   const [isPending, startTransition] = React.useTransition();
   const [serverState, setServerState] = React.useState<AuthState>({});
 
@@ -57,7 +62,7 @@ export default function SignupForm() {
           if (result?.success) toast.success(result.success);
         } catch (error) {
           if (isRedirectError(error)) throw error;
-          const message = "Unable to create account right now.";
+          const message = tAuth("signupUnavailable");
           setServerState({ error: message });
           toast.error(message);
         }
@@ -68,15 +73,15 @@ export default function SignupForm() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="space-y-1 pb-3">
-        <CardTitle className="text-base font-semibold">Create your account</CardTitle>
-        <CardDescription className="text-sm">Start building quizzes in minutes.</CardDescription>
+        <CardTitle className="text-base font-semibold" data-testid="signup-heading">{tAuth("signupTitle")}</CardTitle>
+        <CardDescription className="text-sm">{tAuth("signupCardDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-3" noValidate>
           <FormFieldText
             id="name"
             name="name"
-            label="Name"
+            label={tAuth("name")}
             register={form.register}
             error={form.formState.errors.name}
             autoComplete="name"
@@ -85,7 +90,7 @@ export default function SignupForm() {
           <FormFieldText
             id="username"
             name="username"
-            label="Username"
+            label={tAuth("username")}
             register={form.register}
             error={form.formState.errors.username}
             autoComplete="username"
@@ -94,7 +99,7 @@ export default function SignupForm() {
           <FormFieldText
             id="email"
             name="email"
-            label="Email"
+            label={tAuth("email")}
             type="email"
             register={form.register}
             error={form.formState.errors.email}
@@ -104,7 +109,7 @@ export default function SignupForm() {
           <FormFieldPassword
             id="password"
             name="password"
-            label="Password"
+            label={tAuth("password")}
             register={form.register}
             error={form.formState.errors.password}
             autoComplete="new-password"
@@ -122,13 +127,13 @@ export default function SignupForm() {
           />
 
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Creating account..." : "Create account"}
+            {isPending ? tAuth("creatingAccount") : tAuth("createAccount")}
           </Button>
 
           <p className="text-xs text-slate-500">
-            Already have an account?{" "}
-            <Link href="/auth/login" className="font-medium text-slate-900 underline">
-              Sign in
+            {tAuth("alreadyAccount")}{" "}
+            <Link href={localizeHref(locale, "/auth/login")} className="font-medium text-slate-900 underline">
+              {tAuth("signIn")}
             </Link>
           </p>
         </form>

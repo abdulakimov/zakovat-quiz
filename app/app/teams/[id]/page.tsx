@@ -1,9 +1,12 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import type { ComponentProps } from "react";
+import { getLocale } from "next-intl/server";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { getTeamDetails } from "@/src/actions/teams";
+import { getTranslations } from "@/src/i18n/server";
+import { localizeHref, type AppLocale } from "@/src/i18n/config";
 import { DeleteTeamButton } from "@/src/components/teams/DeleteTeamButton";
 import { InviteMemberForm } from "@/src/components/teams/InviteMemberForm";
 import { LeaveTeamButton } from "@/src/components/teams/LeaveTeamButton";
@@ -18,26 +21,6 @@ import { UserPlusIcon } from "@/src/ui/icons";
 type TeamMember = NonNullable<Awaited<ReturnType<typeof getTeamDetails>>["team"]>["members"][number];
 type TeamInvite = NonNullable<Awaited<ReturnType<typeof getTeamDetails>>["team"]>["invites"][number];
 
-function NotAuthorizedState() {
-  return (
-    <div className="space-y-4">
-      <PageHeader
-        title="Not authorized"
-        description="You are not a member of this team."
-        backHref="/app/teams"
-        breadcrumbs={[
-          { label: "App", href: "/app" },
-          { label: "Teams", href: "/app/teams" },
-          { label: "Not authorized" },
-        ]}
-      />
-      <Link href="/app/teams" className="text-sm font-medium text-slate-900 underline">
-        Back to teams
-      </Link>
-    </div>
-  );
-}
-
 function initials(name: string) {
   return name
     .split(/\s+/)
@@ -46,15 +29,35 @@ function initials(name: string) {
     .join("");
 }
 
-function expiresInLabel(date: Date) {
+function expiresInLabel(date: Date, tTeams: Awaited<ReturnType<typeof getTranslations>>) {
   const diffMs = date.getTime() - Date.now();
-  if (diffMs <= 0) return "Expired";
+  if (diffMs <= 0) return tTeams("inviteExpired");
   const hours = Math.floor(diffMs / (1000 * 60 * 60));
   const days = Math.floor(hours / 24);
-  if (days >= 1) return `Expires in ${days} day${days === 1 ? "" : "s"}`;
-  if (hours >= 1) return `Expires in ${hours} hour${hours === 1 ? "" : "s"}`;
+  if (days >= 1) return tTeams("inviteExpiresInDays", { count: days });
+  if (hours >= 1) return tTeams("inviteExpiresInHours", { count: hours });
   const mins = Math.max(1, Math.floor(diffMs / (1000 * 60)));
-  return `Expires in ${mins} min`;
+  return tTeams("inviteExpiresInMins", { count: mins });
+}
+
+function NotAuthorizedState({ locale, tCommon, tTeams }: { locale: AppLocale; tCommon: Awaited<ReturnType<typeof getTranslations>>; tTeams: Awaited<ReturnType<typeof getTranslations>> }) {
+  return (
+    <div className="space-y-4">
+      <PageHeader
+        title={tCommon("notAuthorized")}
+        description={tTeams("notMember")}
+        backHref={localizeHref(locale, "/app/teams")}
+        breadcrumbs={[
+          { label: tCommon("app"), href: localizeHref(locale, "/app") },
+          { label: tTeams("title"), href: localizeHref(locale, "/app/teams") },
+          { label: tCommon("notAuthorized") },
+        ]}
+      />
+      <Link href={localizeHref(locale, "/app/teams")} className="text-sm font-medium text-slate-900 underline">
+        {tTeams("backToTeams")}
+      </Link>
+    </div>
+  );
 }
 
 export default async function TeamDetailPage({
@@ -62,45 +65,48 @@ export default async function TeamDetailPage({
 }: {
   params: Promise<{ id?: string | string[] }>;
 }) {
+  const locale = (await getLocale()) as AppLocale;
+  const [tCommon, tTeams] = await Promise.all([getTranslations("common"), getTranslations("teams")]);
+
   const resolvedParams = await params;
   const teamId = Array.isArray(resolvedParams?.id) ? resolvedParams.id[0] : resolvedParams?.id;
 
-  if (!teamId) return <NotAuthorizedState />;
+  if (!teamId) return <NotAuthorizedState locale={locale} tCommon={tCommon} tTeams={tTeams} />;
 
   const { team, isMember, isOwner } = await getTeamDetails(teamId);
   if (!team) {
     return (
       <div className="space-y-4">
         <PageHeader
-          title="Team not found"
-          description="The requested team does not exist."
-          backHref="/app/teams"
+          title={tTeams("teamNotFound")}
+          description={tTeams("teamNotFoundDescription")}
+          backHref={localizeHref(locale, "/app/teams")}
           breadcrumbs={[
-            { label: "App", href: "/app" },
-            { label: "Teams", href: "/app/teams" },
-            { label: "Team not found" },
+            { label: tCommon("app"), href: localizeHref(locale, "/app") },
+            { label: tTeams("title"), href: localizeHref(locale, "/app/teams") },
+            { label: tTeams("teamNotFound") },
           ]}
         />
-        <Link href="/app/teams" className="text-sm font-medium text-slate-900 underline">
-          Back to teams
+        <Link href={localizeHref(locale, "/app/teams")} className="text-sm font-medium text-slate-900 underline">
+          {tTeams("backToTeams")}
         </Link>
       </div>
     );
   }
-  if (!isMember) return <NotAuthorizedState />;
+  if (!isMember) return <NotAuthorizedState locale={locale} tCommon={tCommon} tTeams={tTeams} />;
 
   const baseItems: ComponentProps<typeof SettingsTabsLayout>["items"] = [
     {
       key: "members",
-      label: "Members",
+      label: tTeams("membersTab"),
       icon: "users",
       content: (
         <div className="space-y-6">
           <section className="space-y-3">
-            <h2 className="text-lg font-semibold text-slate-900">Members</h2>
+            <h2 className="text-lg font-semibold text-slate-900">{tTeams("membersTab")}</h2>
             {team.members.length === 0 ? (
               <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-600">
-                No active members found.
+                {tTeams("noActiveMembers")}
               </div>
             ) : (
               <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -121,7 +127,9 @@ export default async function TeamDetailPage({
                       </div>
                     </div>
                     <div className="flex items-center gap-2 self-end sm:self-auto">
-                      <Badge variant={member.role === "OWNER" ? "success" : "secondary"}>{member.role}</Badge>
+                      <Badge variant={member.role === "OWNER" ? "success" : "secondary"}>
+                        {member.role === "OWNER" ? tTeams("ownerBadge") : tTeams("memberBadge")}
+                      </Badge>
                       {isOwner && member.role !== "OWNER" ? (
                         <MemberRowActions
                           teamId={team.id}
@@ -140,20 +148,20 @@ export default async function TeamDetailPage({
             <>
               <Separator />
               <section className="space-y-3">
-                <h2 className="text-lg font-semibold text-slate-900">Invite member</h2>
+                <h2 className="text-lg font-semibold text-slate-900">{tTeams("inviteMember")}</h2>
                 <InviteMemberForm teamId={team.id} />
               </section>
 
               <Separator />
               <section className="space-y-3">
-                <h2 className="text-lg font-semibold text-slate-900">Pending invites</h2>
+                <h2 className="text-lg font-semibold text-slate-900">{tTeams("pendingInvites")}</h2>
                 {team.invites.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-slate-300 bg-white p-6 text-center">
                     <div className="mx-auto mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-slate-500">
                       <UserPlusIcon className="h-5 w-5" />
                     </div>
-                    <p className="text-sm font-medium text-slate-900">No pending invites</p>
-                    <p className="mt-1 text-sm text-slate-600">Invite teammates to collaborate on this team.</p>
+                    <p className="text-sm font-medium text-slate-900">{tTeams("noPendingInvites")}</p>
+                    <p className="mt-1 text-sm text-slate-600">{tTeams("inviteTeammatesHint")}</p>
                   </div>
                 ) : (
                   <div className="space-y-2 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -174,8 +182,8 @@ export default async function TeamDetailPage({
                               @{invite.invitedUser.username} - {invite.invitedUser.email}
                             </p>
                             <div className="mt-1 flex flex-wrap items-center gap-2">
-                              <Badge variant="secondary">PENDING</Badge>
-                              <span className="text-xs text-slate-500">{expiresInLabel(invite.expiresAt)}</span>
+                              <Badge variant="secondary">{tTeams("pendingBadge")}</Badge>
+                              <span className="text-xs text-slate-500">{expiresInLabel(invite.expiresAt, tTeams)}</span>
                             </div>
                           </div>
                         </div>
@@ -196,11 +204,11 @@ export default async function TeamDetailPage({
     ? [
         {
           key: "settings",
-          label: "Settings",
+          label: tCommon("settings"),
           icon: "settings",
           content: (
             <section className="space-y-3">
-              <h2 className="text-lg font-semibold text-slate-900">Team settings</h2>
+              <h2 className="text-lg font-semibold text-slate-900">{tTeams("teamSettings")}</h2>
               <TeamSettingsCard
                 team={{
                   id: team.id,
@@ -215,14 +223,14 @@ export default async function TeamDetailPage({
         },
         {
           key: "danger",
-          label: "Danger",
+          label: tTeams("dangerTab"),
           icon: "danger",
           content: (
             <section className="space-y-3">
-              <h2 className="text-lg font-semibold text-red-700">Danger zone</h2>
+              <h2 className="text-lg font-semibold text-red-700">{tTeams("dangerZone")}</h2>
               <div className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
                 <p className="text-sm leading-6 text-red-700">
-                  Permanently delete this team and all associated members and invites.
+                  {tTeams("deleteTeamHint")}
                 </p>
                 <div className="shrink-0">
                   <DeleteTeamButton teamId={team.id} teamName={team.name} />
@@ -244,14 +252,11 @@ export default async function TeamDetailPage({
         avatarUrl={team.avatarAsset?.path ? `/api/media/${team.avatarAsset.path}` : null}
         slogan={team.slogan}
         memberCount={team.members.length}
-        isOwner={false}
+        isOwner={isOwner}
         extraActions={!isOwner ? <LeaveTeamButton teamId={team.id} /> : null}
       />
 
-      <SettingsTabsLayout
-        defaultKey="members"
-        items={items}
-      />
+      <SettingsTabsLayout defaultKey="members" items={items} />
     </div>
   );
 }

@@ -4,10 +4,13 @@ import * as React from "react";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useLocale } from "next-intl";
 import { login, type AuthState } from "@/app/auth/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormErrorSummary } from "@/src/components/form/FormErrorSummary";
+import { useTranslations } from "@/src/i18n/client";
+import { localizeHref, normalizeLocale } from "@/src/i18n/config";
 import { FormFieldPassword } from "@/src/components/form/FormFieldPassword";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
 import { toast } from "@/src/components/ui/sonner";
@@ -30,6 +33,8 @@ function toFormData(values: LoginInput) {
 }
 
 export default function LoginForm() {
+  const locale = normalizeLocale(useLocale());
+  const tAuth = useTranslations("auth");
   const [isPending, startTransition] = React.useTransition();
   const [serverState, setServerState] = React.useState<AuthState>({});
 
@@ -53,7 +58,7 @@ export default function LoginForm() {
           if (result?.success) toast.success(result.success);
         } catch (error) {
           if (isRedirectError(error)) throw error;
-          const message = "Unable to sign in right now.";
+          const message = tAuth("loginUnavailable");
           setServerState({ error: message });
           toast.error(message);
         }
@@ -64,15 +69,15 @@ export default function LoginForm() {
   return (
     <Card className="w-full max-w-md">
       <CardHeader className="space-y-1 pb-3">
-        <CardTitle className="text-base font-semibold">Welcome back</CardTitle>
-        <CardDescription className="text-sm">Sign in to continue.</CardDescription>
+        <CardTitle className="text-base font-semibold" data-testid="login-heading">{tAuth("loginTitle")}</CardTitle>
+        <CardDescription className="text-sm">{tAuth("loginCardDescription")}</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={onSubmit} className="space-y-3" noValidate>
           <FormFieldText
             id="usernameOrEmail"
             name="usernameOrEmail"
-            label="Username or email"
+            label={tAuth("usernameOrEmail")}
             register={form.register}
             error={form.formState.errors.usernameOrEmail}
             autoComplete="username"
@@ -81,7 +86,7 @@ export default function LoginForm() {
           <FormFieldPassword
             id="password"
             name="password"
-            label="Password"
+            label={tAuth("password")}
             register={form.register}
             error={form.formState.errors.password}
             autoComplete="current-password"
@@ -97,13 +102,13 @@ export default function LoginForm() {
           />
 
           <Button type="submit" className="w-full" disabled={isPending}>
-            {isPending ? "Signing in..." : "Sign in"}
+            {isPending ? tAuth("signingIn") : tAuth("signIn")}
           </Button>
 
           <p className="text-xs text-slate-500">
-            Need an account?{" "}
-            <Link href="/auth/signup" className="font-medium text-slate-900 underline">
-              Sign up
+            {tAuth("needAccount")}{" "}
+            <Link href={localizeHref(locale, "/auth/signup")} className="font-medium text-slate-900 underline">
+              {tAuth("signUp")}
             </Link>
           </p>
         </form>

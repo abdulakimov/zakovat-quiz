@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import type { PresenterItem, QuestionSlide } from "@/src/lib/presenterDeck";
+import { useTranslations } from "@/src/i18n/client";
 import { MinimalMedia } from "@/src/components/presenter/MinimalMedia";
 import { MinimalTimer } from "@/src/components/presenter/MinimalTimer";
 
@@ -50,6 +51,7 @@ export function SlideRenderer({
   setClipRef: (el: HTMLMediaElement | null) => void;
   mediaHint: string | null;
 }) {
+  const tPresenter = useTranslations("presenter");
   const showQuestion = Boolean(question);
   const questionImage: MediaInfo | null =
     question?.primaryMedia && question.primaryMedia.type === "IMAGE"
@@ -85,32 +87,32 @@ export function SlideRenderer({
 
       {item.kind === "ROUND_INTRO" ? (
         <div className="flex h-full flex-col items-center justify-center text-center">
-          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Round</p>
+          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">{tPresenter("phaseRound")}</p>
           <h1 className="mt-3 text-4xl font-semibold text-slate-900 sm:text-6xl">{roundTitle}</h1>
         </div>
       ) : null}
 
       {item.kind === "RECAP_INTRO" ? (
         <div className="flex h-full flex-col items-center justify-center text-center">
-          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Recap</p>
-          <h2 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-5xl">Savollarni takrorlab olamiz</h2>
+          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">{tPresenter("phaseRecap")}</p>
+          <h2 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-5xl">{tPresenter("recapTitle")}</h2>
           <p className="mt-3 text-sm text-slate-500">{roundTitle}</p>
         </div>
       ) : null}
 
       {item.kind === "WRITE_ANSWERS" ? (
         <div className="flex h-full flex-col items-center justify-center text-center">
-          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Write</p>
-          <h2 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-5xl">Write Answers</h2>
+          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">{tPresenter("phaseWrite")}</p>
+          <h2 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-5xl">{tPresenter("writeAnswersTitle")}</h2>
           <p className="mt-3 text-sm text-slate-500">{roundTitle}</p>
-          <p className="mt-2 text-2xl text-slate-900">{writeDurationSec} sec</p>
+          <p className="mt-2 text-2xl text-slate-900">{tPresenter("seconds", { count: writeDurationSec })}</p>
         </div>
       ) : null}
 
       {item.kind === "REVEAL_INTRO" ? (
         <div className="flex h-full flex-col items-center justify-center text-center">
-          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">Reveal</p>
-          <h2 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-5xl">Javoblarni e'lon qilamiz</h2>
+          <p className="text-sm uppercase tracking-[0.2em] text-slate-400">{tPresenter("phaseReveal")}</p>
+          <h2 className="mt-3 text-3xl font-semibold text-slate-900 sm:text-5xl">{tPresenter("revealTitle")}</h2>
           <p className="mt-3 text-sm text-slate-500">{roundTitle}</p>
         </div>
       ) : null}
@@ -122,7 +124,7 @@ export function SlideRenderer({
 
             {item.kind === "REVEAL_ANSWER" ? (
               <div className="mt-8 space-y-2">
-                <p className="text-xs text-slate-500">Answer</p>
+                <p className="text-xs text-slate-500">{tPresenter("answer")}</p>
                 <p className="text-2xl font-semibold text-slate-900">
                   {question?.answerText ?? question?.answer ?? ""}
                 </p>

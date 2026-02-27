@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useLocale } from "next-intl";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { renameTeam } from "@/src/actions/teams";
 import { IconButton } from "@/src/components/ui/icon-button";
+import { useTranslations } from "@/src/i18n/client";
+import { localizeHref, normalizeLocale } from "@/src/i18n/config";
 import { toast } from "@/src/components/ui/sonner";
 import { PageHeader } from "@/src/components/layout/PageHeader";
 import { CopyIcon, LinkIcon, PencilIcon } from "@/src/ui/icons";
@@ -60,6 +63,9 @@ export function TeamDetailHeader({
   isOwner,
   extraActions,
 }: TeamDetailHeaderProps) {
+  const locale = normalizeLocale(useLocale());
+  const tTeams = useTranslations("teams");
+  const tCommon = useTranslations("common");
   const [isEditing, setIsEditing] = React.useState(false);
   const [currentName, setCurrentName] = React.useState(initialName);
   const [isPending, startTransition] = React.useTransition();
@@ -86,7 +92,7 @@ export function TeamDetailHeader({
         }
         setCurrentName(values.name);
         setIsEditing(false);
-        toast.success(result?.success ?? "Saved");
+        toast.success(result?.success ?? tTeams("saved"));
       })();
     });
   });
@@ -94,10 +100,10 @@ export function TeamDetailHeader({
   return (
     <TooltipProvider>
       <PageHeader
-        backHref="/app/teams"
+        backHref={localizeHref(locale, "/app/teams")}
         breadcrumbs={[
-          { label: "App", href: "/app" },
-          { label: "Teams", href: "/app/teams" },
+          { label: tCommon("app"), href: localizeHref(locale, "/app") },
+          { label: tTeams("title"), href: localizeHref(locale, "/app/teams") },
           { label: currentName },
         ]}
         title={
@@ -111,9 +117,14 @@ export function TeamDetailHeader({
             {!isEditing ? (
               <>
                 <span className="truncate text-2xl font-semibold tracking-tight text-slate-900">{currentName}</span>
-                <Badge>{memberCount} members</Badge>
+                <Badge>{tTeams("membersCount", { count: memberCount })}</Badge>
                 {isOwner ? (
-                  <IconButton label="Rename team" tooltip="Rename" className="h-8 w-8" onClick={() => setIsEditing(true)}>
+                  <IconButton
+                    label={tTeams("renameTeam")}
+                    tooltip={tTeams("rename")}
+                    className="h-8 w-8"
+                    onClick={() => setIsEditing(true)}
+                  >
                     <PencilIcon className="h-4 w-4" />
                   </IconButton>
                 ) : null}
@@ -133,7 +144,7 @@ export function TeamDetailHeader({
                   ) : null}
                 </div>
                 <Button type="submit" size="sm" disabled={isPending}>
-                  {isPending ? "Saving..." : "Save"}
+                  {isPending ? tCommon("saving") : tCommon("save")}
                 </Button>
                 <Button
                   type="button"
@@ -145,13 +156,13 @@ export function TeamDetailHeader({
                     setIsEditing(false);
                   }}
                 >
-                  Cancel
+                  {tCommon("cancel")}
                 </Button>
               </form>
             )}
           </div>
         }
-        description={slogan?.trim() ? slogan : "Manage members and invitations."}
+        description={slogan?.trim() ? slogan : tTeams("manageMembersInvites")}
         actions={
           <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
             <Tooltip>
@@ -164,17 +175,17 @@ export function TeamDetailHeader({
                   onClick={() => {
                     void (async () => {
                       const ok = await copyWithFallback(teamId);
-                      if (ok) toast.success("Copied!");
-                      else toast.error("Failed to copy");
+                      if (ok) toast.success(tTeams("copied"));
+                      else toast.error(tTeams("copyFailed"));
                     })();
                   }}
                 >
                   <CopyIcon className="mr-2 h-4 w-4" />
-                  <span className="sm:hidden">Copy ID</span>
-                  <span className="hidden sm:inline">Copy team ID</span>
+                  <span className="sm:hidden">{tTeams("copyIdShort")}</span>
+                  <span className="hidden sm:inline">{tTeams("copyTeamId")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Copy team ID</TooltipContent>
+              <TooltipContent>{tTeams("copyTeamId")}</TooltipContent>
             </Tooltip>
 
             <Tooltip>
@@ -182,12 +193,12 @@ export function TeamDetailHeader({
                 <span className="inline-flex">
                   <Button type="button" variant="outline" size="sm" disabled className="justify-center sm:justify-start">
                     <LinkIcon className="mr-2 h-4 w-4" />
-                    <span className="sm:hidden">Share link</span>
-                    <span className="hidden sm:inline">Copy share link</span>
+                    <span className="sm:hidden">{tTeams("shareLink")}</span>
+                    <span className="hidden sm:inline">{tTeams("copyShareLink")}</span>
                   </Button>
                 </span>
               </TooltipTrigger>
-              <TooltipContent>Coming soon</TooltipContent>
+              <TooltipContent>{tCommon("comingSoon")}</TooltipContent>
             </Tooltip>
 
             {extraActions}

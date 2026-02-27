@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { useLocale } from "next-intl";
+import { useTranslations } from "@/src/i18n/client";
 import type { PresenterSlide } from "@/src/actions/presenter";
 import { AudioManager } from "@/src/lib/audioManager";
 import { buildPresenterDeck, type PresenterItem } from "@/src/lib/presenterDeck";
@@ -8,6 +10,7 @@ import { findIndexForLoc, getLocForItem, parseLoc, serializeLoc } from "@/src/li
 import { presenterReducer, type PresenterContext, type PresenterState } from "@/src/lib/presenter/reducer";
 import { PresenterShell } from "@/src/components/presenter/PresenterShell";
 import { SlideRenderer } from "@/src/components/presenter/SlideRenderer";
+import { localizeHref, normalizeLocale } from "@/src/i18n/config";
 import { toast } from "@/src/components/ui/sonner";
 
 type PackMeta = {
@@ -44,12 +47,14 @@ const initialState: PresenterState = {
 };
 
 export function PresenterPlayer({ pack, slides }: { pack: PackMeta; slides: PresenterSlide[] }) {
+  const locale = normalizeLocale(useLocale());
+  const tPresenter = useTranslations("presenter");
   const storageKey = `quiz_creator.presenter.loc.${pack.id}`;
   const rawWriteDuration = pack.breakTimerSec && pack.breakTimerSec > 0 ? pack.breakTimerSec : 60;
   const safeWriteDuration = rawWriteDuration > 0 ? rawWriteDuration : 60;
   if (process.env.NODE_ENV !== "production" && rawWriteDuration <= 0) {
     // eslint-disable-next-line no-console
-    console.warn("WRITE_ANSWERS duration invalid, falling back to 60s.");
+    console.warn(tPresenter("writeAnswersDurationInvalid"));
   }
   const writeDurationSec = Math.min(300, Math.max(10, safeWriteDuration));
 
@@ -98,14 +103,14 @@ export function PresenterPlayer({ pack, slides }: { pack: PackMeta; slides: Pres
 
   const phaseLabel =
     current?.kind === "ASK_READ" || current?.kind === "ASK_MEDIA" || current?.kind === "ASK_TIMER"
-      ? "Asking"
+      ? tPresenter("phaseAsking")
       : current?.kind === "RECAP_INTRO" || current?.kind === "RECAP_QUESTION"
-        ? "Recap"
+        ? tPresenter("phaseRecap")
         : current?.kind === "WRITE_ANSWERS"
-          ? "Write"
+          ? tPresenter("phaseWrite")
           : current?.kind === "REVEAL_QUESTION" || current?.kind === "REVEAL_ANSWER" || current?.kind === "REVEAL_INTRO"
-            ? "Reveal"
-            : "Round";
+            ? tPresenter("phaseReveal")
+            : tPresenter("phaseRound");
 
   const questionHasClip = Boolean(
     currentQuestion &&
@@ -116,22 +121,22 @@ export function PresenterPlayer({ pack, slides }: { pack: PackMeta; slides: Pres
   const hintText =
     current?.kind === "ASK_READ"
       ? questionHasClip
-        ? "Press Next to play clip"
-        : "Press Next to start timer"
+        ? tPresenter("hintNextPlayClip")
+        : tPresenter("hintNextStartTimer")
       : current?.kind === "ASK_MEDIA"
-        ? "Press Next to start timer"
+        ? tPresenter("hintNextStartTimer")
         : current?.kind === "ASK_TIMER"
-          ? "Press Next to skip"
+          ? tPresenter("hintNextSkip")
           : current?.kind === "RECAP_INTRO" || current?.kind === "RECAP_QUESTION"
-            ? "Press Next to continue"
+            ? tPresenter("hintNextContinue")
             : current?.kind === "WRITE_ANSWERS"
-              ? "Press Next to skip"
+              ? tPresenter("hintNextSkip")
               : current?.kind === "REVEAL_INTRO"
-                ? "Press Next to continue"
+                ? tPresenter("hintNextContinue")
                 : current?.kind === "REVEAL_QUESTION"
-                  ? "Press Next to show answer"
+                  ? tPresenter("hintNextShowAnswer")
                   : current?.kind === "REVEAL_ANSWER"
-                    ? "Press Next for next question"
+                    ? tPresenter("hintNextQuestion")
                     : null;
 
   const showTimer = current?.kind === "ASK_TIMER" || current?.kind === "WRITE_ANSWERS";
@@ -241,7 +246,7 @@ export function PresenterPlayer({ pack, slides }: { pack: PackMeta; slides: Pres
     const manager = audioRef.current;
     if (!manager) return;
     manager.stopTimer();
-    void manager.playClip(pending.media.url).catch(() => setMediaHint("Press play to start audio."));
+    void manager.playClip(pending.media.url).catch(() => setMediaHint(tPresenter("hintPressPlayAudio")));
   }, [currentKey]);
 
   React.useEffect(() => {
@@ -250,7 +255,7 @@ export function PresenterPlayer({ pack, slides }: { pack: PackMeta; slides: Pres
     if (state.timerStatus === "RUNNING" && current && (current.kind === "ASK_TIMER" || current.kind === "WRITE_ANSWERS")) {
       const url = current.kind === "ASK_TIMER" ? pack.timerMusicUrl ?? null : pack.breakMusicUrl ?? null;
       void manager.playTimer(url, { loop: true }).catch(() => {
-        toast.error("Presenter audio could not start.");
+        toast.error(tPresenter("audioCouldNotStart"));
       });
       return;
     }
@@ -313,13 +318,13 @@ export function PresenterPlayer({ pack, slides }: { pack: PackMeta; slides: Pres
   if (!current) return null;
 
   const progressLabel = currentQuestionIndex
-    ? `Q${currentQuestionIndex}/${roundQuestions.length || 0}`
-    : `Q-/${currentRoundCount}`;
+    ? tPresenter("questionProgress", { current: currentQuestionIndex, total: roundQuestions.length || 0 })
+    : tPresenter("questionProgressUnknown", { total: currentRoundCount });
 
   return (
     <PresenterShell
       packTitle={pack.title}
-      roundTitle={currentRoundTitle || "Round"}
+      roundTitle={currentRoundTitle || tPresenter("phaseRound")}
       phaseLabel={phaseLabel}
       progressLabel={progressLabel}
       volume={volume}
@@ -330,7 +335,7 @@ export function PresenterPlayer({ pack, slides }: { pack: PackMeta; slides: Pres
       canNext={state.index < deck.items.length - 1}
       hint={hintText}
       onToggleFullscreen={toggleFullscreen}
-      backHref={`/app/packs/${pack.id}`}
+      backHref={localizeHref(locale, `/app/packs/${pack.id}`)}
       onRestart={restartPresenter}
       audioWarning={audioWarning}
     >

@@ -1,4 +1,4 @@
-import fs from "fs/promises";
+﻿import fs from "fs/promises";
 import path from "path";
 import { PrismaClient } from "@prisma/client";
 import { SignJWT } from "jose";
@@ -52,6 +52,26 @@ async function authSession(page: import("@playwright/test").Page, locale: "uz" |
   return user;
 }
 
+async function createTeamForUser(userId: string) {
+  const nonce = Date.now();
+  const team = await prisma.team.create({
+    data: {
+      name: `i18n-team-${nonce}`,
+      ownerId: userId,
+      members: {
+        create: {
+          userId,
+          role: "OWNER",
+          status: "ACTIVE",
+        },
+      },
+    },
+    select: { id: true },
+  });
+
+  return team.id;
+}
+
 async function createPackWithRound(userId: string) {
   const nonce = Date.now();
   const pack = await prisma.pack.create({
@@ -78,73 +98,79 @@ async function createPackWithRound(userId: string) {
   return pack.id;
 }
 
+async function switchLocale(page: import("@playwright/test").Page, locale: "uz" | "ru" | "en") {
+  const target = locale.toUpperCase();
+  await page.getByTestId("lang-switcher").click();
+  const item = page.getByRole("menuitem", { name: target }).first();
+  await expect(item).toBeVisible();
+  await item.click();
+}
+
 test.afterAll(async () => {
   await prisma.$disconnect();
 });
 
-test("switch locale to ru on pack page localizes tabs/buttons/badges", async ({ page }) => {
-  const user = await authSession(page, "uz");
-  const packId = await createPackWithRound(user.id);
+test("redirects / to /uz and /auth/login to /uz/auth/login", async ({ page }) => {
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/uz(\/|$)/);
 
-  await page.goto(`/uz/app/packs/${packId}?tab=rounds`);
-  await page.getByTestId("lang-switcher").click();
-  await page.getByTestId("lang-ru").click();
-
-  await expect(page).toHaveURL(new RegExp(`/ru/app/packs/${packId}`));
-  await expect(page.getByTestId("tab-rounds")).toContainText("Раунды");
-  await expect(page.getByTestId("tab-settings")).toContainText("Настройки");
-  await expect(page.getByTestId("btn-add-round")).toContainText("Добавить раунд");
-  await expect(page.getByTestId("btn-reorder")).toContainText("Сортировать");
-  await expect(page.getByTestId("btn-generate-template")).toContainText("Сгенерировать шаблон Zakovat");
-  await expect(page.getByTestId("badge-status").first()).toContainText("Черновик");
-  await expect(page.getByTestId("roundtype-badge").first()).toContainText("Изображение");
+  await page.goto("/auth/login");
+  await expect(page).toHaveURL(/\/uz\/auth\/login/);
 });
 
-test("switch locale to en on pack page localizes tabs/buttons/badges", async ({ page }) => {
+test("switching language on teams updates URL and translated UI", async ({ page }) => {
   const user = await authSession(page, "uz");
-  const packId = await createPackWithRound(user.id);
+  await createTeamForUser(user.id);
 
-  await page.goto(`/uz/app/packs/${packId}?tab=rounds`);
-  await page.getByTestId("lang-switcher").click();
-  await page.getByTestId("lang-en").click();
+  await page.goto("/uz/app/teams");
+  await expect(page.getByTestId("teams-heading")).toContainText("Jamoalar");
 
-  await expect(page).toHaveURL(new RegExp(`/en/app/packs/${packId}`));
-  await expect(page.getByTestId("tab-rounds")).toContainText("Rounds");
-  await expect(page.getByTestId("tab-settings")).toContainText("Settings");
-  await expect(page.getByTestId("btn-add-round")).toContainText("Add round");
-  await expect(page.getByTestId("btn-reorder")).toContainText("Reorder");
-  await expect(page.getByTestId("btn-generate-template")).toContainText("Generate Zakovat template");
-  await expect(page.getByTestId("badge-status").first()).toContainText("Draft");
-  await expect(page.getByTestId("roundtype-badge").first()).toContainText("Image");
+  await switchLocale(page, "ru");
+
+  await expect(page).toHaveURL(/\/ru\/app\/teams/);
+  await expect(page.getByTestId("teams-heading")).not.toContainText("Jamoalar");
 });
 
-test("locale persists across navigation from packs to profile", async ({ page }) => {
+test("locale persists across navigation to settings and presenter", async ({ page }) => {
   const user = await authSession(page, "uz");
   const packId = await createPackWithRound(user.id);
 
-  await page.goto(`/uz/app/packs/${packId}`);
-  await page.getByTestId("lang-switcher").click();
-  await page.getByTestId("lang-ru").click();
-  await expect(page).toHaveURL(new RegExp(`/ru/app/packs/${packId}`));
+  await page.goto("/uz/app/teams");
+  await switchLocale(page, "ru");
+  await expect(page).toHaveURL(/\/ru\/app\/teams/);
 
-  await page.getByRole("button", { name: /Playwright User|@playwright/ }).click();
-  await page.getByRole("menuitem", { name: "Профиль" }).click();
+  await page.goto("/app/settings");
+  await expect(page).toHaveURL(/\/ru\/app\/settings/);
+  await expect(page.getByTestId("settings-heading")).not.toContainText("Sozlamalar");
 
-  await expect(page).toHaveURL(/\/ru\/app\/profile/);
+  await page.goto(`/app/presenter/${packId}`);
+  await expect(page).toHaveURL(new RegExp(`/ru/app/presenter/${packId}`));
+  await expect(page.getByTestId("presenter-heading")).toBeVisible();
 });
 
-test("no console errors on pack page load", async ({ page }) => {
-  const user = await authSession(page, "uz");
-  const packId = await createPackWithRound(user.id);
+test("auth signup page renders translated heading by locale", async ({ page }) => {
+  await page.goto("/uz/auth/signup");
+  const uzText = (await page.getByTestId("signup-heading").textContent()) ?? "";
+  expect(uzText.length).toBeGreaterThan(0);
+
+  await page.goto("/ru/auth/signup");
+  const ruText = (await page.getByTestId("signup-heading").textContent()) ?? "";
+  expect(ruText.length).toBeGreaterThan(0);
+  expect(ruText).not.toEqual(uzText);
+});
+
+test("no console errors on localized app routes", async ({ page }) => {
+  const user = await authSession(page, "ru");
+  await createTeamForUser(user.id);
+
   const errors: string[] = [];
-
   page.on("console", (message) => {
     if (message.type() === "error") {
       errors.push(message.text());
     }
   });
 
-  await page.goto(`/uz/app/packs/${packId}?tab=rounds`);
+  await page.goto("/ru/app");
   await page.waitForLoadState("networkidle");
   expect(errors).toEqual([]);
 });

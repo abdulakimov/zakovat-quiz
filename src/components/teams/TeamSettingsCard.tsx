@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { updateTeamSettingsAction, type TeamActionState } from "@/src/actions/teams";
 import { FormErrorSummary } from "@/src/components/form/FormErrorSummary";
+import { useTranslations } from "@/src/i18n/client";
 import { SettingsSectionCard, SettingsSectionGroup } from "@/src/components/layout/SettingsSectionCard";
 import { StickySaveBar } from "@/src/components/layout/StickySaveBar";
 import { toast } from "@/src/components/ui/sonner";
@@ -57,14 +58,14 @@ function uploadTeamAvatar(teamId: string, file: File, onProgress: (percent: numb
       if (!event.lengthComputable) return;
       onProgress(Math.round((event.loaded / event.total) * 100));
     };
-    xhr.onerror = () => reject(new Error("Upload failed."));
+    xhr.onerror = () => reject(new Error("upload-error"));
     xhr.onload = () => {
       const data = xhr.response as { error?: string; assetId?: string; url?: string } | null;
       if (xhr.status >= 200 && xhr.status < 300 && data?.assetId && data?.url) {
         resolve({ assetId: data.assetId, url: data.url });
         return;
       }
-      reject(new Error(data?.error || "Upload failed."));
+      reject(new Error(data?.error || "upload-error"));
     };
     const body = new FormData();
     body.set("teamId", teamId);
@@ -74,6 +75,7 @@ function uploadTeamAvatar(teamId: string, file: File, onProgress: (percent: numb
 }
 
 export function TeamSettingsCard({ team }: Props) {
+  const tTeams = useTranslations("teams");
   const router = useRouter();
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [isSaving, startTransition] = React.useTransition();
@@ -138,10 +140,10 @@ export function TeamSettingsCard({ team }: Props) {
         if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
         return uploaded.url;
       });
-      toast.success("Team avatar uploaded. Save changes to apply it.");
+      toast.success(tTeams("avatarUploaded"));
     } catch (error) {
       setPreviewUrl(team.avatarAsset?.path ? `/api/media/${team.avatarAsset.path}` : null);
-      toast.error(error instanceof Error ? error.message : "Upload failed.");
+      toast.error(error instanceof Error && error.message !== "upload-error" ? error.message : tTeams("uploadFailed"));
     } finally {
       setIsUploading(false);
       setUploadProgress(0);
@@ -164,7 +166,7 @@ export function TeamSettingsCard({ team }: Props) {
           toast.error(result.error);
           return;
         }
-        toast.success(result?.success ?? "Team settings updated.");
+        toast.success(result?.success ?? tTeams("settingsUpdated"));
         form.reset({
           teamId: values.teamId,
           name: values.name,
@@ -183,8 +185,8 @@ export function TeamSettingsCard({ team }: Props) {
         <CardHeader className="pb-4">
           <div className="flex items-start justify-between gap-3">
             <div className="space-y-1">
-              <CardTitle className="text-base font-semibold">Team settings</CardTitle>
-              <CardDescription>Update branding and basic team details.</CardDescription>
+              <CardTitle className="text-base font-semibold">{tTeams("teamSettings")}</CardTitle>
+              <CardDescription>{tTeams("settingsDescription")}</CardDescription>
             </div>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -203,10 +205,10 @@ export function TeamSettingsCard({ team }: Props) {
                   }}
                 >
                   <PencilIcon className="h-4 w-4" />
-                  <span className="sr-only">{isEditing ? "Cancel editing" : "Edit team settings"}</span>
+                  <span className="sr-only">{isEditing ? tTeams("cancelEditing") : tTeams("editTeamSettings")}</span>
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>{isEditing ? "Cancel editing" : "Edit team settings"}</TooltipContent>
+              <TooltipContent>{isEditing ? tTeams("cancelEditing") : tTeams("editTeamSettings")}</TooltipContent>
             </Tooltip>
           </div>
         </CardHeader>
@@ -218,8 +220,8 @@ export function TeamSettingsCard({ team }: Props) {
             <SettingsSectionGroup>
               <SettingsSectionCard
                 icon={SettingsIcon}
-                title="Team profile"
-                subtitle="Update the team name, slogan, and avatar."
+                title={tTeams("teamProfile")}
+                subtitle={tTeams("teamProfileSubtitle")}
               >
                 <div className="grid gap-5 lg:grid-cols-[220px_minmax(0,1fr)]">
                   <div className="space-y-3 rounded-lg border border-slate-200 p-4">
@@ -248,17 +250,17 @@ export function TeamSettingsCard({ team }: Props) {
                         disabled={fieldsDisabled}
                         onClick={() => fileInputRef.current?.click()}
                       >
-                        {isUploading ? `Uploading... ${uploadProgress}%` : "Upload avatar"}
+                        {isUploading ? tTeams("uploadingWithProgress", { progress: uploadProgress }) : tTeams("uploadAvatar")}
                       </Button>
                       <p className="text-xs text-slate-500">
-                        Image only (JPEG/PNG/WebP), max 2MB. {!isEditing ? "Click edit to change." : ""}
+                        {tTeams("imageHint")} {!isEditing ? tTeams("clickEditToChange") : ""}
                       </p>
                     </div>
                   </div>
 
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="team-settings-name" className="text-sm text-slate-500">Team name</Label>
+                      <Label htmlFor="team-settings-name" className="text-sm text-slate-500">{tTeams("teamNameLabel")}</Label>
                       <Input
                         id="team-settings-name"
                         {...form.register("name")}
@@ -273,14 +275,14 @@ export function TeamSettingsCard({ team }: Props) {
 
                     <div className="space-y-2">
                       <div className="flex items-center justify-between gap-2">
-                        <Label htmlFor="team-settings-slogan" className="text-sm text-slate-500">Team slogan</Label>
+                        <Label htmlFor="team-settings-slogan" className="text-sm text-slate-500">{tTeams("teamSloganLabel")}</Label>
                         <span className="text-xs text-slate-500">{sloganValue.length}/80</span>
                       </div>
                       <Textarea
                         id="team-settings-slogan"
                         rows={2}
                         maxLength={80}
-                        placeholder="Optional short team slogan"
+                        placeholder={tTeams("teamSloganPlaceholder")}
                         {...form.register("slogan")}
                         disabled={fieldsDisabled}
                         aria-invalid={form.formState.errors.slogan ? "true" : "false"}

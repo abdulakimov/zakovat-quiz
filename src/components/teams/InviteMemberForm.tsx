@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent } from "@/components/ui/popover";
 import { inviteMember, type TeamActionState } from "@/src/actions/teams";
 import { FormErrorSummary } from "@/src/components/form/FormErrorSummary";
+import { useTranslations } from "@/src/i18n/client";
 import { toast } from "@/src/components/ui/sonner";
 import { inviteSchema } from "@/src/schemas/teams";
 
@@ -31,6 +32,7 @@ function initials(name: string) {
 }
 
 export function InviteMemberForm({ teamId }: { teamId: string }) {
+  const tTeams = useTranslations("teams");
   const [isPending, startTransition] = React.useTransition();
   const [serverState, setServerState] = React.useState<TeamActionState>({});
   const [suggestions, setSuggestions] = React.useState<UserSuggestion[]>([]);
@@ -120,12 +122,12 @@ export function InviteMemberForm({ teamId }: { teamId: string }) {
   return (
     <form onSubmit={onSubmit} className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" noValidate>
       <div className="space-y-2">
-        <Label htmlFor="invite-username-or-email" className="text-sm text-slate-500">Invite member</Label>
+        <Label htmlFor="invite-username-or-email" className="text-sm text-slate-500">{tTeams("inviteMember")}</Label>
 
         {selectedUser ? (
           <div className="flex flex-wrap items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 p-2">
             <Badge variant="secondary" className="rounded-md px-2 py-1">
-              Selected user
+              {tTeams("selectedUser")}
             </Badge>
             <div className="flex min-w-0 items-center gap-2">
               <Avatar className="h-7 w-7">
@@ -150,7 +152,7 @@ export function InviteMemberForm({ teamId }: { teamId: string }) {
                 form.setValue("usernameOrEmail", "", { shouldDirty: true, shouldTouch: true, shouldValidate: true });
               }}
             >
-              Clear
+              {tTeams("clear")}
             </Button>
           </div>
         ) : null}
@@ -159,7 +161,7 @@ export function InviteMemberForm({ teamId }: { teamId: string }) {
           <div className="relative">
             <Input
               id="invite-username-or-email"
-              placeholder="Search username/email or paste full email"
+              placeholder={tTeams("searchUserPlaceholder")}
               autoComplete="off"
               aria-invalid={form.formState.errors.usernameOrEmail ? "true" : "false"}
               disabled={isPending}
@@ -177,9 +179,9 @@ export function InviteMemberForm({ teamId }: { teamId: string }) {
               <Command>
                 <CommandList>
                   {isLoadingSuggestions ? (
-                    <CommandEmpty>Searching users...</CommandEmpty>
+                    <CommandEmpty>{tTeams("searchingUsers")}</CommandEmpty>
                   ) : suggestions.length === 0 ? (
-                    <CommandEmpty>No matching users</CommandEmpty>
+                    <CommandEmpty>{tTeams("noMatchingUsers")}</CommandEmpty>
                   ) : (
                     <CommandGroup>
                       {suggestions.map((user) => (
@@ -224,7 +226,7 @@ export function InviteMemberForm({ teamId }: { teamId: string }) {
           </p>
         ) : null}
         <p className="text-xs text-slate-500">
-          Select a suggested user or paste a full email/username to invite manually.
+          {tTeams("inviteHint")}
         </p>
       </div>
 
@@ -232,7 +234,7 @@ export function InviteMemberForm({ teamId }: { teamId: string }) {
       {serverState.success ? <p className="text-sm text-green-700">{serverState.success}</p> : null}
 
       <Button type="submit" disabled={!canSubmit}>
-        {isPending ? "Sending..." : "Send invite"}
+        {isPending ? tTeams("sending") : tTeams("sendInvite")}
       </Button>
     </form>
   );

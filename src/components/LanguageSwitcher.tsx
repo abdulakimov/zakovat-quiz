@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -77,7 +77,7 @@ export function LanguageSwitcher() {
             className="justify-between"
           >
             <span>{localeLabels[item]}</span>
-            {item === currentLocale ? <span aria-hidden="true">•</span> : null}
+            {item === currentLocale ? <span aria-hidden="true">*</span> : null}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

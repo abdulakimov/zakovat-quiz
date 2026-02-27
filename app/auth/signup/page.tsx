@@ -1,11 +1,14 @@
+import { getTranslations } from "@/src/i18n/server";
 import SignupForm from "@/app/auth/signup/signup-form";
 import { AuthLayout } from "@/src/components/layout/AuthLayout";
 
-export default function SignupPage() {
+export default async function SignupPage() {
+  const tAuth = await getTranslations("auth");
+
   return (
     <AuthLayout
-      title="Create your account"
-      description="Set up your workspace and start building quizzes in minutes."
+      title={tAuth("signupTitle")}
+      description={tAuth("signupDescription")}
     >
       <SignupForm />
     </AuthLayout>

@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { consumeRateLimit } from "@/src/lib/rate-limit";
 import { safeAction } from "@/src/lib/actions";
+import { localizeHref, normalizeLocale } from "@/src/i18n/config";
 import { loginSchema, signupSchema } from "@/src/schemas/auth";
 import {
   getSessionCookieName,
@@ -77,6 +78,11 @@ function makeRateLimitKey(ip: string, identifier: string) {
   return `${ip}:${identifier || "unknown"}`;
 }
 
+async function getActionLocale() {
+  const headerStore = await headers();
+  return normalizeLocale(headerStore.get("x-locale"));
+}
+
 
 async function setSessionCookie(user: {
   id: string;
@@ -106,6 +112,7 @@ export async function signup(
   _prevState: AuthState,
   formData: FormData
 ): Promise<AuthState> {
+  const locale = await getActionLocale();
   const execute = safeAction(signupSchema, async (input) => {
     const username = input.username.toLowerCase();
     const name = normalizeName(input.name ?? null);
@@ -137,7 +144,7 @@ export async function signup(
     });
 
     await setSessionCookie(user);
-    redirect("/app");
+    redirect(localizeHref(locale, "/app"));
   });
 
   const result = await execute(toSignupInput(formData));
@@ -152,6 +159,7 @@ export async function login(
   _prevState: AuthState,
   formData: FormData
 ): Promise<AuthState> {
+  const locale = await getActionLocale();
   const clientIp = await getClientIp();
   const execute = safeAction(loginSchema, async (input) => {
     const identifier = input.usernameOrEmail.toLowerCase();
@@ -205,7 +213,7 @@ export async function login(
     await setSessionCookie(user);
 
     logger.info("Login successful", { userId: user.id });
-    redirect("/app");
+    redirect(localizeHref(locale, "/app"));
   });
 
   const result = await execute(toLoginInput(formData));
@@ -217,8 +225,9 @@ export async function login(
 }
 
 export async function signOut() {
+  const locale = await getActionLocale();
   const cookieStore = await cookies();
   cookieStore.delete(getSessionCookieName());
   logger.info("User signed out");
-  redirect("/auth/login");
+  redirect(localizeHref(locale, "/auth/login"));
 }

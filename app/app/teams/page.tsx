@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getLocale } from "next-intl/server";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,6 +9,8 @@ import { TeamInviteDialogButton } from "@/src/components/teams/TeamInviteDialogB
 import { PageHeader } from "@/src/components/layout/PageHeader";
 import { ActionGroup } from "@/src/components/ui/action-group";
 import { IconButton } from "@/src/components/ui/icon-button";
+import { getTranslations } from "@/src/i18n/server";
+import { localizeHref, type AppLocale } from "@/src/i18n/config";
 import { SettingsIcon, UserPlusIcon } from "@/src/ui/icons";
 
 type ActiveTeamMembership = Awaited<ReturnType<typeof getMyTeamsAndInvites>>["activeTeams"][number];
@@ -22,16 +25,18 @@ function getTeamInitials(name: string) {
 }
 
 export default async function TeamsPage() {
+  const locale = (await getLocale()) as AppLocale;
+  const [tTeams, tCommon] = await Promise.all([getTranslations("teams"), getTranslations("common")]);
   const { activeTeams } = await getMyTeamsAndInvites();
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-6">
       <PageHeader
-        title="Teams"
-        description="Create a team, manage members, and collaborate on quizzes."
+        title={<span data-testid="teams-heading">{tTeams("title")}</span>}
+        description={tTeams("description")}
         breadcrumbs={[
-          { label: "App", href: "/app" },
-          { label: "Teams" },
+          { label: tCommon("app"), href: localizeHref(locale, "/app") },
+          { label: tTeams("title") },
         ]}
         actions={<CreateTeamDialog />}
       />
@@ -40,8 +45,8 @@ export default async function TeamsPage() {
         <Card className="border-dashed">
           <CardContent className="flex flex-col items-center gap-4 p-8 text-center">
             <div className="space-y-1">
-              <p className="text-base font-medium text-slate-900">No teams yet</p>
-              <p className="text-sm text-slate-600">Create your first team to start inviting collaborators.</p>
+              <p className="text-base font-medium text-slate-900">{tTeams("emptyTitle")}</p>
+              <p className="text-sm text-slate-600">{tTeams("emptyDescription")}</p>
             </div>
             <CreateTeamDialog />
           </CardContent>
@@ -57,8 +62,8 @@ export default async function TeamsPage() {
               <Card key={membership.id} className="transition hover:border-slate-300">
                 <CardContent className="relative p-4">
                   <Link
-                    href={`/app/teams/${team.id}`}
-                    aria-label={`Open ${team.name}`}
+                    href={localizeHref(locale, `/app/teams/${team.id}`)}
+                    aria-label={tTeams("openTeam", { name: team.name })}
                     className="absolute inset-0 z-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
                   />
                   <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -76,14 +81,14 @@ export default async function TeamsPage() {
                       <div className="min-w-0 space-y-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="truncate text-base font-semibold text-slate-900">{team.name}</p>
-                          {isOwner ? <Badge variant="success">Owner</Badge> : null}
+                          {isOwner ? <Badge variant="success">{tTeams("ownerBadge")}</Badge> : null}
                         </div>
                         <p className="text-sm text-slate-600">
-                          {memberCount !== null ? `${memberCount} members` : "Members count unavailable"}
+                          {memberCount !== null ? tTeams("membersCount", { count: memberCount }) : tTeams("membersUnavailable")}
                         </p>
                         {team.slogan ? <p className="truncate text-xs text-slate-500">{team.slogan}</p> : null}
                         <p className="truncate text-xs text-slate-500">
-                          Owner: {team.owner.name ?? team.owner.username}
+                          {tTeams("ownerPrefix")}: {team.owner.name ?? team.owner.username}
                         </p>
                       </div>
                     </div>
@@ -93,16 +98,16 @@ export default async function TeamsPage() {
                         <TeamInviteDialogButton teamId={team.id} teamName={team.name} />
                       ) : (
                         <IconButton
-                          label="Invite member"
-                          tooltip="Only team owners can invite members"
+                          label={tTeams("inviteMember")}
+                          tooltip={tTeams("inviteDisabledTooltip")}
                           disabled
                         >
                           <UserPlusIcon className="h-4 w-4" />
                         </IconButton>
                       )}
 
-                      <IconButton label="Team settings" tooltip="Settings" asChild>
-                        <Link href={`/app/teams/${team.id}`}>
+                      <IconButton label={tTeams("teamSettings")} tooltip={tCommon("settings")} asChild>
+                        <Link href={localizeHref(locale, `/app/teams/${team.id}`)}>
                           <SettingsIcon className="h-4 w-4" />
                         </Link>
                       </IconButton>

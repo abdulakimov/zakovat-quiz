@@ -10,6 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { IconButton } from "@/src/components/ui/icon-button";
+import { useTranslations } from "@/src/i18n/client";
 import { InviteMemberForm } from "@/src/components/teams/InviteMemberForm";
 import { UserPlusIcon } from "@/src/ui/icons";
 
@@ -19,20 +20,21 @@ type Props = {
 };
 
 export function TeamInviteDialogButton({ teamId, teamName }: Props) {
+  const tTeams = useTranslations("teams");
   const [open, setOpen] = React.useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <IconButton label="Invite member" tooltip="Invite member">
+        <IconButton label={tTeams("inviteMember")} tooltip={tTeams("inviteMember")}>
           <UserPlusIcon className="h-4 w-4" />
         </IconButton>
       </DialogTrigger>
       <DialogContent className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>Invite member</DialogTitle>
+          <DialogTitle>{tTeams("inviteMember")}</DialogTitle>
           <DialogDescription>
-            Invite a teammate to <span className="font-medium text-slate-900">{teamName}</span>.
+            {tTeams("inviteToTeam", { teamName })}
           </DialogDescription>
         </DialogHeader>
         <InviteMemberForm teamId={teamId} />

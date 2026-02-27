@@ -3,9 +3,11 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { leaveTeam } from "@/src/actions/teams";
+import { useTranslations } from "@/src/i18n/client";
 import { toast } from "@/src/components/ui/sonner";
 
 export function LeaveTeamButton({ teamId }: { teamId: string }) {
+  const tTeams = useTranslations("teams");
   const [isPending, startTransition] = React.useTransition();
 
   return (
@@ -25,7 +27,7 @@ export function LeaveTeamButton({ teamId }: { teamId: string }) {
         });
       }}
     >
-      {isPending ? "Leaving..." : "Leave team"}
+      {isPending ? tTeams("leaving") : tTeams("leaveTeam")}
     </Button>
   );
 }
