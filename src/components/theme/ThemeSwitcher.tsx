@@ -47,13 +47,13 @@ export function ThemeSwitcher() {
             <DropdownMenuTrigger asChild>
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                className="h-9 w-9 p-0"
+                className="h-10 w-10 p-0 hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring"
                 data-testid="theme-switcher"
                 aria-label={tCommon("theme")}
               >
-                <ActiveIcon className="h-4 w-4" aria-hidden />
+                <ActiveIcon className="h-5 w-5" aria-hidden />
                 <span className="sr-only">{activeOption.label}</span>
               </Button>
             </DropdownMenuTrigger>

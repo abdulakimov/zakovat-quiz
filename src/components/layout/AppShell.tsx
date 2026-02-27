@@ -180,10 +180,10 @@ function ProfileMenu({
             <DropdownMenuTrigger asChild>
               <Button
                 type="button"
-                variant="outline"
-                className="h-9 gap-1 rounded-full px-2"
+                variant="ghost"
+                className="h-10 gap-1 rounded-full p-1 hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <Avatar className="h-8 w-8">
+                <Avatar className="h-10 w-10">
                   {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName} /> : null}
                   {!avatarUrl ? <AvatarFallback>{getInitials(user)}</AvatarFallback> : null}
                 </Avatar>

@@ -62,13 +62,13 @@ export function LanguageSwitcher() {
             <DropdownMenuTrigger asChild>
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="sm"
-                className="h-9 w-9 p-0"
+                className="h-10 w-10 p-0 hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring"
                 data-testid="lang-switcher"
                 aria-label={tCommon("changeLanguage")}
               >
-                <Globe className="h-4 w-4" aria-hidden />
+                <Globe className="h-5 w-5" aria-hidden />
               </Button>
             </DropdownMenuTrigger>
           </TooltipTrigger>
