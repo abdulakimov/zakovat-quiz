@@ -1,5 +1,6 @@
 import { cookies, headers } from "next/headers";
-import { getRequestConfig, IntlErrorCode } from "next-intl/server";
+import { getRequestConfig } from "next-intl/server";
+import { IntlErrorCode } from "next-intl";
 import { defaultLocale, isAppLocale, localeCookieName } from "@/src/i18n/config";
 
 export default getRequestConfig(async () => {
