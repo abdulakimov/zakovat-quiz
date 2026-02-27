@@ -378,14 +378,19 @@ export function ProfileSecurityForm() {
     confirm: false,
   });
   const passwordForm = useForm<ChangePasswordInput>({
-    resolver: zodResolver(changePasswordSchema),
     defaultValues: {
       currentPassword: "",
       newPassword: "",
       confirmNewPassword: "",
     },
-    mode: "onChange",
+    mode: "onSubmit",
   });
+
+  const passwordValues = passwordForm.watch();
+  const passwordClientValid = React.useMemo(
+    () => changePasswordSchema.safeParse(passwordValues).success,
+    [passwordValues],
+  );
 
   function PasswordInputRow({
     id,
@@ -446,6 +451,35 @@ export function ProfileSecurityForm() {
 
   const onPasswordSubmit = passwordForm.handleSubmit((values) => {
     setPasswordServerError(null);
+    passwordForm.clearErrors();
+    const parsed = changePasswordSchema.safeParse(values);
+    if (!parsed.success) {
+      const flattened = parsed.error.flatten();
+      const fields = flattened.fieldErrors;
+      if (fields.currentPassword?.[0]) {
+        passwordForm.setError("currentPassword", {
+          type: "manual",
+          message: fields.currentPassword[0],
+        });
+      }
+      if (fields.newPassword?.[0]) {
+        passwordForm.setError("newPassword", {
+          type: "manual",
+          message: fields.newPassword[0],
+        });
+      }
+      if (fields.confirmNewPassword?.[0]) {
+        passwordForm.setError("confirmNewPassword", {
+          type: "manual",
+          message: fields.confirmNewPassword[0],
+        });
+      }
+      if (flattened.formErrors[0]) {
+        setPasswordServerError(flattened.formErrors[0]);
+      }
+      return;
+    }
+
     startPasswordTransition(() => {
       void (async () => {
         const result = await changePasswordAction({
@@ -522,7 +556,7 @@ export function ProfileSecurityForm() {
               <StickySaveBar
                 dirty={passwordForm.formState.isDirty}
                 pending={isChangingPassword}
-                canSave={passwordForm.formState.isValid && !isChangingPassword}
+                canSave={passwordClientValid && !isChangingPassword}
               />
             </form>
           </SettingsSectionCard>
