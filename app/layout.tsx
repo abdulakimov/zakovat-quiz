@@ -1,17 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { cn } from "@/lib/utils";
+import { fontSans } from "@/src/lib/fonts";
 import { Toaster } from "@/src/components/ui/sonner";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Zakovat Quiz Creator",
@@ -26,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-slate-50 text-slate-900 antialiased`}
+        className={cn(fontSans.variable, "font-sans bg-slate-50 text-slate-900 antialiased")}
         suppressHydrationWarning
       >
         {children}

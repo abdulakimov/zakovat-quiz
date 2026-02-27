@@ -4,6 +4,7 @@ import { InviteResponseButtons } from "@/src/components/teams/InviteResponseButt
 import { SettingsTabsLayout } from "@/src/components/layout/SettingsTabsLayout";
 import { PageHeader } from "@/src/components/layout/PageHeader";
 import { ProfileSecurityForm, ProfileSettingsForm } from "@/src/components/profile/ProfileSettingsForm";
+import { UiDiagnostics } from "@/src/components/UiDiagnostics";
 import { MAX_ACTIVE_TEAMS } from "@/src/lib/teams";
 
 type ActiveTeamMembership = Awaited<ReturnType<typeof getMyTeamsAndInvites>>["activeTeams"][number];
@@ -117,6 +118,7 @@ export default async function ProfilePage() {
           },
         ]}
       />
+      <UiDiagnostics />
     </div>
   );
 }
