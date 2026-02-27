@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
+import { IntlErrorCode, NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
 
 export function IntlProvider({
   locale,
@@ -17,6 +17,12 @@ export function IntlProvider({
       locale={locale}
       messages={messages}
       onError={(error) => {
+        const messagePath = [error.namespace, error.key].filter(Boolean).join(".");
+        if (error.code === IntlErrorCode.MISSING_MESSAGE) {
+          const warning = `Missing translation ${messagePath}`;
+          if (typeof console !== "undefined") console.warn(warning);
+          return;
+        }
         if (process.env.NODE_ENV === "development") {
           console.error(error);
           return;
@@ -25,10 +31,11 @@ export function IntlProvider({
       }}
       getMessageFallback={({ namespace, key }) => {
         const messagePath = [namespace, key].filter(Boolean).join(".");
-        if (process.env.NODE_ENV === "development") {
-          return messagePath;
+        const placeholder = `⟦${messagePath}⟧`;
+        if (typeof console !== "undefined") {
+          console.warn(`Missing translation fallback for ${messagePath}`);
         }
-        throw new Error(`Missing translation key: ${messagePath}`);
+        return placeholder;
       }}
     >
       {children}
