@@ -21,7 +21,10 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
-      <body className={cn(fontSans.variable, "bg-background text-foreground font-sans antialiased")}>
+      <body
+        suppressHydrationWarning
+        className={cn(fontSans.variable, "bg-background text-foreground font-sans antialiased")}
+      >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <IntlProvider locale={locale} messages={messages}>
             {children}
