@@ -18,9 +18,19 @@ export function IntlProvider({
       messages={messages}
       onError={(error) => {
         const messagePath = [error.namespace, error.key].filter(Boolean).join(".");
-        if (error.code === IntlErrorCode.MISSING_MESSAGE) {
-          const warning = `Missing translation ${messagePath}`;
-          if (typeof console !== "undefined") console.warn(warning);
+        const isMissingMessage = error.code === IntlErrorCode.MISSING_MESSAGE;
+        if (isMissingMessage) {
+          const warning = `[i18n] Missing message: ${error.locale ?? locale} ${messagePath}`;
+          if (typeof console !== "undefined") {
+            if (process.env.NODE_ENV === "development") {
+              console.warn(warning, error.stack ?? error);
+            } else {
+              console.warn(warning);
+            }
+          }
+          if (process.env.NEXT_PUBLIC_I18N_STRICT === "true") {
+            throw error;
+          }
           return;
         }
         if (process.env.NODE_ENV === "development") {
@@ -31,9 +41,14 @@ export function IntlProvider({
       }}
       getMessageFallback={({ namespace, key }) => {
         const messagePath = [namespace, key].filter(Boolean).join(".");
-        const placeholder = `⟦${messagePath}⟧`;
+        const placeholder = namespace ? `⟦${namespace}.${key}⟧` : `⟦${key}⟧`;
         if (typeof console !== "undefined") {
-          console.warn(`Missing translation fallback for ${messagePath}`);
+          const warning = `[i18n] Missing message: ${locale} ${messagePath}`;
+          if (process.env.NODE_ENV === "development") {
+            console.warn(warning, { namespace, key });
+          } else {
+            console.warn(warning);
+          }
         }
         return placeholder;
       }}
