@@ -90,7 +90,7 @@ export function DropdownMenuContent({
       ref={ref}
       role="menu"
       className={cn(
-        "absolute top-full z-50 mt-2 min-w-52 rounded-lg border border-slate-200 bg-white p-1 shadow-xl",
+        "absolute top-full z-50 mt-2 min-w-52 rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-xl",
         align === "end" ? "right-0" : "left-0",
         className,
       )}
@@ -107,11 +107,11 @@ export function DropdownMenuLabel({
   children: React.ReactNode;
   className?: string;
 }) {
-  return <div className={cn("px-2 py-1.5 text-xs font-medium text-slate-500", className)}>{children}</div>;
+  return <div className={cn("px-2 py-1.5 text-xs font-medium text-muted-foreground", className)}>{children}</div>;
 }
 
 export function DropdownMenuSeparator({ className }: { className?: string }) {
-  return <div className={cn("my-1 h-px bg-slate-200", className)} />;
+  return <div className={cn("my-1 h-px bg-border", className)} />;
 }
 
 export function DropdownMenuItem({
@@ -120,34 +120,38 @@ export function DropdownMenuItem({
   asChild,
   disabled,
   onSelect,
-}: {
-  children: React.ReactNode;
-  className?: string;
+  ...props
+}: React.ButtonHTMLAttributes<HTMLButtonElement> & {
   asChild?: boolean;
-  disabled?: boolean;
   onSelect?: (event: { preventDefault: () => void; defaultPrevented: boolean }) => void;
 }) {
   const ctx = React.useContext(DropdownContext);
 
+  const handleClick = (event: React.MouseEvent) => {
+    if (disabled) {
+      return;
+    }
+    const selectEvent = {
+      defaultPrevented: false,
+      preventDefault() {
+        this.defaultPrevented = true;
+      },
+    };
+    onSelect?.(selectEvent);
+    if (!selectEvent.defaultPrevented) {
+      ctx?.setOpen(false);
+    }
+    props.onClick?.(event as React.MouseEvent<HTMLButtonElement>);
+  };
+
   const itemProps = {
+    ...props,
     className: cn(
-      "flex w-full cursor-pointer items-center rounded-md px-2 py-2 text-sm text-slate-700 hover:bg-slate-100",
+      "flex w-full cursor-pointer items-center rounded-md px-2 py-2 text-sm text-popover-foreground hover:bg-accent hover:text-accent-foreground",
       disabled ? "cursor-not-allowed opacity-50 hover:bg-transparent" : "",
       className,
     ),
-    onClick: () => {
-      if (disabled) return;
-      const selectEvent = {
-        defaultPrevented: false,
-        preventDefault() {
-          this.defaultPrevented = true;
-        },
-      };
-      onSelect?.(selectEvent);
-      if (!selectEvent.defaultPrevented) {
-        ctx?.setOpen(false);
-      }
-    },
+    onClick: handleClick,
     role: "menuitem",
   };
 
@@ -158,7 +162,7 @@ export function DropdownMenuItem({
       ...itemProps,
       className: cn(itemProps.className, childProps.className),
       onClick: (event: React.MouseEvent) => {
-        itemProps.onClick();
+        itemProps.onClick(event);
         childProps.onClick?.(event);
       },
     });

@@ -82,7 +82,7 @@ export function PopoverContent({
     <div
       ref={ref}
       className={cn(
-        "absolute z-30 mt-2 w-full rounded-lg border border-slate-200 bg-white shadow-lg",
+        "absolute z-30 mt-2 w-full rounded-lg border border-border bg-popover text-popover-foreground shadow-lg",
         align === "end" ? "right-0" : "left-0",
         className,
       )}

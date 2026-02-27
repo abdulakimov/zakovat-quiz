@@ -6,7 +6,7 @@ const Avatar = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanEl
     <span
       ref={ref}
       className={cn(
-        "relative inline-flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-200 bg-slate-100",
+        "relative inline-flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-muted",
         className,
       )}
       {...props}
@@ -33,7 +33,7 @@ const AvatarFallback = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HT
   ({ className, ...props }, ref) => (
     <span
       ref={ref}
-      className={cn("inline-flex h-full w-full items-center justify-center text-xs font-semibold text-slate-700", className)}
+      className={cn("inline-flex h-full w-full items-center justify-center text-xs font-semibold text-muted-foreground", className)}
       {...props}
     />
   ),

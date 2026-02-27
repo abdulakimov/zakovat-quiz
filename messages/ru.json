@@ -18,7 +18,11 @@
     "delete": "Удалить",
     "done": "Готово",
     "back": "Назад",
-    "notAuthorized": "Нет доступа"
+    "notAuthorized": "Нет доступа",
+    "theme": "Тема",
+    "themeLight": "Светлая",
+    "themeDark": "Темная",
+    "themeSystem": "Системная"
   },
   "nav": {
     "teams": "Команды",

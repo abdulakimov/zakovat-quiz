@@ -23,7 +23,7 @@ export function AccordionItem({
 }: React.DetailsHTMLAttributes<HTMLDetailsElement>) {
   return (
     <details
-      className={cn("rounded-lg border border-slate-200 bg-white", className)}
+      className={cn("rounded-lg border border-border bg-card", className)}
       open={open}
       {...props}
     >
@@ -40,7 +40,7 @@ export function AccordionTrigger({
   return (
     <summary
       className={cn(
-        "cursor-pointer list-none rounded-lg px-4 py-3 text-sm font-medium text-slate-900 transition hover:bg-slate-50",
+        "cursor-pointer list-none rounded-lg px-4 py-3 text-sm font-medium text-foreground transition hover:bg-accent hover:text-accent-foreground",
         className,
       )}
       {...props}
@@ -56,7 +56,7 @@ export function AccordionContent({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div className={cn("accordion-content border-t border-slate-200 px-4 py-4", className)} {...props}>
+    <div className={cn("accordion-content border-t border-border px-4 py-4", className)} {...props}>
       {children}
     </div>
   );

@@ -71,7 +71,7 @@ export function TooltipContent({
     <span
       role="tooltip"
       className={cn(
-        "absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 rounded-md bg-slate-900 px-2 py-1 text-xs text-white shadow-lg",
+        "absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 rounded-md bg-popover px-2 py-1 text-xs text-popover-foreground shadow-lg",
         className,
       )}
     >

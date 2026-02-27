@@ -3,6 +3,14 @@
 import * as React from "react";
 import { IntlErrorCode, NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
 
+type IntlErrorDetails = {
+  code?: string;
+  namespace?: string;
+  key?: string;
+  locale?: string;
+  stack?: string;
+};
+
 export function IntlProvider({
   locale,
   messages,
@@ -17,13 +25,14 @@ export function IntlProvider({
       locale={locale}
       messages={messages}
       onError={(error) => {
-        const messagePath = [error.namespace, error.key].filter(Boolean).join(".");
-        const isMissingMessage = error.code === IntlErrorCode.MISSING_MESSAGE;
+        const details = error as IntlErrorDetails;
+        const messagePath = [details.namespace, details.key].filter(Boolean).join(".");
+        const isMissingMessage = details.code === IntlErrorCode.MISSING_MESSAGE;
         if (isMissingMessage) {
-          const warning = `[i18n] Missing message: ${error.locale ?? locale} ${messagePath}`;
+          const warning = `[i18n] Missing message: ${details.locale ?? locale} ${messagePath}`;
           if (typeof console !== "undefined") {
             if (process.env.NODE_ENV === "development") {
-              console.warn(warning, error.stack ?? error);
+              console.warn(warning, details.stack ?? error);
             } else {
               console.warn(warning);
             }

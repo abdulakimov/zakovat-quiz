@@ -3,6 +3,14 @@ import { getRequestConfig } from "next-intl/server";
 import { IntlErrorCode } from "next-intl";
 import { defaultLocale, isAppLocale, localeCookieName } from "@/src/i18n/config";
 
+type IntlErrorDetails = {
+  code?: string;
+  namespace?: string;
+  key?: string;
+  locale?: string;
+  stack?: string;
+};
+
 export default getRequestConfig(async () => {
   const headerStore = await headers();
   const cookieStore = await cookies();
@@ -17,11 +25,12 @@ export default getRequestConfig(async () => {
     locale,
     messages,
     onError(error) {
-      const messagePath = [error.namespace, error.key].filter(Boolean).join(".");
-      if (error.code === IntlErrorCode.MISSING_MESSAGE) {
-        const warning = `[i18n] Missing message: ${error.locale ?? locale} ${messagePath}`;
+      const details = error as IntlErrorDetails;
+      const messagePath = [details.namespace, details.key].filter(Boolean).join(".");
+      if (details.code === IntlErrorCode.MISSING_MESSAGE) {
+        const warning = `[i18n] Missing message: ${details.locale ?? locale} ${messagePath}`;
         if (process.env.NODE_ENV === "development") {
-          console.warn(warning, error.stack ?? error);
+          console.warn(warning, details.stack ?? error);
         } else {
           console.warn(warning);
         }

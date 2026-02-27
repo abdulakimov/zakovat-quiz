@@ -77,10 +77,10 @@ export function Toaster(props: ToasterProps) {
           key={item.id}
           role="status"
           className={[
-            "pointer-events-auto rounded-lg border bg-white px-4 py-3 text-sm shadow-lg",
-            item.kind === "success" ? "border-emerald-200 text-emerald-900" : "",
-            item.kind === "error" ? "border-red-200 text-red-900" : "",
-            item.kind === "message" ? "border-slate-200 text-slate-900" : "",
+            "pointer-events-auto rounded-lg border bg-card px-4 py-3 text-sm text-card-foreground shadow-lg",
+            item.kind === "success" ? "border-chart-2/30 bg-chart-2/10 text-chart-2" : "",
+            item.kind === "error" ? "border-destructive/30 bg-destructive/10 text-destructive" : "",
+            item.kind === "message" ? "border-border" : "",
           ].join(" ")}
         >
           {item.message}

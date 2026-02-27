@@ -79,11 +79,11 @@ export function DialogContent({
   if (!ctx?.open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/35 p-4" onMouseDown={() => ctx.setOpen(false)}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/35 p-4" onMouseDown={() => ctx.setOpen(false)}>
       <div
         role="dialog"
         aria-modal="true"
-        className={cn("w-full max-w-lg rounded-xl border border-slate-200 bg-white p-5 shadow-xl", className)}
+        className={cn("w-full max-w-lg rounded-xl border border-border bg-card p-5 text-card-foreground shadow-xl", className)}
         onMouseDown={(event) => event.stopPropagation()}
       >
         {children}
@@ -97,11 +97,11 @@ export function DialogHeader({ className, ...props }: React.HTMLAttributes<HTMLD
 }
 
 export function DialogTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h2 className={cn("text-lg font-semibold text-slate-900", className)} {...props} />;
+  return <h2 className={cn("text-lg font-semibold text-foreground", className)} {...props} />;
 }
 
 export function DialogDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn("text-sm text-slate-600", className)} {...props} />;
+  return <p className={cn("text-sm text-muted-foreground", className)} {...props} />;
 }
 
 export function DialogClose({

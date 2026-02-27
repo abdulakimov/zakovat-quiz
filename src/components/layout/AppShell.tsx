@@ -16,6 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { signOut } from "@/app/auth/actions";
 import { LanguageSwitcher } from "@/src/components/LanguageSwitcher";
 import { PageMotion } from "@/src/components/layout/PageMotion";
+import { ThemeSwitcher } from "@/src/components/theme/ThemeSwitcher";
 import {
   BoxIcon,
   ChevronDownIcon,
@@ -65,7 +66,7 @@ function DisabledNavItem({ item, comingSoon }: { item: NavItem; comingSoon: stri
           <button
             type="button"
             disabled
-            className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm text-slate-400"
+            className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground/70"
           >
             {item.icon}
             <span>{item.label}</span>
@@ -88,7 +89,7 @@ function DesktopNav({ items, comingSoon }: { items: NavItem[]; comingSoon: strin
             <Link
               key={item.label}
               href={item.href!}
-              className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+              className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             >
               {item.icon}
               <span>{item.label}</span>
@@ -131,7 +132,7 @@ function MobileNav({
             <DropdownMenuSeparator />
             {items.map((item) =>
               item.disabled ? (
-                <div key={item.label} className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-400">
+                <div key={item.label} className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-muted-foreground/70">
                   {item.icon}
                   <span>{item.label}</span>
                   <span className="ml-auto text-xs">{soon}</span>
@@ -180,14 +181,14 @@ function ProfileMenu({
               <Button
                 type="button"
                 variant="outline"
-                className="h-10 gap-2 rounded-full border-slate-200 bg-white px-2 sm:px-3"
+                className="h-10 gap-2 rounded-full px-2 sm:px-3"
               >
                 <Avatar className="h-7 w-7">
                   {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName} /> : null}
                   {!avatarUrl ? <AvatarFallback>{getInitials(user)}</AvatarFallback> : null}
                 </Avatar>
                 <span className="hidden max-w-36 truncate text-sm sm:inline">{displayName}</span>
-                <ChevronDownIcon className="hidden h-4 w-4 text-slate-500 sm:block" />
+                <ChevronDownIcon className="hidden h-4 w-4 text-muted-foreground sm:block" />
               </Button>
             </DropdownMenuTrigger>
           </TooltipTrigger>
@@ -197,8 +198,8 @@ function ProfileMenu({
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>
           <div className="space-y-0.5">
-            <p className="text-sm font-semibold text-slate-900">{displayName}</p>
-            {username ? <p className="text-xs text-slate-500">{username}</p> : null}
+            <p className="text-sm font-semibold text-foreground">{displayName}</p>
+            {username ? <p className="text-xs text-muted-foreground">{username}</p> : null}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
@@ -223,7 +224,7 @@ function ProfileMenu({
           <form action={signOut}>
             <button
               type="submit"
-              className="flex w-full items-center rounded-md px-2 py-2 text-sm text-red-700 hover:bg-red-50"
+              className="flex w-full items-center rounded-md px-2 py-2 text-sm text-destructive hover:bg-destructive/10"
             >
               <LogOutIcon className="mr-2 h-4 w-4" />
               {logOutLabel}
@@ -246,8 +247,8 @@ export async function AppShell({ children, user }: AppShellProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <div className="min-h-screen bg-background text-foreground">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
           <MobileNav
             items={navItems}
@@ -258,12 +259,12 @@ export async function AppShell({ children, user }: AppShellProps) {
 
           <div className="flex min-w-0 items-center gap-3">
             <Link href={localizeHref(locale, "/app")} className="inline-flex items-center gap-2 rounded-md px-1 py-1">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-sm font-bold text-white">
+              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
                 Z
               </span>
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold tracking-tight text-slate-900">Zakovat</p>
-                <p className="hidden text-xs text-slate-500 sm:block">Quiz Creator</p>
+                <p className="truncate text-sm font-semibold tracking-tight text-foreground">Zakovat</p>
+                <p className="hidden text-xs text-muted-foreground sm:block">Quiz Creator</p>
               </div>
             </Link>
           </div>
@@ -273,6 +274,7 @@ export async function AppShell({ children, user }: AppShellProps) {
           <DesktopNav items={navItems} comingSoon={tCommon("comingSoon")} />
 
           <div className="ml-auto flex items-center gap-2">
+            <ThemeSwitcher />
             <LanguageSwitcher />
             <ProfileMenu
               user={user}

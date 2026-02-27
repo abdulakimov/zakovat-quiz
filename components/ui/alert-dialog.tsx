@@ -48,11 +48,11 @@ export function AlertDialogContent({ children, className }: { children: React.Re
   const ctx = React.useContext(AlertDialogContext);
   if (!ctx?.open) return null;
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4" onMouseDown={() => ctx.setOpen(false)}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 p-4" onMouseDown={() => ctx.setOpen(false)}>
       <div
         role="alertdialog"
         aria-modal="true"
-        className={cn("w-full max-w-md rounded-xl border border-slate-200 bg-white p-5 shadow-xl", className)}
+        className={cn("w-full max-w-md rounded-xl border border-border bg-card p-5 text-card-foreground shadow-xl", className)}
         onMouseDown={(e) => e.stopPropagation()}
       >
         {children}
@@ -65,10 +65,10 @@ export function AlertDialogHeader(props: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn("space-y-1", props.className)} {...props} />;
 }
 export function AlertDialogTitle(props: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h3 className={cn("text-lg font-semibold text-slate-900", props.className)} {...props} />;
+  return <h3 className={cn("text-lg font-semibold text-foreground", props.className)} {...props} />;
 }
 export function AlertDialogDescription(props: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn("text-sm text-slate-600", props.className)} {...props} />;
+  return <p className={cn("text-sm text-muted-foreground", props.className)} {...props} />;
 }
 export function AlertDialogFooter(props: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn("mt-4 flex justify-end gap-2", props.className)} {...props} />;

@@ -10,7 +10,7 @@ export function CommandInput(props: React.InputHTMLAttributes<HTMLInputElement>)
     <input
       {...props}
       className={cn(
-        "h-10 w-full border-b border-slate-200 bg-white px-3 text-sm outline-none placeholder:text-slate-400",
+        "h-10 w-full border-b border-border bg-background px-3 text-sm text-foreground outline-none placeholder:text-muted-foreground",
         props.className,
       )}
     />
@@ -22,7 +22,7 @@ export function CommandList({ className, ...props }: React.HTMLAttributes<HTMLDi
 }
 
 export function CommandEmpty({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("px-3 py-2 text-sm text-slate-500", className)} {...props} />;
+  return <div className={cn("px-3 py-2 text-sm text-muted-foreground", className)} {...props} />;
 }
 
 export function CommandGroup({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
@@ -36,7 +36,7 @@ export function CommandItem({
   return (
     <button
       type="button"
-      className={cn("flex w-full items-start gap-3 rounded-md px-3 py-2 text-left hover:bg-slate-50", className)}
+      className={cn("flex w-full items-start gap-3 rounded-md px-3 py-2 text-left hover:bg-accent hover:text-accent-foreground", className)}
       {...props}
     />
   );

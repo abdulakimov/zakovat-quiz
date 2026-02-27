@@ -18,7 +18,11 @@
     "delete": "O'chirish",
     "done": "Tayyor",
     "back": "Orqaga",
-    "notAuthorized": "Ruxsat yo'q"
+    "notAuthorized": "Ruxsat yo'q",
+    "theme": "Mavzu",
+    "themeLight": "Yorug'",
+    "themeDark": "Qorong'i",
+    "themeSystem": "Tizim"
   },
   "nav": {
     "teams": "Jamoalar",
