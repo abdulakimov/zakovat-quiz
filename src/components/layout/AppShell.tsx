@@ -1,5 +1,6 @@
-import type { ReactNode } from "react";
+﻿import type { ReactNode } from "react";
 import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { signOut } from "@/app/auth/actions";
+import { LanguageSwitcher } from "@/src/components/LanguageSwitcher";
 import { PageMotion } from "@/src/components/layout/PageMotion";
 import {
   BoxIcon,
@@ -23,7 +26,7 @@ import {
   UserIcon,
   UsersIcon,
 } from "@/src/components/ui/icons";
-import { signOut } from "@/app/auth/actions";
+import { localizeHref, type AppLocale } from "@/src/i18n/config";
 
 type AppShellUser = {
   id: string;
@@ -45,12 +48,6 @@ type NavItem = {
   disabled?: boolean;
 };
 
-const NAV_ITEMS: NavItem[] = [
-  { href: "/app/teams", label: "Teams", icon: <UsersIcon className="h-4 w-4" /> },
-  { href: "/app/packs", label: "Packs", icon: <BoxIcon className="h-4 w-4" /> },
-  { label: "Presenter", icon: <PresentationIcon className="h-4 w-4" />, disabled: true },
-];
-
 function getInitials(user: AppShellUser | null) {
   const source = user?.displayName?.trim() || user?.name?.trim() || user?.username || "U";
   return source
@@ -60,7 +57,7 @@ function getInitials(user: AppShellUser | null) {
     .join("");
 }
 
-function DisabledNavItem({ item }: { item: NavItem }) {
+function DisabledNavItem({ item, comingSoon }: { item: NavItem; comingSoon: string }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -75,18 +72,18 @@ function DisabledNavItem({ item }: { item: NavItem }) {
           </button>
         </span>
       </TooltipTrigger>
-      <TooltipContent>Coming soon</TooltipContent>
+      <TooltipContent>{comingSoon}</TooltipContent>
     </Tooltip>
   );
 }
 
-function DesktopNav() {
+function DesktopNav({ items, comingSoon }: { items: NavItem[]; comingSoon: string }) {
   return (
     <TooltipProvider>
       <nav className="hidden items-center gap-1 md:flex" aria-label="Primary">
-        {NAV_ITEMS.map((item) =>
+        {items.map((item) =>
           item.disabled ? (
-            <DisabledNavItem key={item.label} item={item} />
+            <DisabledNavItem key={item.label} item={item} comingSoon={comingSoon} />
           ) : (
             <Link
               key={item.label}
@@ -103,7 +100,17 @@ function DesktopNav() {
   );
 }
 
-function MobileNav() {
+function MobileNav({
+  items,
+  openNavigation,
+  navigation,
+  soon,
+}: {
+  items: NavItem[];
+  openNavigation: string;
+  navigation: string;
+  soon: string;
+}) {
   return (
     <TooltipProvider>
       <div className="md:hidden">
@@ -113,21 +120,21 @@ function MobileNav() {
               <DropdownMenuTrigger asChild>
                 <Button type="button" variant="outline" size="sm" className="h-9 px-2">
                   <MenuIcon className="h-4 w-4" />
-                  <span className="sr-only">Open navigation</span>
+                  <span className="sr-only">{openNavigation}</span>
                 </Button>
               </DropdownMenuTrigger>
             </TooltipTrigger>
-            <TooltipContent>Navigation</TooltipContent>
+            <TooltipContent>{navigation}</TooltipContent>
           </Tooltip>
           <DropdownMenuContent align="start" className="min-w-48">
-            <DropdownMenuLabel>Navigation</DropdownMenuLabel>
+            <DropdownMenuLabel>{navigation}</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {NAV_ITEMS.map((item) =>
+            {items.map((item) =>
               item.disabled ? (
                 <div key={item.label} className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-slate-400">
                   {item.icon}
                   <span>{item.label}</span>
-                  <span className="ml-auto text-xs">Soon</span>
+                  <span className="ml-auto text-xs">{soon}</span>
                 </div>
               ) : (
                 <DropdownMenuItem key={item.label} asChild>
@@ -145,7 +152,21 @@ function MobileNav() {
   );
 }
 
-function ProfileMenu({ user }: { user: AppShellUser | null }) {
+function ProfileMenu({
+  user,
+  locale,
+  accountMenu,
+  profileLabel,
+  settingsLabel,
+  logOutLabel,
+}: {
+  user: AppShellUser | null;
+  locale: AppLocale;
+  accountMenu: string;
+  profileLabel: string;
+  settingsLabel: string;
+  logOutLabel: string;
+}) {
   const displayName = user?.displayName ?? user?.name ?? user?.username ?? "User";
   const username = user?.username ? `@${user.username}` : "";
   const avatarUrl = user?.avatarAsset?.path ? `/api/media/${user.avatarAsset.path}` : null;
@@ -170,7 +191,7 @@ function ProfileMenu({ user }: { user: AppShellUser | null }) {
               </Button>
             </DropdownMenuTrigger>
           </TooltipTrigger>
-          <TooltipContent>Account menu</TooltipContent>
+          <TooltipContent>{accountMenu}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
       <DropdownMenuContent align="end">
@@ -182,19 +203,19 @@ function ProfileMenu({ user }: { user: AppShellUser | null }) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/app/profile">
+          <Link href={localizeHref(locale, "/app/profile")}>
             <span className="mr-2">
               <UserIcon className="h-4 w-4" />
             </span>
-            <span>Profile</span>
+            <span>{profileLabel}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
-          <Link href="/app/settings">
+          <Link href={localizeHref(locale, "/app/settings")}>
             <span className="mr-2">
               <SettingsIcon className="h-4 w-4" />
             </span>
-            <span>Settings</span>
+            <span>{settingsLabel}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
@@ -205,7 +226,7 @@ function ProfileMenu({ user }: { user: AppShellUser | null }) {
               className="flex w-full items-center rounded-md px-2 py-2 text-sm text-red-700 hover:bg-red-50"
             >
               <LogOutIcon className="mr-2 h-4 w-4" />
-              Log out
+              {logOutLabel}
             </button>
           </form>
         </div>
@@ -214,15 +235,29 @@ function ProfileMenu({ user }: { user: AppShellUser | null }) {
   );
 }
 
-export function AppShell({ children, user }: AppShellProps) {
+export async function AppShell({ children, user }: AppShellProps) {
+  const locale = (await getLocale()) as AppLocale;
+  const [tNav, tCommon] = await Promise.all([getTranslations("nav"), getTranslations("common")]);
+
+  const navItems: NavItem[] = [
+    { href: localizeHref(locale, "/app/teams"), label: tNav("teams"), icon: <UsersIcon className="h-4 w-4" /> },
+    { href: localizeHref(locale, "/app/packs"), label: tNav("packs"), icon: <BoxIcon className="h-4 w-4" /> },
+    { label: tNav("presenter"), icon: <PresentationIcon className="h-4 w-4" />, disabled: true },
+  ];
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center gap-3 px-4 py-3 sm:px-6">
-          <MobileNav />
+          <MobileNav
+            items={navItems}
+            openNavigation={tCommon("openNavigation")}
+            navigation={tCommon("navigation")}
+            soon={tCommon("soon")}
+          />
 
           <div className="flex min-w-0 items-center gap-3">
-            <Link href="/app" className="inline-flex items-center gap-2 rounded-md px-1 py-1">
+            <Link href={localizeHref(locale, "/app")} className="inline-flex items-center gap-2 rounded-md px-1 py-1">
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-sm font-bold text-white">
                 Z
               </span>
@@ -235,10 +270,18 @@ export function AppShell({ children, user }: AppShellProps) {
 
           <Separator orientation="vertical" className="hidden h-6 md:block" />
 
-          <DesktopNav />
+          <DesktopNav items={navItems} comingSoon={tCommon("comingSoon")} />
 
-          <div className="ml-auto">
-            <ProfileMenu user={user} />
+          <div className="ml-auto flex items-center gap-2">
+            <LanguageSwitcher />
+            <ProfileMenu
+              user={user}
+              locale={locale}
+              accountMenu={tCommon("accountMenu")}
+              profileLabel={tCommon("profile")}
+              settingsLabel={tCommon("settings")}
+              logOutLabel={tCommon("logOut")}
+            />
           </div>
         </div>
       </header>

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +20,7 @@ export function StickySaveBar({
   formId?: string;
   className?: string;
 }) {
+  const tCommon = useTranslations("common");
   if (!dirty) return null;
 
   return (
@@ -29,15 +31,15 @@ export function StickySaveBar({
       )}
     >
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <p className="text-sm text-slate-600">Unsaved changes</p>
+        <p className="text-sm text-slate-600">{tCommon("unsavedChanges")}</p>
         <div className="flex items-center gap-2">
           {onCancel ? (
             <Button type="button" variant="outline" size="sm" disabled={pending} onClick={onCancel}>
-              Cancel
+              {tCommon("cancel")}
             </Button>
           ) : null}
           <Button type="submit" size="sm" disabled={!canSave} form={formId}>
-            {pending ? "Saving..." : "Save"}
+            {pending ? tCommon("saving") : tCommon("save")}
           </Button>
         </div>
       </div>

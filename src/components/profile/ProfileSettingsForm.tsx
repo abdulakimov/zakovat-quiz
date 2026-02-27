@@ -3,6 +3,7 @@
 import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -81,6 +82,7 @@ function uploadAvatar(file: File, onProgress: (percent: number) => void) {
 }
 
 export function ProfileSettingsForm({ user }: Props) {
+  const tProfile = useTranslations("profile");
   const router = useRouter();
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [isSaving, startTransition] = React.useTransition();
@@ -146,7 +148,7 @@ export function ProfileSettingsForm({ user }: Props) {
         if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
         return result.url;
       });
-      toast.success("Photo uploaded. Save changes to apply it.");
+      toast.success(tProfile("photoUploaded"));
     } catch (error) {
       setPreviewUrl((prev) => {
         if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
@@ -182,7 +184,7 @@ export function ProfileSettingsForm({ user }: Props) {
           return;
         }
 
-        toast.success(result.data.success);
+        toast.success(tProfile("profileUpdated"));
         form.reset({
           name: result.data.name ?? "",
           username: result.data.username,
@@ -227,8 +229,8 @@ export function ProfileSettingsForm({ user }: Props) {
           <CardHeader className="pb-4">
             <div className="flex items-start justify-between gap-3">
               <div className="space-y-1">
-                <CardTitle className="text-base font-semibold">Profile details</CardTitle>
-                <CardDescription>Update your photo and how your profile appears across the workspace.</CardDescription>
+                <CardTitle className="text-base font-semibold">{tProfile("detailsTitle")}</CardTitle>
+                <CardDescription>{tProfile("detailsDescription")}</CardDescription>
               </div>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -247,10 +249,10 @@ export function ProfileSettingsForm({ user }: Props) {
                     }}
                   >
                     <PencilIcon className="h-4 w-4" />
-                    <span className="sr-only">{isProfileEditing ? "Cancel editing" : "Edit profile"}</span>
+                    <span className="sr-only">{isProfileEditing ? tProfile("cancelEditing") : tProfile("editProfile")}</span>
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>{isProfileEditing ? "Cancel editing" : "Edit profile"}</TooltipContent>
+                <TooltipContent>{isProfileEditing ? tProfile("cancelEditing") : tProfile("editProfile")}</TooltipContent>
               </Tooltip>
             </div>
           </CardHeader>
@@ -258,8 +260,8 @@ export function ProfileSettingsForm({ user }: Props) {
             <SettingsSectionGroup>
               <SettingsSectionCard
                 icon={UserIconLucide}
-                title="Profile"
-                subtitle="Avatar and personal details."
+                title={tProfile("profileSectionTitle")}
+                subtitle={tProfile("profileSectionSubtitle")}
               >
               <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start">
                 <div className="space-y-4 rounded-lg border border-slate-200 p-4">
@@ -290,10 +292,10 @@ export function ProfileSettingsForm({ user }: Props) {
                       disabled={profileInputsDisabled}
                       onClick={() => fileInputRef.current?.click()}
                     >
-                      {isUploading ? `Uploading... ${uploadProgress}%` : "Change photo"}
+                      {isUploading ? `Uploading... ${uploadProgress}%` : tProfile("changePhoto")}
                     </Button>
                     <p className="text-xs text-slate-500">
-                      JPEG, PNG, or WebP up to 2MB. {!isProfileEditing ? "Click edit to change." : ""}
+                      {tProfile("photoHint")} {!isProfileEditing ? tProfile("photoHintEdit") : ""}
                     </p>
                   </div>
                 </div>
@@ -302,8 +304,8 @@ export function ProfileSettingsForm({ user }: Props) {
                   <FormFieldText
                     id="profile-name"
                     name="name"
-                    label="Name"
-                    placeholder="Your full name (optional)"
+                    label={tProfile("nameLabel")}
+                    placeholder={tProfile("namePlaceholder")}
                     register={form.register}
                     error={form.formState.errors.name}
                     disabled={profileInputsDisabled}
@@ -312,8 +314,8 @@ export function ProfileSettingsForm({ user }: Props) {
                   <FormFieldText
                     id="profile-username"
                     name="username"
-                    label="Username"
-                    placeholder="yourusername"
+                    label={tProfile("usernameLabel")}
+                    placeholder={tProfile("usernamePlaceholder")}
                     register={form.register}
                     error={form.formState.errors.username}
                     disabled={profileInputsDisabled}
@@ -321,19 +323,19 @@ export function ProfileSettingsForm({ user }: Props) {
                     autoCorrect="off"
                   />
                   <p className="-mt-2 text-xs text-slate-500">
-                    Used for sign in and mentions. Must be unique. Lowercase is recommended.
+                    {tProfile("usernameHint")}
                   </p>
 
                   <FormFieldText
                     id="profile-display-name"
                     name="displayName"
-                    label="Display name"
-                    placeholder="Enter display name"
+                    label={tProfile("displayNameLabel")}
+                    placeholder={tProfile("displayNamePlaceholder")}
                     register={form.register}
                     error={form.formState.errors.displayName}
                     disabled={profileInputsDisabled}
                   />
-                  <p className="-mt-2 text-xs text-slate-500">This is shown to others.</p>
+                  <p className="-mt-2 text-xs text-slate-500">{tProfile("displayNameHint")}</p>
                 </div>
               </div>
 
@@ -370,6 +372,7 @@ export function ProfileSettingsForm({ user }: Props) {
 }
 
 export function ProfileSecurityForm() {
+  const tSecurity = useTranslations("security");
   const [passwordServerError, setPasswordServerError] = React.useState<string | null>(null);
   const [isChangingPassword, startPasswordTransition] = React.useTransition();
   const [showPasswords, setShowPasswords] = React.useState({
@@ -438,10 +441,10 @@ export function ProfileSecurityForm() {
             className="absolute right-1 top-1 h-8 w-8 text-slate-500"
             disabled={isChangingPassword}
             onClick={() => setShowPasswords((s) => ({ ...s, [fieldKey]: !s[fieldKey] }))}
-            title={isVisible ? "Hide password" : "Show password"}
+            title={isVisible ? tSecurity("hidePassword") : tSecurity("showPassword")}
           >
             {isVisible ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
-            <span className="sr-only">{isVisible ? "Hide password" : "Show password"}</span>
+            <span className="sr-only">{isVisible ? tSecurity("hidePassword") : tSecurity("showPassword")}</span>
           </Button>
         </div>
         {error ? <p className="text-xs text-red-600">{error}</p> : null}
@@ -493,7 +496,7 @@ export function ProfileSecurityForm() {
           return;
         }
 
-        toast.success("Password updated.");
+        toast.success(tSecurity("passwordUpdated"));
         passwordForm.reset({
           currentPassword: "",
           newPassword: "",
@@ -507,18 +510,18 @@ export function ProfileSecurityForm() {
   return (
     <Card>
       <CardHeader className="pb-4">
-        <CardTitle className="text-base font-semibold">Security</CardTitle>
-        <CardDescription>Change your password and keep your account secure.</CardDescription>
+        <CardTitle className="text-base font-semibold">{tSecurity("sectionTitle")}</CardTitle>
+        <CardDescription>{tSecurity("sectionDescription")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <SettingsSectionGroup>
-          <SettingsSectionCard icon={ShieldIcon} title="Password" subtitle="Update your password regularly.">
+          <SettingsSectionCard icon={ShieldIcon} title={tSecurity("passwordTitle")} subtitle={tSecurity("passwordSubtitle")}>
             <form onSubmit={onPasswordSubmit} className="mx-auto w-full max-w-xl space-y-3" noValidate>
             <PasswordInputRow
               id="profile-current-password"
               fieldKey="current"
-              label="Current password"
-              placeholder="Enter current password"
+              label={tSecurity("currentPasswordLabel")}
+              placeholder={tSecurity("currentPasswordPlaceholder")}
               autoComplete="current-password"
               error={passwordForm.formState.errors.currentPassword?.message}
             />
@@ -526,20 +529,20 @@ export function ProfileSecurityForm() {
             <PasswordInputRow
               id="profile-new-password"
               fieldKey="next"
-              label="New password"
-              placeholder="Enter new password"
+              label={tSecurity("newPasswordLabel")}
+              placeholder={tSecurity("newPasswordPlaceholder")}
               autoComplete="new-password"
               error={passwordForm.formState.errors.newPassword?.message}
             />
             <p className="text-xs text-slate-500">
-              At least 10 characters and include at least 1 letter and 1 number.
+              {tSecurity("passwordHint")}
             </p>
 
             <PasswordInputRow
               id="profile-confirm-password"
               fieldKey="confirm"
-              label="Confirm new password"
-              placeholder="Re-enter new password"
+              label={tSecurity("confirmNewPasswordLabel")}
+              placeholder={tSecurity("confirmNewPasswordPlaceholder")}
               autoComplete="new-password"
               error={passwordForm.formState.errors.confirmNewPassword?.message}
             />
