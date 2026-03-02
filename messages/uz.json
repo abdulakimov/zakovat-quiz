@@ -185,8 +185,54 @@
     }
   },
   "appHome": {
-    "title": "Ish maydoni",
-    "description": "Tizimga kirgansiz. Birinchi viktorinangizni yaratishni boshlang."
+    "title": "Boshqaruv paneli",
+    "description": "Viktorina tayyorlash jarayonini kuzating, tezkor amallarga o'ting va oxirgi paketlarni davom ettiring.",
+    "hero": {
+      "primaryCta": "Paketlarni ochish",
+      "secondaryCta": "Jamoalarni boshqarish"
+    },
+    "stats": {
+      "totalPacks": {
+        "label": "Jami paketlar",
+        "hint": "Ish maydoningizdagi barcha paketlar"
+      },
+      "totalRounds": {
+        "label": "Jami raundlar",
+        "hint": "Barcha paketlar bo'yicha"
+      },
+      "activeTeams": {
+        "label": "Faol jamoalar",
+        "hint": "Kutilayotgan takliflar: {count}"
+      }
+    },
+    "quickActions": {
+      "title": "Tezkor amallar",
+      "description": "Eng ko'p ishlatiladigan ish jarayonlariga bir bosishda o'ting.",
+      "items": {
+        "packs": {
+          "title": "Paketlar",
+          "description": "Viktorina paketlarini yarating, tahrirlang va tartiblang."
+        },
+        "teams": {
+          "title": "Jamoalar",
+          "description": "A'zolar, takliflar va egalikni boshqaring."
+        },
+        "profile": {
+          "description": "Akkaunt ma'lumotlari va xavfsizlik sozlamalarini yangilang."
+        },
+        "settings": {
+          "description": "Ish maydoni sozlamalari va standartlarini moslang."
+        }
+      }
+    },
+    "recent": {
+      "title": "So'nggi paketlar",
+      "description": "Ish maydoningizda oxirgi tahrirlangan paketlar.",
+      "updatedAt": "Yangilangan: {date}",
+      "open": "Ochish",
+      "emptyTitle": "Hali paketlar yo'q",
+      "emptyDescription": "Raund va savollarni tuzishni boshlash uchun birinchi paketni yarating."
+    }
   },
   "settingsPage": {
     "title": "Sozlamalar",

@@ -185,8 +185,54 @@
     }
   },
   "appHome": {
-    "title": "Your workspace",
-    "description": "You are signed in. Start building your first quiz."
+    "title": "Control panel",
+    "description": "Track quiz production, jump into core actions, and continue editing your latest packs.",
+    "hero": {
+      "primaryCta": "Open packs",
+      "secondaryCta": "Manage teams"
+    },
+    "stats": {
+      "totalPacks": {
+        "label": "Total packs",
+        "hint": "All packs in your workspace"
+      },
+      "totalRounds": {
+        "label": "Total rounds",
+        "hint": "Across all your packs"
+      },
+      "activeTeams": {
+        "label": "Active teams",
+        "hint": "Pending invites: {count}"
+      }
+    },
+    "quickActions": {
+      "title": "Quick actions",
+      "description": "Jump directly to the most common workflows.",
+      "items": {
+        "packs": {
+          "title": "Packs",
+          "description": "Create, edit, and organize quiz packs."
+        },
+        "teams": {
+          "title": "Teams",
+          "description": "Manage members, invites, and ownership."
+        },
+        "profile": {
+          "description": "Update account details and security settings."
+        },
+        "settings": {
+          "description": "Adjust workspace preferences and defaults."
+        }
+      }
+    },
+    "recent": {
+      "title": "Recent packages",
+      "description": "Last edited packs from your workspace.",
+      "updatedAt": "Updated: {date}",
+      "open": "Open",
+      "emptyTitle": "No packages yet",
+      "emptyDescription": "Create your first pack to start building rounds and questions."
+    }
   },
   "settingsPage": {
     "title": "Settings",
