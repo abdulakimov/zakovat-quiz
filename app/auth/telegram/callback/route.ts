@@ -9,6 +9,7 @@ import {
   getTelegramEndpoints,
   TELEGRAM_FLOW_COOKIE,
   verifyTelegramFlowCookie,
+  verifyTelegramStateToken,
   verifyTelegramIdToken,
 } from "@/lib/telegram-oidc";
 import { localizeHref, normalizeLocale } from "@/src/i18n/config";
@@ -26,18 +27,18 @@ export async function GET(request: NextRequest) {
   const cookieStore = await cookies();
   const flowToken = cookieStore.get(TELEGRAM_FLOW_COOKIE)?.value;
 
-  if (!code || !state || !flowToken) {
+  if (!code || !state) {
     return redirectToAuthError(request, "uz", "telegram_oauth_failed");
   }
 
-  const flow = await verifyTelegramFlowCookie(flowToken);
-  if (!flow) {
+  const statePayload = await verifyTelegramStateToken(state);
+  if (!statePayload) {
     return redirectToAuthError(request, "uz", "telegram_oauth_failed");
   }
 
-  if (flow.state !== state) {
-    logger.warn("Telegram state mismatch");
-    return redirectToAuthError(request, flow.locale, "telegram_oauth_invalid_state");
+  const flow = flowToken ? await verifyTelegramFlowCookie(flowToken) : null;
+  if (flow && flow.state !== state) {
+    logger.warn("Telegram state cookie mismatch; continuing with signed state token");
   }
 
   try {
@@ -46,7 +47,7 @@ export async function GET(request: NextRequest) {
     const idToken = await exchangeTelegramCodeForIdToken({
       tokenEndpoint: endpoints.tokenEndpoint,
       code,
-      codeVerifier: flow.codeVerifier,
+      codeVerifier: statePayload.codeVerifier,
       redirectUri: env.TELEGRAM_OIDC_REDIRECT_URI,
       clientId: env.TELEGRAM_OIDC_CLIENT_ID,
       clientSecret: env.TELEGRAM_OIDC_CLIENT_SECRET,
@@ -56,13 +57,13 @@ export async function GET(request: NextRequest) {
       idToken,
       jwksUri: endpoints.jwksUri,
       clientId: env.TELEGRAM_OIDC_CLIENT_ID,
-      nonce: flow.nonce,
+      nonce: statePayload.nonce,
     });
 
     const user = await upsertTelegramUser(claims);
     await setUserSessionCookie(user);
 
-    const destination = new URL(localizeHref(normalizeLocale(flow.locale), "/app"), request.url);
+    const destination = new URL(localizeHref(normalizeLocale(statePayload.locale), "/app"), request.url);
     const response = NextResponse.redirect(destination);
     response.cookies.set(TELEGRAM_FLOW_COOKIE, "", {
       httpOnly: true,
@@ -74,6 +75,6 @@ export async function GET(request: NextRequest) {
     return response;
   } catch (error) {
     logger.error("Telegram callback failed", { error });
-    return redirectToAuthError(request, flow.locale, "telegram_oauth_failed");
+    return redirectToAuthError(request, statePayload.locale, "telegram_oauth_failed");
   }
 }

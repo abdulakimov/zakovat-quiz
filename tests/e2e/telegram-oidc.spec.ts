@@ -83,8 +83,19 @@ test("Callback validates id_token, creates session, and redirects to app", async
     },
   ]);
 
+  const stateToken = await new SignJWT({
+    nonce,
+    codeVerifier,
+    locale: "uz",
+    csrf: state,
+  })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime("10m")
+    .sign(new TextEncoder().encode(process.env.SESSION_SECRET!));
+
   const code = `test:${nonce}:${providerSub}`;
-  await page.goto(`/uz/auth/telegram/callback?code=${encodeURIComponent(code)}&state=${state}`);
+  await page.goto(`/uz/auth/telegram/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(stateToken)}`);
   await page.waitForURL(/\/uz\/app/);
 
   const cookies = await page.context().cookies();

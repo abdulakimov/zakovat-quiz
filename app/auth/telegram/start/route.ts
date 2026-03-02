@@ -7,6 +7,7 @@ import {
   getTelegramEnv,
   getTelegramEndpoints,
   signTelegramFlowCookie,
+  signTelegramStateToken,
   TELEGRAM_FLOW_COOKIE,
   TELEGRAM_FLOW_TTL_SECONDS,
 } from "@/lib/telegram-oidc";
@@ -21,8 +22,14 @@ export async function GET(request: Request) {
     ]);
     const locale = normalizeLocale(headerStore.get("x-locale"));
     const flow = createTelegramFlowValues();
+    const stateToken = await signTelegramStateToken({
+      nonce: flow.nonce,
+      codeVerifier: flow.codeVerifier,
+      locale,
+      csrf: flow.state,
+    });
     const flowCookie = await signTelegramFlowCookie({
-      state: flow.state,
+      state: stateToken,
       nonce: flow.nonce,
       codeVerifier: flow.codeVerifier,
       locale,
@@ -32,7 +39,7 @@ export async function GET(request: Request) {
       authorizationEndpoint: endpoints.authorizationEndpoint,
       clientId: env.TELEGRAM_OIDC_CLIENT_ID,
       redirectUri: env.TELEGRAM_OIDC_REDIRECT_URI,
-      state: flow.state,
+      state: stateToken,
       nonce: flow.nonce,
       codeChallenge: flow.codeChallenge,
     });

@@ -29,6 +29,13 @@ type TelegramFlowPayload = {
   locale: string;
 };
 
+type TelegramStatePayload = {
+  nonce: string;
+  codeVerifier: string;
+  locale: string;
+  csrf: string;
+};
+
 type TelegramIdTokenClaims = {
   sub: string;
   nonce?: string;
@@ -90,6 +97,23 @@ export async function signTelegramFlowCookie(payload: TelegramFlowPayload) {
 export async function verifyTelegramFlowCookie(token: string) {
   try {
     const { payload } = await jwtVerify<TelegramFlowPayload>(token, getFlowSecret());
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+export async function signTelegramStateToken(payload: TelegramStatePayload) {
+  return new SignJWT(payload)
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime(`${TELEGRAM_FLOW_TTL_SECONDS}s`)
+    .sign(getFlowSecret());
+}
+
+export async function verifyTelegramStateToken(token: string) {
+  try {
+    const { payload } = await jwtVerify<TelegramStatePayload>(token, getFlowSecret());
     return payload;
   } catch {
     return null;
