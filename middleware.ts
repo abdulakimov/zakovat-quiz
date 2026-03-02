@@ -18,6 +18,13 @@ function withLocale(url: URL, locale: AppLocale, pathname: string) {
   return localized;
 }
 
+function buildLoginRedirect(request: NextRequest, locale: AppLocale) {
+  const loginUrl = withLocale(request.nextUrl, locale, "/auth/login");
+  const nextPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
+  loginUrl.searchParams.set("next", nextPath);
+  return loginUrl;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   if (pathname.startsWith("/api") || pathname.startsWith("/_next") || PUBLIC_FILE.test(pathname)) {
@@ -38,12 +45,12 @@ export async function middleware(request: NextRequest) {
   if (rewrittenPathname.startsWith("/app")) {
     const token = request.cookies.get(getSessionCookieName())?.value;
     if (!token) {
-      return NextResponse.redirect(withLocale(request.nextUrl, locale, "/auth/login"));
+      return NextResponse.redirect(buildLoginRedirect(request, locale));
     }
 
     const session = await verifySessionToken(token);
     if (!session) {
-      return NextResponse.redirect(withLocale(request.nextUrl, locale, "/auth/login"));
+      return NextResponse.redirect(buildLoginRedirect(request, locale));
     }
 
     if (rewrittenPathname.startsWith("/app/admin") && session.role !== "ADMIN") {

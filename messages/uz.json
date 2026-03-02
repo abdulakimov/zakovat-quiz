@@ -341,5 +341,54 @@
     "revealTitle": "Javoblarni e'lon qilamiz",
     "answer": "Javob",
     "writeAnswersDurationInvalid": "WRITE_ANSWERS muddati noto'g'ri, 60s ishlatildi."
+  },
+  "landing": {
+    "brand": "Zakovat Quiz Creator",
+    "brandTagline": "Jamoa bilan professional viktorina tayyorlang",
+    "heroEyebrow": "Hamkorlik uchun qulay platforma",
+    "heroTitle": "Viktorinalarni tez yarating va jamoa bilan boshqaring",
+    "heroDescription": "Raundlar, savollar va media fayllarni bir joyda boshqaring. Jonli o'yinlar uchun tayyor ish jarayoni.",
+    "ctaStartFree": "Ro'yxatdan o'tish",
+    "ctaLogIn": "Kirish",
+    "ctaDashboard": "Dashboardga o'tish",
+    "heroPanelTitle": "Nega bu platforma",
+    "heroPanelLineOne": "Raundlar va savollarni tartibli tuzing.",
+    "heroPanelLineTwo": "Jamoa bilan birga tahrirlang va nazorat qiling.",
+    "heroPanelLineThree": "Taqdimot uchun bitta ish maydonidan foydalaning.",
+    "featuresTitle": "Asosiy imkoniyatlar",
+    "featuresDescription": "Ish jarayonini tezlashtiradigan minimal, amaliy funksiyalar.",
+    "featureOne": {
+      "title": "Tez paket yaratish",
+      "description": "Bir necha daqiqada viktorina paketini oching va dastlabki raundlarni qo'shing."
+    },
+    "featureTwo": {
+      "title": "Moslashuvchan savol turlari",
+      "description": "Matn, rasm, audio va boshqa formatlarda savollarni bitta oqimda boshqaring."
+    },
+    "featureThree": {
+      "title": "Jamoaviy boshqaruv",
+      "description": "A'zolar bilan birga ishlang, rollarni boshqaring va kontent sifati ustidan nazorat qiling."
+    },
+    "featureFour": {
+      "title": "Jonli taqdimotga tayyor",
+      "description": "Paketni prezenter rejimiga tayyorlab, o'yinni muammosiz boshlang."
+    },
+    "howTitle": "Qanday ishlaydi",
+    "howDescription": "Uch oddiy bosqichda viktorinani ishga tushiring.",
+    "stepLabel": "Bosqich {number}",
+    "stepOne": {
+      "title": "Akkaunt yarating",
+      "description": "Ro'yxatdan o'ting va ish maydoni sozlamalarini birinchi marta tayyorlang."
+    },
+    "stepTwo": {
+      "title": "Paketni yig'ing",
+      "description": "Raundlar va savollarni qo'shing, kerakli media fayllarni biriktiring."
+    },
+    "stepThree": {
+      "title": "Jamoa bilan ishga tushiring",
+      "description": "Tayyor paketni ko'rib chiqing va prezenter orqali jonli o'yinni boshlang."
+    },
+    "footerNote": "Zakovat Quiz Creator",
+    "footerSupport": "Viktorina workflow'i uchun"
   }
 }

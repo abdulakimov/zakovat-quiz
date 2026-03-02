@@ -341,5 +341,54 @@
     "revealTitle": "Now we reveal answers",
     "answer": "Answer",
     "writeAnswersDurationInvalid": "WRITE_ANSWERS duration invalid, falling back to 60s."
+  },
+  "landing": {
+    "brand": "Zakovat Quiz Creator",
+    "brandTagline": "Build professional quizzes with your team",
+    "heroEyebrow": "Built for collaborative quiz production",
+    "heroTitle": "Create quiz experiences quickly and run them with confidence",
+    "heroDescription": "Manage rounds, questions, and media in one workspace designed for live game workflows.",
+    "ctaStartFree": "Start free",
+    "ctaLogIn": "Log in",
+    "ctaDashboard": "Go to dashboard",
+    "heroPanelTitle": "Why teams choose it",
+    "heroPanelLineOne": "Structure rounds and questions with clarity.",
+    "heroPanelLineTwo": "Collaborate with your team in one place.",
+    "heroPanelLineThree": "Prepare quickly for live presenter sessions.",
+    "featuresTitle": "Core features",
+    "featuresDescription": "Minimal, practical tools for faster quiz delivery.",
+    "featureOne": {
+      "title": "Fast pack setup",
+      "description": "Create a new quiz pack and start building rounds in minutes."
+    },
+    "featureTwo": {
+      "title": "Flexible question formats",
+      "description": "Handle text, image, audio, and other question types in one flow."
+    },
+    "featureThree": {
+      "title": "Team collaboration",
+      "description": "Work together with clear roles and better review control."
+    },
+    "featureFour": {
+      "title": "Presenter-ready workflow",
+      "description": "Prepare your pack and move into live presentation mode smoothly."
+    },
+    "howTitle": "How it works",
+    "howDescription": "Launch your quiz in three practical steps.",
+    "stepLabel": "Step {number}",
+    "stepOne": {
+      "title": "Create your account",
+      "description": "Sign up and configure your workspace once."
+    },
+    "stepTwo": {
+      "title": "Build your pack",
+      "description": "Add rounds, write questions, and attach media assets."
+    },
+    "stepThree": {
+      "title": "Run with your team",
+      "description": "Review everything and launch your live session from the dashboard."
+    },
+    "footerNote": "Zakovat Quiz Creator",
+    "footerSupport": "Built for quiz workflows"
   }
 }

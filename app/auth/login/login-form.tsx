@@ -5,6 +5,7 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useLocale } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { login, type AuthState } from "@/app/auth/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,16 +26,21 @@ function isRedirectError(error: unknown) {
   );
 }
 
-function toFormData(values: LoginInput) {
+function toFormData(values: LoginInput, nextPath: string | null) {
   const formData = new FormData();
   formData.set("usernameOrEmail", values.usernameOrEmail);
   formData.set("password", values.password);
+  if (nextPath) {
+    formData.set("next", nextPath);
+  }
   return formData;
 }
 
 export default function LoginForm() {
   const locale = normalizeLocale(useLocale());
+  const searchParams = useSearchParams();
   const tAuth = useTranslations("auth");
+  const nextPath = searchParams.get("next");
   const [isPending, startTransition] = React.useTransition();
   const [serverState, setServerState] = React.useState<AuthState>({});
 
@@ -52,7 +58,7 @@ export default function LoginForm() {
     startTransition(() => {
       void (async () => {
         try {
-          const result = await login({}, toFormData(values));
+          const result = await login({}, toFormData(values, nextPath));
           setServerState(result ?? {});
           if (result?.error) toast.error(result.error);
           if (result?.success) toast.success(result.success);

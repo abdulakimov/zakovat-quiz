@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { consumeRateLimit } from "@/src/lib/rate-limit";
 import { safeAction } from "@/src/lib/actions";
-import { localizeHref, normalizeLocale } from "@/src/i18n/config";
+import { getPathWithoutLocale, localizeHref, normalizeLocale } from "@/src/i18n/config";
 import { loginSchema, signupSchema } from "@/src/schemas/auth";
 import {
   getSessionCookieName,
@@ -51,6 +51,29 @@ function toLoginInput(formData: FormData) {
     usernameOrEmail: normalizeUsername(formData.get("usernameOrEmail")),
     password: typeof formData.get("password") === "string" ? String(formData.get("password")) : "",
   };
+}
+
+function resolvePostLoginRedirect(rawNext: FormDataEntryValue | null, locale: ReturnType<typeof normalizeLocale>) {
+  const fallback = localizeHref(locale, "/app");
+  if (typeof rawNext !== "string" || rawNext.length === 0) {
+    return fallback;
+  }
+
+  try {
+    const parsed = new URL(rawNext, "http://localhost");
+    if (parsed.origin !== "http://localhost") {
+      return fallback;
+    }
+
+    const nextPathname = getPathWithoutLocale(parsed.pathname);
+    if (!nextPathname.startsWith("/app")) {
+      return fallback;
+    }
+
+    return `${localizeHref(locale, nextPathname)}${parsed.search}`;
+  } catch {
+    return fallback;
+  }
 }
 
 
@@ -160,6 +183,7 @@ export async function login(
   formData: FormData
 ): Promise<AuthState> {
   const locale = await getActionLocale();
+  const destination = resolvePostLoginRedirect(formData.get("next"), locale);
   const clientIp = await getClientIp();
   const execute = safeAction(loginSchema, async (input) => {
     const identifier = input.usernameOrEmail.toLowerCase();
@@ -213,7 +237,7 @@ export async function login(
     await setSessionCookie(user);
 
     logger.info("Login successful", { userId: user.id });
-    redirect(localizeHref(locale, "/app"));
+    redirect(destination);
   });
 
   const result = await execute(toLoginInput(formData));
