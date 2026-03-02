@@ -256,13 +256,56 @@
     "name": "Ism",
     "username": "Foydalanuvchi nomi",
     "email": "Email",
+    "confirmPassword": "Parolni tasdiqlang",
     "creatingAccount": "Akkaunt yaratilmoqda...",
     "createAccount": "Akkaunt yaratish",
     "alreadyAccount": "Akkauntingiz bormi?",
     "signupUnavailable": "Hozir akkaunt yaratib bo'lmadi.",
     "continueWithTelegram": "Telegram orqali kirish",
     "telegramLoginFailed": "Telegram orqali kirish hozircha mavjud emas.",
-    "telegramStateInvalid": "Telegram orqali kirish tekshiruvi muvaffaqiyatsiz tugadi. Qayta urinib ko'ring."
+    "telegramStateInvalid": "Telegram orqali kirish tekshiruvi muvaffaqiyatsiz tugadi. Qayta urinib ko'ring.",
+    "error": {
+      "invalidCredentials": "Foydalanuvchi nomi/email yoki parol noto'g'ri.",
+      "tooManyAttempts": "Juda ko'p urinish qilindi. Keyinroq qayta urinib ko'ring."
+    },
+    "validation": {
+      "invalidInput": "Belgilangan maydonlarni tekshiring.",
+      "fixFields": "Belgilangan maydonlardagi xatolarni to'g'rilab, qayta urinib ko'ring.",
+      "identifier": {
+        "required": "Foydalanuvchi nomi yoki email kiriting.",
+        "invalid": "To'g'ri foydalanuvchi nomi yoki email kiriting."
+      },
+      "email": {
+        "required": "Email kiritilishi shart.",
+        "invalid": "To'g'ri email manzilini kiriting.",
+        "tooLong": "Email juda uzun.",
+        "taken": "Bu email allaqachon ishlatilmoqda."
+      },
+      "username": {
+        "tooShort": "Foydalanuvchi nomi kamida 3 ta belgidan iborat bo'lishi kerak.",
+        "tooLong": "Foydalanuvchi nomi ko'pi bilan 24 ta belgi bo'lishi kerak.",
+        "invalid": "Faqat kichik harflar, raqamlar, nuqta yoki pastki chiziq ishlating.",
+        "invalidEdge": "Foydalanuvchi nomi nuqta yoki pastki chiziq bilan boshlanmasligi/tugamasligi kerak.",
+        "consecutive": "Ketma-ket nuqta yoki pastki chiziq ishlatib bo'lmaydi.",
+        "taken": "Bu foydalanuvchi nomi band."
+      },
+      "password": {
+        "tooShort": "Parol kamida 8 ta belgidan iborat bo'lishi kerak.",
+        "tooLong": "Parol ko'pi bilan 72 ta belgi bo'lishi kerak.",
+        "edgeSpaces": "Parol boshida yoki oxirida bo'sh joy bo'lmasligi kerak.",
+        "missingLetter": "Parolda kamida bitta harf bo'lishi kerak.",
+        "missingNumber": "Parolda kamida bitta raqam bo'lishi kerak."
+      },
+      "name": {
+        "tooShort": "Ism kamida 2 ta belgidan iborat bo'lishi kerak.",
+        "tooLong": "Ism ko'pi bilan 64 ta belgi bo'lishi kerak.",
+        "invalid": "Faqat harflar, bo'sh joy, apostrof yoki defisdan foydalaning."
+      },
+      "confirmPassword": {
+        "required": "Parolni tasdiqlang.",
+        "mismatch": "Parollar mos kelmadi."
+      }
+    }
   },
   "teams": {
     "title": "Jamoalar",

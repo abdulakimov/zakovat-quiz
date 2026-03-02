@@ -1,10 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/src/i18n/client";
-import { localizeHref, normalizeLocale } from "@/src/i18n/config";
 
 function TelegramIcon() {
   return (
@@ -20,13 +18,12 @@ function TelegramIcon() {
 }
 
 export function TelegramLoginButton() {
-  const locale = normalizeLocale(useLocale());
   const tAuth = useTranslations("auth");
 
   return (
     <Button asChild variant="outline" className="w-full" data-testid="telegram-login-button">
       <Link
-        href={localizeHref(locale, "/auth/telegram/start")}
+        href="/auth/telegram/start"
         aria-label={tAuth("continueWithTelegram")}
       >
         <TelegramIcon />

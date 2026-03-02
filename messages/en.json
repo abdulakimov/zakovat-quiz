@@ -256,13 +256,56 @@
     "name": "Name",
     "username": "Username",
     "email": "Email",
+    "confirmPassword": "Confirm password",
     "creatingAccount": "Creating account...",
     "createAccount": "Create account",
     "alreadyAccount": "Already have an account?",
     "signupUnavailable": "Unable to create account right now.",
     "continueWithTelegram": "Continue with Telegram",
     "telegramLoginFailed": "Telegram sign in is temporarily unavailable.",
-    "telegramStateInvalid": "Telegram sign in validation failed. Please try again."
+    "telegramStateInvalid": "Telegram sign in validation failed. Please try again.",
+    "error": {
+      "invalidCredentials": "Invalid username/email or password.",
+      "tooManyAttempts": "Too many sign in attempts. Please try again later."
+    },
+    "validation": {
+      "invalidInput": "Please check the highlighted fields.",
+      "fixFields": "Please fix the highlighted fields and try again.",
+      "identifier": {
+        "required": "Enter your username or email.",
+        "invalid": "Enter a valid username or email."
+      },
+      "email": {
+        "required": "Email is required.",
+        "invalid": "Enter a valid email address.",
+        "tooLong": "Email is too long.",
+        "taken": "This email is already in use."
+      },
+      "username": {
+        "tooShort": "Username must be at least 3 characters.",
+        "tooLong": "Username must be at most 24 characters.",
+        "invalid": "Use only lowercase letters, numbers, dots, or underscores.",
+        "invalidEdge": "Username cannot start or end with a dot or underscore.",
+        "consecutive": "Username cannot contain consecutive dots or underscores.",
+        "taken": "This username is already taken."
+      },
+      "password": {
+        "tooShort": "Password must be at least 8 characters.",
+        "tooLong": "Password must be at most 72 characters.",
+        "edgeSpaces": "Password cannot start or end with a space.",
+        "missingLetter": "Password must include at least one letter.",
+        "missingNumber": "Password must include at least one number."
+      },
+      "name": {
+        "tooShort": "Name must be at least 2 characters.",
+        "tooLong": "Name must be at most 64 characters.",
+        "invalid": "Use letters, spaces, apostrophes, or hyphens."
+      },
+      "confirmPassword": {
+        "required": "Please confirm your password.",
+        "mismatch": "Passwords do not match."
+      }
+    }
   },
   "teams": {
     "title": "Teams",

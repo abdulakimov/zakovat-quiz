@@ -3,48 +3,38 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
-import { prisma } from "@/lib/prisma";
-import { logger } from "@/lib/logger";
-import { consumeRateLimit } from "@/src/lib/rate-limit";
-import { safeAction } from "@/src/lib/actions";
-import { getPathWithoutLocale, localizeHref, normalizeLocale } from "@/src/i18n/config";
-import { loginSchema, signupSchema } from "@/src/schemas/auth";
 import { clearUserSessionCookie, setUserSessionCookie } from "@/lib/auth-session";
+import { logger } from "@/lib/logger";
+import { prisma } from "@/lib/prisma";
+import { getPathWithoutLocale, localizeHref, normalizeLocale } from "@/src/i18n/config";
+import { consumeRateLimit } from "@/src/lib/rate-limit";
+import { signInSchema, signUpSchema, type SignInRawInput, type SignUpRawInput } from "@/src/validators/auth";
+import { formatZodError, type FieldErrorMap } from "@/src/validators/zod-error";
 
 export type AuthState = {
-  error?: string;
-  success?: string;
+  ok?: boolean;
+  fieldErrors?: FieldErrorMap;
+  formErrorKey?: string;
+  successKey?: string;
 };
 
 const LOGIN_LIMIT = { bucket: "auth:login", limit: 5, windowMs: 10 * 60 * 1000 };
 
-function normalizeUsername(value: FormDataEntryValue | null) {
-  return typeof value === "string" ? value.trim().toLowerCase() : "";
-}
-
-function normalizeName(value: FormDataEntryValue | null) {
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
-}
-
-function normalizeEmail(value: FormDataEntryValue | null) {
-  if (typeof value !== "string") return "";
-  return value.trim().toLowerCase();
-}
-
-function toSignupInput(formData: FormData) {
+function toSignupInput(formData: FormData): SignUpRawInput {
   return {
-    username: normalizeUsername(formData.get("username")),
     name: typeof formData.get("name") === "string" ? String(formData.get("name")) : "",
-    email: normalizeEmail(formData.get("email")),
+    username: typeof formData.get("username") === "string" ? String(formData.get("username")) : "",
+    email: typeof formData.get("email") === "string" ? String(formData.get("email")) : "",
     password: typeof formData.get("password") === "string" ? String(formData.get("password")) : "",
+    confirmPassword:
+      typeof formData.get("confirmPassword") === "string" ? String(formData.get("confirmPassword")) : "",
   };
 }
 
-function toLoginInput(formData: FormData) {
+function toLoginInput(formData: FormData): SignInRawInput {
   return {
-    usernameOrEmail: normalizeUsername(formData.get("usernameOrEmail")),
+    usernameOrEmail:
+      typeof formData.get("usernameOrEmail") === "string" ? String(formData.get("usernameOrEmail")) : "",
     password: typeof formData.get("password") === "string" ? String(formData.get("password")) : "",
   };
 }
@@ -72,12 +62,6 @@ function resolvePostLoginRedirect(rawNext: FormDataEntryValue | null, locale: Re
   }
 }
 
-
-function toAuthError(resultError: string, fieldErrors?: Record<string, string[] | undefined>): string {
-  const firstFieldError = Object.values(fieldErrors ?? {}).flat().find(Boolean);
-  return firstFieldError ?? resultError;
-}
-
 async function getClientIp() {
   const h = await headers();
   const forwarded = h.get("x-forwarded-for");
@@ -102,35 +86,46 @@ async function getActionLocale() {
   return normalizeLocale(headerStore.get("x-locale"));
 }
 
-
-export async function signup(
-  _prevState: AuthState,
-  formData: FormData
-): Promise<AuthState> {
+export async function signup(_prevState: AuthState, formData: FormData): Promise<AuthState> {
   const locale = await getActionLocale();
-  const execute = safeAction(signupSchema, async (input) => {
-    const username = input.username.toLowerCase();
-    const name = normalizeName(input.name ?? null);
-    const email = input.email.toLowerCase();
 
-    const existing = await prisma.user.findUnique({ where: { username } });
-    if (existing) {
-      logger.warn("Signup rejected: username already taken", { username });
-      return { error: "Username is already taken." } satisfies AuthState;
+  try {
+    const inputResult = signUpSchema.safeParse(toSignupInput(formData));
+    if (!inputResult.success) {
+      return {
+        ok: false,
+        fieldErrors: formatZodError(inputResult.error),
+        formErrorKey: "auth.validation.invalidInput",
+      };
     }
 
-    const existingEmail = await prisma.user.findUnique({ where: { email } });
+    const input = inputResult.data;
+    const existing = await prisma.user.findUnique({ where: { username: input.username } });
+    if (existing) {
+      logger.warn("Signup rejected: username already taken", { username: input.username });
+      return {
+        ok: false,
+        fieldErrors: { username: "auth.validation.username.taken" },
+        formErrorKey: "auth.validation.fixFields",
+      };
+    }
+
+    const existingEmail = await prisma.user.findUnique({ where: { email: input.email } });
     if (existingEmail) {
-      logger.warn("Signup rejected: email already in use", { email });
-      return { error: "Unable to create account with the provided details." } satisfies AuthState;
+      logger.warn("Signup rejected: email already in use", { email: input.email });
+      return {
+        ok: false,
+        fieldErrors: { email: "auth.validation.email.taken" },
+        formErrorKey: "auth.validation.fixFields",
+      };
     }
 
     const passwordHash = await bcrypt.hash(input.password, 12);
     const user = await prisma.user.create({
       data: {
-        username,
-        email,
-        name,
+        username: input.username,
+        email: input.email,
+        name: input.name ?? null,
         passwordHash,
         role: "USER",
         status: "ACTIVE",
@@ -140,60 +135,72 @@ export async function signup(
 
     await setUserSessionCookie(user);
     redirect(localizeHref(locale, "/app"));
-  });
-
-  const result = await execute(toSignupInput(formData));
-  if (!result.ok) {
-    return { error: toAuthError(result.error, result.fieldErrors) };
+  } catch (error) {
+    logger.error("Signup unexpected failure", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    throw error;
   }
-
-  return result.data ?? {};
 }
 
-export async function login(
-  _prevState: AuthState,
-  formData: FormData
-): Promise<AuthState> {
+export async function login(_prevState: AuthState, formData: FormData): Promise<AuthState> {
   const locale = await getActionLocale();
   const destination = resolvePostLoginRedirect(formData.get("next"), locale);
-  const clientIp = await getClientIp();
-  const execute = safeAction(loginSchema, async (input) => {
-    const identifier = input.usernameOrEmail.toLowerCase();
+
+  try {
+    const inputResult = signInSchema.safeParse(toLoginInput(formData));
+    if (!inputResult.success) {
+      return {
+        ok: false,
+        fieldErrors: formatZodError(inputResult.error),
+        formErrorKey: "auth.validation.invalidInput",
+      };
+    }
+
+    const input = inputResult.data;
+    const clientIp = await getClientIp();
     const rate = consumeRateLimit({
       ...LOGIN_LIMIT,
-      key: makeRateLimitKey(clientIp, identifier),
+      key: makeRateLimitKey(clientIp, input.usernameOrEmail),
     });
+
     if (!rate.ok) {
       logger.warn("Login rate limit exceeded", {
         clientIp,
-        identifier,
+        identifier: input.usernameOrEmail,
         retryAfterSeconds: rate.retryAfterSeconds,
       });
-      return { error: "Too many attempts. Please try again later." } satisfies AuthState;
+      return {
+        ok: false,
+        formErrorKey: "auth.error.tooManyAttempts",
+      };
     }
 
     const user = await prisma.user.findFirst({
       where: {
-        OR: [{ username: identifier }, { email: identifier }],
+        OR: [{ username: input.usernameOrEmail }, { email: input.usernameOrEmail }],
       },
     });
-    if (!user) {
-      logger.warn("Login failed: user not found", { identifier });
-      return { error: "Invalid username or password." } satisfies AuthState;
-    }
 
-    if (user.status === "DISABLED") {
-      logger.warn("Login blocked: user not active", {
-        userId: user.id,
-        status: user.status,
+    if (!user || user.status === "DISABLED") {
+      logger.warn("Login failed: invalid account", {
+        identifier: input.usernameOrEmail,
+        hasUser: Boolean(user),
+        status: user?.status,
       });
-      return { error: "Invalid username or password." } satisfies AuthState;
+      return {
+        ok: false,
+        formErrorKey: "auth.error.invalidCredentials",
+      };
     }
 
     const matches = await bcrypt.compare(input.password, user.passwordHash);
     if (!matches) {
       logger.warn("Login failed: password mismatch", { userId: user.id });
-      return { error: "Invalid username or password." } satisfies AuthState;
+      return {
+        ok: false,
+        formErrorKey: "auth.error.invalidCredentials",
+      };
     }
 
     if (user.status === "PENDING_VERIFICATION") {
@@ -207,17 +214,14 @@ export async function login(
     }
 
     await setUserSessionCookie(user);
-
     logger.info("Login successful", { userId: user.id });
     redirect(destination);
-  });
-
-  const result = await execute(toLoginInput(formData));
-  if (!result.ok) {
-    return { error: toAuthError(result.error, result.fieldErrors) };
+  } catch (error) {
+    logger.error("Login unexpected failure", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    throw error;
   }
-
-  return result.data ?? {};
 }
 
 export async function signOut() {

@@ -3,20 +3,20 @@
 import * as React from "react";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { type FieldError, useForm } from "react-hook-form";
 import { useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { login, type AuthState } from "@/app/auth/actions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { FormErrorSummary } from "@/src/components/form/FormErrorSummary";
-import { useTranslations } from "@/src/i18n/client";
-import { localizeHref, normalizeLocale } from "@/src/i18n/config";
-import { TelegramLoginButton } from "@/src/components/auth/TelegramLoginButton";
 import { FormFieldPassword } from "@/src/components/form/FormFieldPassword";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
+import { TelegramLoginButton } from "@/src/components/auth/TelegramLoginButton";
 import { toast } from "@/src/components/ui/sonner";
-import { loginSchema, type LoginInput } from "@/src/schemas/auth";
+import { useTranslations } from "@/src/i18n/client";
+import { localizeHref, normalizeLocale } from "@/src/i18n/config";
+import { signInSchema, type SignInInput } from "@/src/validators/auth";
 
 function isRedirectError(error: unknown) {
   return (
@@ -27,7 +27,7 @@ function isRedirectError(error: unknown) {
   );
 }
 
-function toFormData(values: LoginInput, nextPath: string | null) {
+function toFormData(values: SignInInput, nextPath: string | null) {
   const formData = new FormData();
   formData.set("usernameOrEmail", values.usernameOrEmail);
   formData.set("password", values.password);
@@ -40,6 +40,7 @@ function toFormData(values: LoginInput, nextPath: string | null) {
 export default function LoginForm() {
   const locale = normalizeLocale(useLocale());
   const searchParams = useSearchParams();
+  const t = useTranslations();
   const tAuth = useTranslations("auth");
   const nextPath = searchParams.get("next");
   const oauthError = searchParams.get("error");
@@ -52,13 +53,52 @@ export default function LoginForm() {
         ? tAuth("telegramLoginFailed")
         : undefined;
 
-  const form = useForm<LoginInput>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<SignInInput>({
+    resolver: zodResolver(signInSchema),
+    mode: "onBlur",
+    reValidateMode: "onBlur",
     defaultValues: {
       usernameOrEmail: "",
       password: "",
     },
   });
+
+  const translateKey = React.useCallback(
+    (key: string | undefined | null) => {
+      if (!key) return undefined;
+      return t(key as never);
+    },
+    [t],
+  );
+
+  const toFieldError = React.useCallback(
+    (error: FieldError | undefined) => {
+      if (!error) return undefined;
+      if (!error.message) return error;
+
+      return {
+        ...error,
+        message: translateKey(String(error.message)) ?? String(error.message),
+      };
+    },
+    [translateKey],
+  );
+
+  const applyServerErrors = React.useCallback(
+    (state: AuthState) => {
+      for (const [field, key] of Object.entries(state.fieldErrors ?? {})) {
+        if (field !== "usernameOrEmail" && field !== "password") {
+          continue;
+        }
+
+        form.setError(field, {
+          type: "server",
+          message: translateKey(key),
+        });
+      }
+    },
+    [form, translateKey],
+  );
 
   const onSubmit = form.handleSubmit((values) => {
     setServerState({});
@@ -68,12 +108,17 @@ export default function LoginForm() {
         try {
           const result = await login({}, toFormData(values, nextPath));
           setServerState(result ?? {});
-          if (result?.error) toast.error(result.error);
-          if (result?.success) toast.success(result.success);
+
+          if (result && result.ok === false) {
+            applyServerErrors(result);
+            if (result.formErrorKey) {
+              toast.error(translateKey(result.formErrorKey) ?? tAuth("loginUnavailable"));
+            }
+          }
         } catch (error) {
           if (isRedirectError(error)) throw error;
           const message = tAuth("loginUnavailable");
-          setServerState({ error: message });
+          setServerState({ formErrorKey: "auth.loginUnavailable" });
           toast.error(message);
         }
       })();
@@ -93,7 +138,7 @@ export default function LoginForm() {
             name="usernameOrEmail"
             label={tAuth("usernameOrEmail")}
             register={form.register}
-            error={form.formState.errors.usernameOrEmail}
+            error={toFieldError(form.formState.errors.usernameOrEmail)}
             autoComplete="username"
             disabled={isPending}
           />
@@ -102,20 +147,20 @@ export default function LoginForm() {
             name="password"
             label={tAuth("password")}
             register={form.register}
-            error={form.formState.errors.password}
+            error={toFieldError(form.formState.errors.password)}
             autoComplete="current-password"
             disabled={isPending}
           />
 
           <FormErrorSummary
-            serverError={serverState.error ?? oauthErrorMessage}
+            serverError={translateKey(serverState.formErrorKey) ?? oauthErrorMessage}
             errors={[
-              form.formState.errors.usernameOrEmail?.message,
-              form.formState.errors.password?.message,
+              toFieldError(form.formState.errors.usernameOrEmail)?.message,
+              toFieldError(form.formState.errors.password)?.message,
             ]}
           />
 
-          <Button type="submit" className="w-full" disabled={isPending}>
+          <Button type="submit" className="w-full" disabled={isPending} data-testid="login-submit">
             {isPending ? tAuth("signingIn") : tAuth("signIn")}
           </Button>
 

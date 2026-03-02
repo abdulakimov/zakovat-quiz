@@ -21,6 +21,7 @@ async function submitSignup(page: import("@playwright/test").Page, label: string
   await page.getByLabel(/^Username$/).fill(user.username);
   await page.getByLabel(/Email/i).fill(user.email);
   await page.getByLabel(/^Password$/).fill(user.password);
+  await page.getByLabel(/Confirm password/i).fill(user.password);
   await page.getByRole("button", { name: /create account/i }).click();
   return user;
 }

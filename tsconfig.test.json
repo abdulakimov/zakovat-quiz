@@ -8,8 +8,13 @@
     "skipLibCheck": true
   },
   "include": [
+    "src/lib/url.ts",
     "src/lib/presenter/reducer.ts",
     "src/lib/presenter/reducer.test.ts",
-    "scripts/presenter-reducer-test.ts"
+    "src/validators/auth.ts",
+    "src/validators/auth.test.ts",
+    "scripts/auth-schema-test.ts",
+    "scripts/presenter-reducer-test.ts",
+    "scripts/url-origin-test.ts"
   ]
 }

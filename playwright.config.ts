@@ -16,6 +16,8 @@ const telegramTokenUrl =
   process.env.TELEGRAM_OIDC_TOKEN_URL ?? "http://localhost:3000/api/test/telegram-oidc/token";
 const telegramJwksUrl =
   process.env.TELEGRAM_OIDC_JWKS_URL ?? "http://localhost:3000/api/test/telegram-oidc/jwks";
+const appBaseUrl =
+  process.env.PUBLIC_APP_URL ?? process.env.APP_BASE_URL ?? "https://9935-89-236-218-41.ngrok-free.app";
 
 process.env.SESSION_SECRET = sessionSecret;
 process.env.TELEGRAM_OIDC_CLIENT_ID = telegramClientId;
@@ -54,6 +56,8 @@ export default defineConfig({
       TELEGRAM_OIDC_AUTH_URL: telegramAuthUrl,
       TELEGRAM_OIDC_TOKEN_URL: telegramTokenUrl,
       TELEGRAM_OIDC_JWKS_URL: telegramJwksUrl,
+      APP_BASE_URL: appBaseUrl,
+      PUBLIC_APP_URL: appBaseUrl,
     },
   },
 });

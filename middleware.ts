@@ -11,6 +11,7 @@ import {
 } from "@/src/i18n/config";
 
 const PUBLIC_FILE = /\.[^/]+$/;
+const TELEGRAM_AUTH_PATHS = new Set(["/auth/telegram/start", "/auth/telegram/callback"]);
 
 function withLocale(url: URL, locale: AppLocale, pathname: string) {
   const localized = new URL(localizeHref(locale, pathname), url);
@@ -28,6 +29,9 @@ function buildLoginRedirect(request: NextRequest, locale: AppLocale) {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   if (pathname.startsWith("/api") || pathname.startsWith("/_next") || PUBLIC_FILE.test(pathname)) {
+    return NextResponse.next();
+  }
+  if (TELEGRAM_AUTH_PATHS.has(pathname)) {
     return NextResponse.next();
   }
 

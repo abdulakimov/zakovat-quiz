@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { type FieldError, useForm } from "react-hook-form";
 import { useLocale } from "next-intl";
 import { signup, type AuthState } from "@/app/auth/actions";
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import { FormFieldPassword } from "@/src/components/form/FormFieldPassword";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
 import { toast } from "@/src/components/ui/sonner";
 import { TelegramLoginButton } from "@/src/components/auth/TelegramLoginButton";
-import { signupSchema, type SignupInput } from "@/src/schemas/auth";
+import { signUpSchema, type SignUpInput } from "@/src/validators/auth";
 
 function isRedirectError(error: unknown) {
   return (
@@ -26,30 +26,78 @@ function isRedirectError(error: unknown) {
   );
 }
 
-function toFormData(values: SignupInput) {
+function toFormData(values: SignUpInput) {
   const formData = new FormData();
   formData.set("name", values.name ?? "");
   formData.set("username", values.username);
   formData.set("email", values.email);
   formData.set("password", values.password);
+  formData.set("confirmPassword", values.confirmPassword);
   return formData;
 }
 
 export default function SignupForm() {
   const locale = normalizeLocale(useLocale());
+  const t = useTranslations();
   const tAuth = useTranslations("auth");
   const [isPending, startTransition] = React.useTransition();
   const [serverState, setServerState] = React.useState<AuthState>({});
 
-  const form = useForm<SignupInput>({
-    resolver: zodResolver(signupSchema),
+  const form = useForm<SignUpInput>({
+    resolver: zodResolver(signUpSchema),
+    mode: "onBlur",
+    reValidateMode: "onBlur",
     defaultValues: {
       name: "",
       username: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
+
+  const translateKey = React.useCallback(
+    (key: string | undefined | null) => {
+      if (!key) return undefined;
+      return t(key as never);
+    },
+    [t],
+  );
+
+  const toFieldError = React.useCallback(
+    (error: FieldError | undefined) => {
+      if (!error) return undefined;
+      if (!error.message) return error;
+
+      return {
+        ...error,
+        message: translateKey(String(error.message)) ?? String(error.message),
+      };
+    },
+    [translateKey],
+  );
+
+  const applyServerErrors = React.useCallback(
+    (state: AuthState) => {
+      for (const [field, key] of Object.entries(state.fieldErrors ?? {})) {
+        if (
+          field !== "name" &&
+          field !== "username" &&
+          field !== "email" &&
+          field !== "password" &&
+          field !== "confirmPassword"
+        ) {
+          continue;
+        }
+
+        form.setError(field, {
+          type: "server",
+          message: translateKey(key),
+        });
+      }
+    },
+    [form, translateKey],
+  );
 
   const onSubmit = form.handleSubmit((values) => {
     setServerState({});
@@ -59,12 +107,17 @@ export default function SignupForm() {
         try {
           const result = await signup({}, toFormData(values));
           setServerState(result ?? {});
-          if (result?.error) toast.error(result.error);
-          if (result?.success) toast.success(result.success);
+
+          if (result && result.ok === false) {
+            applyServerErrors(result);
+            if (result.formErrorKey) {
+              toast.error(translateKey(result.formErrorKey) ?? tAuth("signupUnavailable"));
+            }
+          }
         } catch (error) {
           if (isRedirectError(error)) throw error;
           const message = tAuth("signupUnavailable");
-          setServerState({ error: message });
+          setServerState({ formErrorKey: "auth.signupUnavailable" });
           toast.error(message);
         }
       })();
@@ -84,7 +137,7 @@ export default function SignupForm() {
             name="name"
             label={tAuth("name")}
             register={form.register}
-            error={form.formState.errors.name}
+            error={toFieldError(form.formState.errors.name)}
             autoComplete="name"
             disabled={isPending}
           />
@@ -93,7 +146,7 @@ export default function SignupForm() {
             name="username"
             label={tAuth("username")}
             register={form.register}
-            error={form.formState.errors.username}
+            error={toFieldError(form.formState.errors.username)}
             autoComplete="username"
             disabled={isPending}
           />
@@ -103,7 +156,7 @@ export default function SignupForm() {
             label={tAuth("email")}
             type="email"
             register={form.register}
-            error={form.formState.errors.email}
+            error={toFieldError(form.formState.errors.email)}
             autoComplete="email"
             disabled={isPending}
           />
@@ -112,22 +165,32 @@ export default function SignupForm() {
             name="password"
             label={tAuth("password")}
             register={form.register}
-            error={form.formState.errors.password}
+            error={toFieldError(form.formState.errors.password)}
+            autoComplete="new-password"
+            disabled={isPending}
+          />
+          <FormFieldPassword
+            id="confirmPassword"
+            name="confirmPassword"
+            label={tAuth("confirmPassword")}
+            register={form.register}
+            error={toFieldError(form.formState.errors.confirmPassword)}
             autoComplete="new-password"
             disabled={isPending}
           />
 
           <FormErrorSummary
-            serverError={serverState.error}
+            serverError={translateKey(serverState.formErrorKey)}
             errors={[
-              form.formState.errors.name?.message,
-              form.formState.errors.username?.message,
-              form.formState.errors.email?.message,
-              form.formState.errors.password?.message,
+              toFieldError(form.formState.errors.name)?.message,
+              toFieldError(form.formState.errors.username)?.message,
+              toFieldError(form.formState.errors.email)?.message,
+              toFieldError(form.formState.errors.password)?.message,
+              toFieldError(form.formState.errors.confirmPassword)?.message,
             ]}
           />
 
-          <Button type="submit" className="w-full" disabled={isPending}>
+          <Button type="submit" className="w-full" disabled={isPending} data-testid="signup-submit">
             {isPending ? tAuth("creatingAccount") : tAuth("createAccount")}
           </Button>
 
