@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { type FieldError, type FieldErrors, useForm } from "react-hook-form";
 import { useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
@@ -16,6 +15,7 @@ import { TelegramLoginButton } from "@/src/components/auth/TelegramLoginButton";
 import { toast } from "@/src/components/ui/sonner";
 import { useTranslations } from "@/src/i18n/client";
 import { localizeHref, normalizeLocale } from "@/src/i18n/config";
+import { zodResolverCompat } from "@/src/validators/rhf-zod";
 import { signInSchema, type SignInInput } from "@/src/validators/auth";
 
 function isRedirectError(error: unknown) {
@@ -54,7 +54,7 @@ export default function LoginForm() {
         : undefined;
 
   const form = useForm<SignInInput>({
-    resolver: zodResolver(signInSchema),
+    resolver: zodResolverCompat(signInSchema),
     mode: "onBlur",
     reValidateMode: "onBlur",
     defaultValues: {

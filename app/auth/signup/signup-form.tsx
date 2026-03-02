@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { type FieldError, useForm } from "react-hook-form";
 import { useLocale } from "next-intl";
 import { signup, type AuthState } from "@/app/auth/actions";
@@ -15,6 +14,7 @@ import { FormFieldPassword } from "@/src/components/form/FormFieldPassword";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
 import { toast } from "@/src/components/ui/sonner";
 import { TelegramLoginButton } from "@/src/components/auth/TelegramLoginButton";
+import { zodResolverCompat } from "@/src/validators/rhf-zod";
 import { signUpSchema, type SignUpInput } from "@/src/validators/auth";
 
 function isRedirectError(error: unknown) {
@@ -44,7 +44,7 @@ export default function SignupForm() {
   const [serverState, setServerState] = React.useState<AuthState>({});
 
   const form = useForm<SignUpInput>({
-    resolver: zodResolver(signUpSchema),
+    resolver: zodResolverCompat(signUpSchema),
     mode: "onBlur",
     reValidateMode: "onBlur",
     defaultValues: {
