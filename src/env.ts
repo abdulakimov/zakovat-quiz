@@ -6,6 +6,8 @@ const envBoolean = z.preprocess((value) => {
     const normalized = value.trim().toLowerCase();
     if (normalized === "true") return true;
     if (normalized === "false") return false;
+    if (normalized === "1") return true;
+    if (normalized === "0") return false;
   }
 
   return value;
@@ -42,11 +44,37 @@ const authSchema = z.object({
   ),
 });
 
-const appSchema = prismaSchema.merge(sessionSchema).merge(authSchema);
+const appSchema = prismaSchema.merge(sessionSchema).merge(authSchema).merge(
+  z.object({
+    APP_BASE_URL: z.string().url().optional(),
+    PUBLIC_APP_URL: z.string().url().optional(),
+    LOCAL_HTTPS: z.preprocess(
+      (value) => {
+        if (value === undefined) return false;
+        return value;
+      },
+      envBoolean,
+    ),
+    DEBUG_AUTH: z.preprocess(
+      (value) => {
+        if (value === undefined) return false;
+        return value;
+      },
+      envBoolean,
+    ),
+    DEBUG_TELEGRAM_OIDC: z.preprocess(
+      (value) => {
+        if (value === undefined) return false;
+        return value;
+      },
+      envBoolean,
+    ),
+  }),
+);
 const telegramOidcSchema = z.object({
-  TELEGRAM_OIDC_CLIENT_ID: nonEmpty,
+  TELEGRAM_OIDC_CLIENT_ID: nonEmpty.regex(/^\d+$/, "TELEGRAM_OIDC_CLIENT_ID must be a numeric bot id."),
   TELEGRAM_OIDC_CLIENT_SECRET: nonEmpty,
-  TELEGRAM_OIDC_REDIRECT_URI: z.string().url(),
+  TELEGRAM_OIDC_REDIRECT_URI: z.string().url().optional(),
   TELEGRAM_OIDC_DISCOVERY_URL: z.string().url().optional(),
   TELEGRAM_OIDC_AUTH_URL: z.string().url().optional(),
   TELEGRAM_OIDC_TOKEN_URL: z.string().url().optional(),

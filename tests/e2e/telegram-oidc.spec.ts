@@ -5,6 +5,9 @@ import { expect, test } from "@playwright/test";
 const FLOW_COOKIE = "telegram_oidc_flow";
 const SESSION_COOKIE = "zakovat_session";
 const prisma = new PrismaClient();
+const appOrigin = new URL(
+  process.env.TELEGRAM_OIDC_REDIRECT_URI ?? "http://localhost:3000/auth/telegram/callback",
+).origin;
 
 async function signFlowCookie(input: {
   state: string;
@@ -40,7 +43,7 @@ test("Telegram login button exists with translated label", async ({ page }) => {
 });
 
 test("Start route sets PKCE cookie and redirects to OIDC authorization endpoint", async ({ request }) => {
-  const response = await request.get("/uz/auth/telegram/start", { maxRedirects: 0 });
+  const response = await request.get("/auth/telegram/start", { maxRedirects: 0 });
   expect(response.status()).toBeGreaterThanOrEqual(300);
   expect(response.status()).toBeLessThan(400);
 
@@ -51,6 +54,11 @@ test("Start route sets PKCE cookie and redirects to OIDC authorization endpoint"
   expect(url.searchParams.get("client_id")).toBe(process.env.TELEGRAM_OIDC_CLIENT_ID);
   expect(url.searchParams.get("response_type")).toBe("code");
   expect(url.searchParams.get("scope")).toBe("openid profile phone");
+  const redirectUri = url.searchParams.get("redirect_uri");
+  expect(redirectUri).toBeTruthy();
+  const parsedRedirectUri = new URL(redirectUri!);
+  expect(parsedRedirectUri.pathname).toBe("/auth/telegram/callback");
+  expect(["http:", "https:"]).toContain(parsedRedirectUri.protocol);
   expect(url.searchParams.get("state")).toBeTruthy();
   expect(url.searchParams.get("nonce")).toBeTruthy();
   expect(url.searchParams.get("code_challenge")).toBeTruthy();
@@ -109,5 +117,16 @@ test("Callback validates id_token, creates session, and redirects to app", async
     LIMIT 1
   `;
   expect(accounts.length).toBe(1);
+});
+
+test("Callback failure redirects to canonical localized login", async ({ request }) => {
+  const response = await request.get("/auth/telegram/callback?error=access_denied", { maxRedirects: 0 });
+  expect(response.status()).toBeGreaterThanOrEqual(300);
+  expect(response.status()).toBeLessThan(400);
+
+  const location = response.headers()["location"];
+  expect(location).toBeTruthy();
+  expect(location.startsWith(`${appOrigin}/`)).toBeTruthy();
+  expect(location).toContain("/uz/auth/login?error=telegram_oauth_failed");
 });
 

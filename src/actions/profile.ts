@@ -10,6 +10,7 @@ import { consumeRateLimit } from "@/src/lib/rate-limit";
 import { safeAction, type ActionResult } from "@/src/lib/actions";
 import { changePasswordServerSchema, updateProfileSchema } from "@/src/schemas/profile";
 import { getSessionCookieName, getSessionMaxAge, signSession } from "@/lib/session";
+import { getCanonicalBaseUrl, isSecureBaseUrl } from "@/src/lib/url";
 
 type UpdateProfileResult = {
   success: string;
@@ -143,11 +144,12 @@ export async function changePasswordAction(
       name: stored.name ?? null,
     });
 
+    const headerStore = await headers();
     const cookieStore = await cookies();
     cookieStore.set(getSessionCookieName(), token, {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure: isSecureBaseUrl(getCanonicalBaseUrl(headerStore)),
       path: "/",
       maxAge: getSessionMaxAge(),
     });

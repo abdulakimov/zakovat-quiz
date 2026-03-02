@@ -1,4 +1,4 @@
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import {
@@ -6,21 +6,28 @@ import {
   createTelegramFlowValues,
   getTelegramEnv,
   getTelegramEndpoints,
+  resolveTelegramRedirectUri,
   signTelegramFlowCookie,
   signTelegramStateToken,
   TELEGRAM_FLOW_COOKIE,
   TELEGRAM_FLOW_TTL_SECONDS,
 } from "@/lib/telegram-oidc";
-import { normalizeLocale } from "@/src/i18n/config";
+import { getCanonicalBaseUrl, getRedirectDebugMeta, isSecureBaseUrl, joinUrl, shouldDebugAuthLogs } from "@/src/lib/url";
+import { defaultLocale, localeCookieName, localizeHref, normalizeLocale } from "@/src/i18n/config";
 
-export async function GET(request: Request) {
+export async function GET() {
+  const headerStore = await headers();
+  const cookieStore = await cookies();
+  const locale = normalizeLocale(cookieStore.get(localeCookieName)?.value ?? headerStore.get("x-locale") ?? defaultLocale);
+  const baseUrl = getCanonicalBaseUrl(headerStore);
+  const redirectUri = resolveTelegramRedirectUri(baseUrl);
+  const secureCookies = isSecureBaseUrl(baseUrl);
+
   try {
-    const [env, headerStore, endpoints] = await Promise.all([
+    const [env, endpoints] = await Promise.all([
       Promise.resolve(getTelegramEnv()),
-      headers(),
       getTelegramEndpoints(),
     ]);
-    const locale = normalizeLocale(headerStore.get("x-locale"));
     const flow = createTelegramFlowValues();
     const stateToken = await signTelegramStateToken({
       nonce: flow.nonce,
@@ -38,17 +45,24 @@ export async function GET(request: Request) {
     const authUrl = buildTelegramAuthUrl({
       authorizationEndpoint: endpoints.authorizationEndpoint,
       clientId: env.TELEGRAM_OIDC_CLIENT_ID,
-      redirectUri: env.TELEGRAM_OIDC_REDIRECT_URI,
+      redirectUri,
       state: stateToken,
       nonce: flow.nonce,
       codeChallenge: flow.codeChallenge,
     });
 
+    if (shouldDebugAuthLogs()) {
+      logger.info("Telegram OIDC redirect decision", {
+        ...getRedirectDebugMeta(headerStore, authUrl.toString()),
+        redirectUri,
+      });
+    }
+
     const response = NextResponse.redirect(authUrl);
     response.cookies.set(TELEGRAM_FLOW_COOKIE, flowCookie, {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure: secureCookies,
       path: "/",
       maxAge: TELEGRAM_FLOW_TTL_SECONDS,
     });
@@ -56,6 +70,11 @@ export async function GET(request: Request) {
     return response;
   } catch (error) {
     logger.error("Telegram OIDC start failed", { error });
-    return NextResponse.redirect(new URL("/auth/login?error=telegram_oauth_failed", request.url));
+    const loginUrl = new URL(joinUrl(baseUrl, localizeHref(locale, "/auth/login")));
+    loginUrl.searchParams.set("error", "telegram_oauth_failed");
+    if (shouldDebugAuthLogs()) {
+      logger.info("Telegram start error redirect decision", getRedirectDebugMeta(headerStore, loginUrl.toString()));
+    }
+    return NextResponse.redirect(loginUrl);
   }
 }

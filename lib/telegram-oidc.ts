@@ -2,10 +2,13 @@ import { createHash, randomBytes } from "node:crypto";
 import { SignJWT, createRemoteJWKSet, jwtVerify } from "jose";
 import { z } from "zod";
 import { getSessionEnv, getTelegramOidcEnv } from "@/src/env";
+import { logger } from "@/lib/logger";
+import { joinUrl, shouldDebugAuthLogs } from "@/src/lib/url";
 
 export const TELEGRAM_PROVIDER = "telegram";
 export const TELEGRAM_FLOW_COOKIE = "telegram_oidc_flow";
 export const TELEGRAM_FLOW_TTL_SECONDS = 60 * 10;
+export const TELEGRAM_CALLBACK_PATH = "/auth/telegram/callback";
 const DEFAULT_ISSUER = "https://oauth.telegram.org";
 const DEFAULT_DISCOVERY = "https://oauth.telegram.org/.well-known/openid-configuration";
 
@@ -60,8 +63,27 @@ export function getTelegramEnv() {
   return getTelegramOidcEnv();
 }
 
-export function getTelegramRedirectUri() {
-  return getTelegramEnv().TELEGRAM_OIDC_REDIRECT_URI;
+function validateResolvedRedirectUri(redirectUri: string) {
+  const parsed = new URL(redirectUri);
+  if (!parsed.pathname.startsWith(TELEGRAM_CALLBACK_PATH)) {
+    throw new Error(
+      `TELEGRAM_OIDC_REDIRECT_URI must include callback path "${TELEGRAM_CALLBACK_PATH}" (resolved: ${redirectUri}).`,
+    );
+  }
+}
+
+export function resolveTelegramRedirectUri(baseUrl: string) {
+  const configured = getTelegramEnv().TELEGRAM_OIDC_REDIRECT_URI?.trim();
+  if (!configured) {
+    return joinUrl(baseUrl, TELEGRAM_CALLBACK_PATH);
+  }
+
+  const parsed = new URL(configured);
+  const hasPath = parsed.pathname !== "/" || Boolean(parsed.search) || Boolean(parsed.hash);
+  const resolved = hasPath ? parsed.toString() : joinUrl(parsed.origin, TELEGRAM_CALLBACK_PATH);
+
+  validateResolvedRedirectUri(resolved);
+  return resolved;
 }
 
 export function generatePkceVerifier() {
@@ -222,6 +244,14 @@ export async function exchangeTelegramCodeForIdToken(input: {
     body: form,
     cache: "no-store",
   });
+
+  if (shouldDebugAuthLogs()) {
+    logger.info("Telegram token exchange response", {
+      tokenEndpoint: input.tokenEndpoint,
+      status: response.status,
+      ok: response.ok,
+    });
+  }
 
   if (!response.ok) {
     throw new Error(`Telegram token exchange failed (${response.status}).`);

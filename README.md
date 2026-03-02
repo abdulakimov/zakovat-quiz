@@ -38,3 +38,15 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Telegram OIDC setup
+
+- Set `PUBLIC_APP_URL` to your canonical external URL.
+- For local development with ngrok, use your ngrok HTTPS URL (for example `https://xxxx.ngrok-free.app`).
+- Keep `LOCAL_HTTPS=false` for normal localhost development.
+- `TELEGRAM_OIDC_REDIRECT_URI` is optional:
+  - leave empty to auto-use `${PUBLIC_APP_URL}/auth/telegram/callback`
+  - or set a full absolute callback URL with path
+
+In BotFather Web Login Allowed URLs, add both:
+- your origin (for example `https://xxxx.ngrok-free.app`)
+- your exact callback URL (for example `https://xxxx.ngrok-free.app/auth/telegram/callback`)
