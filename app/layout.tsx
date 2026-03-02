@@ -18,6 +18,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const [locale, messages] = await Promise.all([getLocale(), getMessages()]);
+  const timeZone = "Asia/Tashkent";
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -26,7 +27,7 @@ export default async function RootLayout({
         className={cn(fontSans.variable, "bg-background text-foreground font-sans antialiased")}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <IntlProvider locale={locale} messages={messages}>
+          <IntlProvider locale={locale} messages={messages} timeZone={timeZone}>
             {children}
           </IntlProvider>
         </ThemeProvider>

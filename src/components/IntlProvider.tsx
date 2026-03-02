@@ -14,16 +14,19 @@ type IntlErrorDetails = {
 export function IntlProvider({
   locale,
   messages,
+  timeZone,
   children,
 }: {
   locale: string;
   messages: AbstractIntlMessages;
+  timeZone: string;
   children: React.ReactNode;
 }) {
   return (
     <NextIntlClientProvider
       locale={locale}
       messages={messages}
+      timeZone={timeZone}
       onError={(error) => {
         const details = error as IntlErrorDetails;
         const messagePath = [details.namespace, details.key].filter(Boolean).join(".");
