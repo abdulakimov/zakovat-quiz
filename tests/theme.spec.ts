@@ -245,3 +245,37 @@ test("light theme keeps backgrounds readable", async ({ page }) => {
   await expect(page.locator("html")).not.toHaveClass(/dark/);
   await expectNotDarkBackground(page.getByTestId("app-shell"));
 });
+
+test("theme dropdown is portaled, above content, and fully within viewport", async ({ page }) => {
+  await authSession(page, "en");
+  await page.goto("/en/app");
+
+  await page.getByTestId("theme-switcher").click();
+  const menu = page.getByRole("menu").last();
+  await expect(menu).toBeVisible();
+
+  const box = await menu.boundingBox();
+  const viewport = page.viewportSize();
+  expect(box).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  if (!box || !viewport) throw new Error("Menu bounding box or viewport is missing.");
+
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.y).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
+  expect(box.y + box.height).toBeLessThanOrEqual(viewport.height);
+
+  const zIndex = await menu.evaluate((el) => Number.parseInt(window.getComputedStyle(el).zIndex || "0", 10) || 0);
+  expect(zIndex).toBeGreaterThanOrEqual(1000);
+
+  const centerX = box.x + box.width / 2;
+  const centerY = box.y + box.height / 2;
+  const topLayerMenu = await page.evaluate(
+    ({ x, y }) => {
+      const element = document.elementFromPoint(x, y);
+      return Boolean(element?.closest('[role="menu"]'));
+    },
+    { x: centerX, y: centerY },
+  );
+  expect(topLayerMenu).toBeTruthy();
+});

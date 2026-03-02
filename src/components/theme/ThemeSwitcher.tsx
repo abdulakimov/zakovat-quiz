@@ -59,7 +59,12 @@ export function ThemeSwitcher() {
           <TooltipContent>{`${tCommon("theme")}: ${activeOption.label}`}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <DropdownMenuContent align="end" className="min-w-40">
+      <DropdownMenuContent
+        align="end"
+        sideOffset={8}
+        collisionPadding={12}
+        className="z-[1000] min-w-40 rounded-xl border-border bg-popover shadow-lg"
+      >
         <DropdownMenuLabel>{tCommon("theme")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {options.map((option) => {

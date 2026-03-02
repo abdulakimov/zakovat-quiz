@@ -75,7 +75,12 @@ export function LanguageSwitcher() {
           <TooltipContent>{tCommon("language")}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <DropdownMenuContent align="end" className="min-w-44">
+      <DropdownMenuContent
+        align="end"
+        sideOffset={8}
+        collisionPadding={12}
+        className="z-[1000] min-w-44 rounded-xl border-border bg-popover shadow-lg"
+      >
         <DropdownMenuLabel>{tCommon("language")}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {locales.map((item) => {

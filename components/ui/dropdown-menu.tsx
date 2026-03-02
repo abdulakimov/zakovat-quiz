@@ -1,11 +1,13 @@
 "use client";
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
 type DropdownContextValue = {
   open: boolean;
   setOpen: (open: boolean) => void;
+  anchorRef: React.RefObject<HTMLDivElement | null>;
 };
 
 const DropdownContext = React.createContext<DropdownContextValue | null>(null);
@@ -13,9 +15,12 @@ type MenuChildProps = { className?: string; onClick?: React.MouseEventHandler };
 
 export function DropdownMenu({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
+  const anchorRef = React.useRef<HTMLDivElement | null>(null);
   return (
-    <DropdownContext.Provider value={{ open, setOpen }}>
-      <div className="relative inline-flex">{children}</div>
+    <DropdownContext.Provider value={{ open, setOpen, anchorRef }}>
+      <div ref={anchorRef} className="relative inline-flex">
+        {children}
+      </div>
     </DropdownContext.Provider>
   );
 }
@@ -51,20 +56,73 @@ export function DropdownMenuContent({
   children,
   className,
   align = "end",
+  sideOffset = 8,
+  collisionPadding = 12,
 }: {
   children: React.ReactNode;
   className?: string;
   align?: "start" | "end";
+  sideOffset?: number;
+  collisionPadding?: number;
 }) {
   const ctx = React.useContext(DropdownContext);
   const ref = React.useRef<HTMLDivElement | null>(null);
+  const [mounted, setMounted] = React.useState(false);
+  const [position, setPosition] = React.useState<{ top: number; left: number }>({ top: 0, left: 0 });
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  React.useLayoutEffect(() => {
+    if (!ctx?.open || !ctx.anchorRef.current || !ref.current) return;
+    const dropdown = ctx;
+
+    function updatePosition() {
+      if (!dropdown.anchorRef.current || !ref.current) return;
+      const anchorRect = dropdown.anchorRef.current.getBoundingClientRect();
+      const contentRect = ref.current.getBoundingClientRect();
+
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      let left = align === "end" ? anchorRect.right - contentRect.width : anchorRect.left;
+      const maxLeft = viewportWidth - collisionPadding - contentRect.width;
+      left = Math.max(collisionPadding, Math.min(left, maxLeft));
+
+      let top = anchorRect.bottom + sideOffset;
+      const wouldOverflowBottom = top + contentRect.height > viewportHeight - collisionPadding;
+      if (wouldOverflowBottom) {
+        const aboveTop = anchorRect.top - sideOffset - contentRect.height;
+        if (aboveTop >= collisionPadding) {
+          top = aboveTop;
+        } else {
+          top = Math.max(collisionPadding, viewportHeight - collisionPadding - contentRect.height);
+        }
+      }
+
+      setPosition({ top, left });
+    }
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [align, collisionPadding, ctx, sideOffset]);
 
   React.useEffect(() => {
     if (!ctx || !ctx.open) return;
+    const dropdown = ctx;
     const { setOpen } = ctx;
 
     function onPointerDown(event: MouseEvent) {
-      if (!ref.current?.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const inContent = Boolean(ref.current?.contains(target));
+      const inAnchor = Boolean(dropdown.anchorRef.current?.contains(target));
+      if (!inContent && !inAnchor) {
         setOpen(false);
       }
     }
@@ -83,21 +141,27 @@ export function DropdownMenuContent({
     };
   }, [ctx]);
 
-  if (!ctx?.open) return null;
+  if (!ctx?.open || !mounted) return null;
 
-  return (
+  const content = (
     <div
       ref={ref}
       role="menu"
+      style={{
+        position: "fixed",
+        top: `${position.top}px`,
+        left: `${position.left}px`,
+      }}
       className={cn(
-        "absolute top-full z-50 mt-2 min-w-52 rounded-lg border border-border bg-popover p-1 text-popover-foreground shadow-xl",
-        align === "end" ? "right-0" : "left-0",
+        "z-[1000] min-w-52 rounded-xl border border-border bg-popover p-1 text-popover-foreground shadow-lg",
         className,
       )}
     >
       {children}
     </div>
   );
+
+  return createPortal(content, document.body);
 }
 
 export function DropdownMenuLabel({
