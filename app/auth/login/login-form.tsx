@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type FieldError, useForm } from "react-hook-form";
+import { type FieldError, type FieldErrors, useForm } from "react-hook-form";
 import { useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { login, type AuthState } from "@/app/auth/actions";
@@ -100,30 +100,39 @@ export default function LoginForm() {
     [form, translateKey],
   );
 
-  const onSubmit = form.handleSubmit((values) => {
-    setServerState({});
+  const onValidSubmit = React.useCallback(
+    (values: SignInInput) => {
+      setServerState({});
 
-    startTransition(() => {
-      void (async () => {
-        try {
-          const result = await login({}, toFormData(values, nextPath));
-          setServerState(result ?? {});
+      startTransition(() => {
+        void (async () => {
+          try {
+            const result = await login({}, toFormData(values, nextPath));
+            setServerState(result ?? {});
 
-          if (result && result.ok === false) {
-            applyServerErrors(result);
-            if (result.formErrorKey) {
-              toast.error(translateKey(result.formErrorKey) ?? tAuth("loginUnavailable"));
+            if (result && result.ok === false) {
+              applyServerErrors(result);
+              if (result.formErrorKey) {
+                toast.error(translateKey(result.formErrorKey) ?? tAuth("loginUnavailable"));
+              }
             }
+          } catch (error) {
+            if (isRedirectError(error)) throw error;
+            const message = tAuth("loginUnavailable");
+            setServerState({ formErrorKey: "auth.loginUnavailable" });
+            toast.error(message);
           }
-        } catch (error) {
-          if (isRedirectError(error)) throw error;
-          const message = tAuth("loginUnavailable");
-          setServerState({ formErrorKey: "auth.loginUnavailable" });
-          toast.error(message);
-        }
-      })();
-    });
-  });
+        })();
+      });
+    },
+    [applyServerErrors, nextPath, tAuth, translateKey],
+  );
+
+  const onInvalidSubmit = React.useCallback((_errors: FieldErrors<SignInInput>) => {
+    setServerState({});
+  }, []);
+
+  const onSubmit = form.handleSubmit(onValidSubmit, onInvalidSubmit);
 
   return (
     <Card className="w-full max-w-md">

@@ -46,7 +46,9 @@ export function IntlProvider({
           return;
         }
         if (process.env.NODE_ENV === "development") {
-          console.error(error);
+          const detailsMessage = error instanceof Error ? error.message : String(error);
+          const warning = `[i18n] Non-fatal intl error: ${messagePath || "unknown"} ${detailsMessage}`;
+          console.warn(warning);
           return;
         }
         throw error;
