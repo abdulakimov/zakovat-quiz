@@ -259,7 +259,10 @@
     "creatingAccount": "Creating account...",
     "createAccount": "Create account",
     "alreadyAccount": "Already have an account?",
-    "signupUnavailable": "Unable to create account right now."
+    "signupUnavailable": "Unable to create account right now.",
+    "continueWithTelegram": "Continue with Telegram",
+    "telegramLoginFailed": "Telegram sign in is temporarily unavailable.",
+    "telegramStateInvalid": "Telegram sign in validation failed. Please try again."
   },
   "teams": {
     "title": "Teams",

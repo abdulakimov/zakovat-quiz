@@ -259,7 +259,10 @@
     "creatingAccount": "Akkaunt yaratilmoqda...",
     "createAccount": "Akkaunt yaratish",
     "alreadyAccount": "Akkauntingiz bormi?",
-    "signupUnavailable": "Hozir akkaunt yaratib bo'lmadi."
+    "signupUnavailable": "Hozir akkaunt yaratib bo'lmadi.",
+    "continueWithTelegram": "Telegram orqali kirish",
+    "telegramLoginFailed": "Telegram orqali kirish hozircha mavjud emas.",
+    "telegramStateInvalid": "Telegram orqali kirish tekshiruvi muvaffaqiyatsiz tugadi. Qayta urinib ko'ring."
   },
   "teams": {
     "title": "Jamoalar",

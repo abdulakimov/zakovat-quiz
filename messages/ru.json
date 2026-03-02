@@ -259,7 +259,10 @@
     "creatingAccount": "Создание аккаунта...",
     "createAccount": "Создать аккаунт",
     "alreadyAccount": "Уже есть аккаунт?",
-    "signupUnavailable": "Сейчас не удалось создать аккаунт."
+    "signupUnavailable": "Сейчас не удалось создать аккаунт.",
+    "continueWithTelegram": "Войти через Telegram",
+    "telegramLoginFailed": "Вход через Telegram временно недоступен.",
+    "telegramStateInvalid": "Проверка входа через Telegram не прошла. Попробуйте снова."
   },
   "teams": {
     "title": "Команды",

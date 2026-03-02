@@ -1,6 +1,6 @@
 "use server";
 
-import { cookies, headers } from "next/headers";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
@@ -9,11 +9,7 @@ import { consumeRateLimit } from "@/src/lib/rate-limit";
 import { safeAction } from "@/src/lib/actions";
 import { getPathWithoutLocale, localizeHref, normalizeLocale } from "@/src/i18n/config";
 import { loginSchema, signupSchema } from "@/src/schemas/auth";
-import {
-  getSessionCookieName,
-  getSessionMaxAge,
-  signSession,
-} from "@/lib/session";
+import { clearUserSessionCookie, setUserSessionCookie } from "@/lib/auth-session";
 
 export type AuthState = {
   error?: string;
@@ -107,30 +103,6 @@ async function getActionLocale() {
 }
 
 
-async function setSessionCookie(user: {
-  id: string;
-  role: "USER" | "ADMIN";
-  username: string;
-  name: string | null;
-}) {
-  const token = await signSession({
-    sub: user.id,
-    role: user.role,
-    username: user.username,
-    name: user.name ?? null,
-  });
-
-  const cookieStore = await cookies();
-  cookieStore.set(getSessionCookieName(), token, {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: getSessionMaxAge(),
-  });
-}
-
-
 export async function signup(
   _prevState: AuthState,
   formData: FormData
@@ -166,7 +138,7 @@ export async function signup(
       },
     });
 
-    await setSessionCookie(user);
+    await setUserSessionCookie(user);
     redirect(localizeHref(locale, "/app"));
   });
 
@@ -234,7 +206,7 @@ export async function login(
       });
     }
 
-    await setSessionCookie(user);
+    await setUserSessionCookie(user);
 
     logger.info("Login successful", { userId: user.id });
     redirect(destination);
@@ -250,8 +222,7 @@ export async function login(
 
 export async function signOut() {
   const locale = await getActionLocale();
-  const cookieStore = await cookies();
-  cookieStore.delete(getSessionCookieName());
+  await clearUserSessionCookie();
   logger.info("User signed out");
   redirect(localizeHref(locale, "/auth/login"));
 }

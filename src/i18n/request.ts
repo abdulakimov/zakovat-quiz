@@ -24,6 +24,7 @@ export default getRequestConfig(async () => {
   return {
     locale,
     messages,
+    timeZone: "Asia/Tashkent",
     onError(error) {
       const details = error as IntlErrorDetails;
       const messagePath = [details.namespace, details.key].filter(Boolean).join(".");

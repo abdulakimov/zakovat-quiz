@@ -14,6 +14,7 @@ import { localizeHref, normalizeLocale } from "@/src/i18n/config";
 import { FormFieldPassword } from "@/src/components/form/FormFieldPassword";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
 import { toast } from "@/src/components/ui/sonner";
+import { TelegramLoginButton } from "@/src/components/auth/TelegramLoginButton";
 import { signupSchema, type SignupInput } from "@/src/schemas/auth";
 
 function isRedirectError(error: unknown) {
@@ -129,6 +130,8 @@ export default function SignupForm() {
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? tAuth("creatingAccount") : tAuth("createAccount")}
           </Button>
+
+          <TelegramLoginButton />
 
           <p className="text-xs text-muted-foreground">
             {tAuth("alreadyAccount")}{" "}

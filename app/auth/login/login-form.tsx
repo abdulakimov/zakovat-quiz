@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { FormErrorSummary } from "@/src/components/form/FormErrorSummary";
 import { useTranslations } from "@/src/i18n/client";
 import { localizeHref, normalizeLocale } from "@/src/i18n/config";
+import { TelegramLoginButton } from "@/src/components/auth/TelegramLoginButton";
 import { FormFieldPassword } from "@/src/components/form/FormFieldPassword";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
 import { toast } from "@/src/components/ui/sonner";
@@ -41,8 +42,15 @@ export default function LoginForm() {
   const searchParams = useSearchParams();
   const tAuth = useTranslations("auth");
   const nextPath = searchParams.get("next");
+  const oauthError = searchParams.get("error");
   const [isPending, startTransition] = React.useTransition();
   const [serverState, setServerState] = React.useState<AuthState>({});
+  const oauthErrorMessage =
+    oauthError === "telegram_oauth_invalid_state"
+      ? tAuth("telegramStateInvalid")
+      : oauthError === "telegram_oauth_failed"
+        ? tAuth("telegramLoginFailed")
+        : undefined;
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -100,7 +108,7 @@ export default function LoginForm() {
           />
 
           <FormErrorSummary
-            serverError={serverState.error}
+            serverError={serverState.error ?? oauthErrorMessage}
             errors={[
               form.formState.errors.usernameOrEmail?.message,
               form.formState.errors.password?.message,
@@ -110,6 +118,8 @@ export default function LoginForm() {
           <Button type="submit" className="w-full" disabled={isPending}>
             {isPending ? tAuth("signingIn") : tAuth("signIn")}
           </Button>
+
+          <TelegramLoginButton />
 
           <p className="text-xs text-muted-foreground">
             {tAuth("needAccount")}{" "}
