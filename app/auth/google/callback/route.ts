@@ -36,12 +36,19 @@ export async function GET(request: NextRequest) {
   const code = params.get("code");
   const state = params.get("state");
   const baseUrl = getCanonicalBaseUrl(request.headers);
-  const redirectUri = resolveGoogleRedirectUri(baseUrl);
-  const secureCookies = isSecureBaseUrl(baseUrl);
   const cookieStore = await cookies();
   const flowToken = cookieStore.get(GOOGLE_FLOW_COOKIE)?.value;
   const localeFromCookie = normalizeLocale(cookieStore.get(localeCookieName)?.value ?? defaultLocale);
   const flow = flowToken ? await verifyGoogleFlowCookie(flowToken) : null;
+  const secureCookies = isSecureBaseUrl(baseUrl);
+
+  let redirectUri = "";
+  try {
+    redirectUri = resolveGoogleRedirectUri(baseUrl);
+  } catch (error) {
+    logger.error("Google callback setup failed", { error });
+    return redirectToAuthError(request, localeFromCookie, "google_oauth_failed", baseUrl);
+  }
 
   if (shouldDebugAuthLogs()) {
     logger.info("Google callback request", {

@@ -20,10 +20,10 @@ export async function GET() {
   const cookieStore = await cookies();
   const locale = normalizeLocale(cookieStore.get(localeCookieName)?.value ?? headerStore.get("x-locale") ?? defaultLocale);
   const baseUrl = getCanonicalBaseUrl(headerStore);
-  const redirectUri = resolveGoogleRedirectUri(baseUrl);
-  const secureCookies = isSecureBaseUrl(baseUrl);
 
   try {
+    const redirectUri = resolveGoogleRedirectUri(baseUrl);
+    const secureCookies = isSecureBaseUrl(baseUrl);
     const env = getGoogleEnv();
     const endpoints = getGoogleEndpoints();
     const flow = createGoogleFlowValues();

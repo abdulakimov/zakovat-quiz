@@ -36,13 +36,13 @@ test.afterAll(async () => {
 
 test("Telegram login button exists with translated label", async ({ page }) => {
   await page.goto("/uz/auth/login");
-  await expect(page.getByTestId("telegram-login-button")).toContainText("Telegram orqali kirish");
+  await expect(page.getByTestId("telegram-login")).toContainText("Telegram orqali kirish");
 
   await page.goto("/ru/auth/login");
-  await expect(page.getByTestId("telegram-login-button")).toContainText("Telegram");
+  await expect(page.getByTestId("telegram-login")).toContainText("Telegram");
 
   await page.goto("/en/auth/login");
-  await expect(page.getByTestId("telegram-login-button")).toContainText("Continue with Telegram");
+  await expect(page.getByTestId("telegram-login")).toContainText("Continue with Telegram");
 });
 
 test("Start route sets PKCE cookie and redirects to OIDC authorization endpoint", async ({ request }) => {

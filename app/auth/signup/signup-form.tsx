@@ -6,15 +6,14 @@ import { type FieldError, useForm } from "react-hook-form";
 import { useLocale } from "next-intl";
 import { signup, type AuthState } from "@/app/auth/actions";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { FormErrorSummary } from "@/src/components/form/FormErrorSummary";
 import { useTranslations } from "@/src/i18n/client";
 import { localizeHref, normalizeLocale } from "@/src/i18n/config";
 import { FormFieldPassword } from "@/src/components/form/FormFieldPassword";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
 import { toast } from "@/src/components/ui/sonner";
-import { GoogleLoginButton } from "@/src/components/auth/GoogleLoginButton";
-import { TelegramLoginButton } from "@/src/components/auth/TelegramLoginButton";
+import { SocialLoginButtons } from "@/src/components/auth/SocialLoginButtons";
 import { zodResolverCompat } from "@/src/validators/rhf-zod";
 import { signUpSchema, type SignUpInput } from "@/src/validators/auth";
 
@@ -126,86 +125,87 @@ export default function SignupForm() {
   });
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="space-y-1 pb-3">
-        <CardTitle className="text-base font-semibold" data-testid="signup-heading">{tAuth("signupTitle")}</CardTitle>
-        <CardDescription className="text-sm">{tAuth("signupCardDescription")}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={onSubmit} className="space-y-3" noValidate>
-          <FormFieldText
-            id="name"
-            name="name"
-            label={tAuth("name")}
-            register={form.register}
-            error={toFieldError(form.formState.errors.name)}
-            autoComplete="name"
-            disabled={isPending}
-          />
-          <FormFieldText
-            id="username"
-            name="username"
-            label={tAuth("username")}
-            register={form.register}
-            error={toFieldError(form.formState.errors.username)}
-            autoComplete="username"
-            disabled={isPending}
-          />
-          <FormFieldText
-            id="email"
-            name="email"
-            label={tAuth("email")}
-            type="email"
-            register={form.register}
-            error={toFieldError(form.formState.errors.email)}
-            autoComplete="email"
-            disabled={isPending}
-          />
-          <FormFieldPassword
-            id="password"
-            name="password"
-            label={tAuth("password")}
-            register={form.register}
-            error={toFieldError(form.formState.errors.password)}
-            autoComplete="new-password"
-            disabled={isPending}
-          />
-          <FormFieldPassword
-            id="confirmPassword"
-            name="confirmPassword"
-            label={tAuth("confirmPassword")}
-            register={form.register}
-            error={toFieldError(form.formState.errors.confirmPassword)}
-            autoComplete="new-password"
-            disabled={isPending}
-          />
+    <form onSubmit={onSubmit} className="space-y-4" noValidate>
+      <h1 className="sr-only" data-testid="signup-heading">
+        {tAuth("signup.title")}
+      </h1>
+      <FormFieldText
+        id="name"
+        name="name"
+        label={tAuth("fields.name")}
+        register={form.register}
+        error={toFieldError(form.formState.errors.name)}
+        autoComplete="name"
+        disabled={isPending}
+      />
+      <FormFieldText
+        id="username"
+        name="username"
+        label={tAuth("fields.username")}
+        register={form.register}
+        error={toFieldError(form.formState.errors.username)}
+        autoComplete="username"
+        disabled={isPending}
+      />
+      <FormFieldText
+        id="email"
+        name="email"
+        label={tAuth("fields.email")}
+        type="email"
+        register={form.register}
+        error={toFieldError(form.formState.errors.email)}
+        autoComplete="email"
+        disabled={isPending}
+      />
+      <FormFieldPassword
+        id="password"
+        name="password"
+        label={tAuth("fields.password")}
+        register={form.register}
+        error={toFieldError(form.formState.errors.password)}
+        autoComplete="new-password"
+        disabled={isPending}
+      />
+      <FormFieldPassword
+        id="confirmPassword"
+        name="confirmPassword"
+        label={tAuth("fields.confirmPassword")}
+        register={form.register}
+        error={toFieldError(form.formState.errors.confirmPassword)}
+        autoComplete="new-password"
+        disabled={isPending}
+      />
 
-          <FormErrorSummary
-            serverError={translateKey(serverState.formErrorKey)}
-            errors={[
-              toFieldError(form.formState.errors.name)?.message,
-              toFieldError(form.formState.errors.username)?.message,
-              toFieldError(form.formState.errors.email)?.message,
-              toFieldError(form.formState.errors.password)?.message,
-              toFieldError(form.formState.errors.confirmPassword)?.message,
-            ]}
-          />
+      <FormErrorSummary
+        serverError={translateKey(serverState.formErrorKey)}
+        errors={[
+          toFieldError(form.formState.errors.name)?.message,
+          toFieldError(form.formState.errors.username)?.message,
+          toFieldError(form.formState.errors.email)?.message,
+          toFieldError(form.formState.errors.password)?.message,
+          toFieldError(form.formState.errors.confirmPassword)?.message,
+        ]}
+      />
 
-          <Button type="submit" className="w-full" disabled={isPending} data-testid="signup-submit">
-            {isPending ? tAuth("creatingAccount") : tAuth("createAccount")}
-          </Button>
+      <Button type="submit" className="h-10 w-full" disabled={isPending} data-testid="signup-submit">
+        {isPending ? tAuth("creatingAccount") : tAuth("actions.signup")}
+      </Button>
 
-          <GoogleLoginButton />
-          <TelegramLoginButton />
+      <div className="relative py-1">
+        <Separator />
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
+          {tAuth("misc.or")}
+        </span>
+      </div>
 
-          <p className="text-xs text-muted-foreground">
-            {tAuth("alreadyAccount")}{" "}
-            <Link href={localizeHref(locale, "/auth/login")} className="font-medium text-foreground underline">
-              {tAuth("signIn")}
-            </Link>
-          </p>
-        </form>
-      </CardContent>
-    </Card>
+      <SocialLoginButtons />
+
+      <p className="text-center text-xs text-muted-foreground">
+        {tAuth("misc.haveAccount")}{" "}
+        <Link href={localizeHref(locale, "/auth/login")} className="font-medium text-foreground underline">
+          {tAuth("actions.login")}
+        </Link>
+      </p>
+    </form>
   );
 }

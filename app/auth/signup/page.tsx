@@ -1,16 +1,23 @@
 import { getTranslations } from "@/src/i18n/server";
 import SignupForm from "@/app/auth/signup/signup-form";
-import { AuthLayout } from "@/src/components/layout/AuthLayout";
+import { AuthShell } from "@/src/components/auth/AuthShell";
 
 export default async function SignupPage() {
   const tAuth = await getTranslations("auth");
 
   return (
-    <AuthLayout
-      title={tAuth("signupTitle")}
-      description={tAuth("signupDescription")}
+    <AuthShell
+      eyebrow={tAuth("eyebrow")}
+      title={tAuth("signup.title")}
+      subtitle={tAuth("signup.subtitle")}
+      benefits={[
+        tAuth("benefits.fastAccess"),
+        tAuth("benefits.workspaceSync"),
+        tAuth("benefits.secureSession"),
+      ]}
+      privacyNote={tAuth("benefits.privacyNote")}
     >
       <SignupForm />
-    </AuthLayout>
+    </AuthShell>
   );
 }

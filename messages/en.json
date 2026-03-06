@@ -308,6 +308,40 @@
         "required": "Please confirm your password.",
         "mismatch": "Passwords do not match."
       }
+    },
+    "eyebrow": "Authentication",
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to manage quizzes, assets, and workspace settings."
+    },
+    "signup": {
+      "title": "Create your account",
+      "subtitle": "Set up your workspace and start building quizzes in minutes."
+    },
+    "fields": {
+      "identifier": "Username or email",
+      "email": "Email",
+      "username": "Username",
+      "password": "Password",
+      "confirmPassword": "Confirm password",
+      "name": "Name"
+    },
+    "actions": {
+      "login": "Sign in",
+      "signup": "Create account",
+      "continueWithGoogle": "Continue with Google",
+      "continueWithTelegram": "Continue with Telegram"
+    },
+    "misc": {
+      "or": "or",
+      "noAccount": "Need an account?",
+      "haveAccount": "Already have an account?"
+    },
+    "benefits": {
+      "fastAccess": "Access your workspace in seconds with secure sign in.",
+      "workspaceSync": "Keep packs, media, and team progress in sync across devices.",
+      "secureSession": "Rely on stable sessions built for live production workflows.",
+      "privacyNote": "Privacy: we never post anything via Telegram or Google without your permission."
     }
   },
   "teams": {

@@ -308,6 +308,40 @@
         "required": "Parolni tasdiqlang.",
         "mismatch": "Parollar mos kelmadi."
       }
+    },
+    "eyebrow": "Autentifikatsiya",
+    "login": {
+      "title": "Xush kelibsiz",
+      "subtitle": "Viktorina, media va ish maydoni sozlamalarini boshqarish uchun tizimga kiring."
+    },
+    "signup": {
+      "title": "Akkaunt yarating",
+      "subtitle": "Ish maydoningizni sozlang va bir necha daqiqada viktorina yaratishni boshlang."
+    },
+    "fields": {
+      "identifier": "Foydalanuvchi nomi yoki email",
+      "email": "Email",
+      "username": "Foydalanuvchi nomi",
+      "password": "Parol",
+      "confirmPassword": "Parolni tasdiqlang",
+      "name": "Ism"
+    },
+    "actions": {
+      "login": "Kirish",
+      "signup": "Akkaunt yaratish",
+      "continueWithGoogle": "Google orqali kirish",
+      "continueWithTelegram": "Telegram orqali kirish"
+    },
+    "misc": {
+      "or": "yoki",
+      "noAccount": "Akkauntingiz yo'qmi?",
+      "haveAccount": "Akkauntingiz bormi?"
+    },
+    "benefits": {
+      "fastAccess": "Ish maydoningizga tez va xavfsiz kirish imkoniyati.",
+      "workspaceSync": "Paketlar, media va jamoa jarayoni qurilmalar bo'ylab sinxron ishlaydi.",
+      "secureSession": "Jonli o'yinlar uchun barqaror sessiya boshqaruvi.",
+      "privacyNote": "Maxfiylik: Telegram yoki Google orqali ruxsatsiz hech narsa e'lon qilinmaydi."
     }
   },
   "teams": {

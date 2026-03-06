@@ -7,12 +7,11 @@ import { useLocale } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { login, type AuthState } from "@/app/auth/actions";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { FormErrorSummary } from "@/src/components/form/FormErrorSummary";
 import { FormFieldPassword } from "@/src/components/form/FormFieldPassword";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
-import { GoogleLoginButton } from "@/src/components/auth/GoogleLoginButton";
-import { TelegramLoginButton } from "@/src/components/auth/TelegramLoginButton";
+import { SocialLoginButtons } from "@/src/components/auth/SocialLoginButtons";
 import { toast } from "@/src/components/ui/sonner";
 import { useTranslations } from "@/src/i18n/client";
 import { localizeHref, normalizeLocale } from "@/src/i18n/config";
@@ -140,55 +139,56 @@ export default function LoginForm() {
   const onSubmit = form.handleSubmit(onValidSubmit, onInvalidSubmit);
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="space-y-1 pb-3">
-        <CardTitle className="text-base font-semibold" data-testid="login-heading">{tAuth("loginTitle")}</CardTitle>
-        <CardDescription className="text-sm">{tAuth("loginCardDescription")}</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={onSubmit} className="space-y-3" noValidate>
-          <FormFieldText
-            id="usernameOrEmail"
-            name="usernameOrEmail"
-            label={tAuth("usernameOrEmail")}
-            register={form.register}
-            error={toFieldError(form.formState.errors.usernameOrEmail)}
-            autoComplete="username"
-            disabled={isPending}
-          />
-          <FormFieldPassword
-            id="password"
-            name="password"
-            label={tAuth("password")}
-            register={form.register}
-            error={toFieldError(form.formState.errors.password)}
-            autoComplete="current-password"
-            disabled={isPending}
-          />
+    <form onSubmit={onSubmit} className="space-y-4" noValidate>
+      <h1 className="sr-only" data-testid="login-heading">
+        {tAuth("login.title")}
+      </h1>
+      <FormFieldText
+        id="usernameOrEmail"
+        name="usernameOrEmail"
+        label={tAuth("fields.identifier")}
+        register={form.register}
+        error={toFieldError(form.formState.errors.usernameOrEmail)}
+        autoComplete="username"
+        disabled={isPending}
+      />
+      <FormFieldPassword
+        id="password"
+        name="password"
+        label={tAuth("fields.password")}
+        register={form.register}
+        error={toFieldError(form.formState.errors.password)}
+        autoComplete="current-password"
+        disabled={isPending}
+      />
 
-          <FormErrorSummary
-            serverError={translateKey(serverState.formErrorKey) ?? oauthErrorMessage}
-            errors={[
-              toFieldError(form.formState.errors.usernameOrEmail)?.message,
-              toFieldError(form.formState.errors.password)?.message,
-            ]}
-          />
+      <FormErrorSummary
+        serverError={translateKey(serverState.formErrorKey) ?? oauthErrorMessage}
+        errors={[
+          toFieldError(form.formState.errors.usernameOrEmail)?.message,
+          toFieldError(form.formState.errors.password)?.message,
+        ]}
+      />
 
-          <Button type="submit" className="w-full" disabled={isPending} data-testid="login-submit">
-            {isPending ? tAuth("signingIn") : tAuth("signIn")}
-          </Button>
+      <Button type="submit" className="h-10 w-full" disabled={isPending} data-testid="login-submit">
+        {isPending ? tAuth("signingIn") : tAuth("actions.login")}
+      </Button>
 
-          <GoogleLoginButton />
-          <TelegramLoginButton />
+      <div className="relative py-1">
+        <Separator />
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
+          {tAuth("misc.or")}
+        </span>
+      </div>
 
-          <p className="text-xs text-muted-foreground">
-            {tAuth("needAccount")}{" "}
-            <Link href={localizeHref(locale, "/auth/signup")} className="font-medium text-foreground underline">
-              {tAuth("signUp")}
-            </Link>
-          </p>
-        </form>
-      </CardContent>
-    </Card>
+      <SocialLoginButtons />
+
+      <p className="text-center text-xs text-muted-foreground">
+        {tAuth("misc.noAccount")}{" "}
+        <Link href={localizeHref(locale, "/auth/signup")} className="font-medium text-foreground underline">
+          {tAuth("actions.signup")}
+        </Link>
+      </p>
+    </form>
   );
 }

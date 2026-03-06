@@ -1,5 +1,7 @@
 "use client";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+
 type FormErrorSummaryProps = {
   serverError?: string | null;
   errors?: Array<string | undefined>;
@@ -17,16 +19,16 @@ export function FormErrorSummary({ serverError, errors = [] }: FormErrorSummaryP
   if (messages.length === 0) return null;
 
   return (
-    <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
+    <Alert variant="destructive">
       {messages.length === 1 ? (
-        <p>{messages[0]}</p>
+        <AlertDescription>{messages[0]}</AlertDescription>
       ) : (
-        <ul className="list-disc space-y-1 pl-4">
+        <ul className="list-disc space-y-1 pl-4 text-sm">
           {messages.map((message) => (
             <li key={message}>{message}</li>
           ))}
         </ul>
       )}
-    </div>
+    </Alert>
   );
 }

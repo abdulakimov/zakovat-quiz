@@ -3,6 +3,7 @@
 import type { FieldError, FieldValues, Path, UseFormRegister } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { FormMessage } from "@/components/ui/form";
 import { cn } from "@/lib/utils";
 
 type FormFieldTextProps<TFieldValues extends FieldValues> = {
@@ -40,14 +41,14 @@ export function FormFieldText<TFieldValues extends FieldValues>({
         type={type}
         aria-invalid={error ? "true" : "false"}
         aria-describedby={error ? errorId : undefined}
-        className={cn("h-10", error ? "border-red-300 focus-visible:ring-red-300" : "", className)}
+        className={cn("h-10", error ? "border-destructive/60 focus-visible:ring-destructive/40" : "", className)}
         {...register(name)}
         {...inputProps}
       />
       {error ? (
-        <p id={errorId} className="text-xs text-red-600" role="alert">
+        <FormMessage id={errorId} role="alert">
           {error.message}
-        </p>
+        </FormMessage>
       ) : null}
     </div>
   );
