@@ -127,6 +127,16 @@ async function expectNotDarkBackground(locator: import("@playwright/test").Locat
   expect(color).not.toBe("rgba(0, 0, 0, 0)");
 }
 
+async function openThemeMenu(page: import("@playwright/test").Page) {
+  const trigger = page.getByTestId("theme-switcher");
+  const menuItem = page.getByTestId("theme-dark");
+  await trigger.click();
+  if (!(await menuItem.isVisible())) {
+    await trigger.click();
+  }
+  await expect(menuItem).toBeVisible();
+}
+
 test.afterAll(async () => {
   await prisma.$disconnect();
 });
@@ -210,7 +220,7 @@ test("dark theme renders non-white surfaces across key pages", async ({ page }) 
   await expectNotWhiteBackground(page.getByTestId("app-shell"));
   await expectNotWhiteBackground(page.getByTestId("teams-card").first());
 
-  await page.getByTestId("theme-switcher").click();
+  await openThemeMenu(page);
   const themeMenu = page.getByRole("menu");
   await expect(themeMenu).toBeVisible();
   await expectNotWhiteBackground(themeMenu);
