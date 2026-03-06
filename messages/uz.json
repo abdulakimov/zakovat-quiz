@@ -261,7 +261,10 @@
     "createAccount": "Akkaunt yaratish",
     "alreadyAccount": "Akkauntingiz bormi?",
     "signupUnavailable": "Hozir akkaunt yaratib bo'lmadi.",
+    "continueWithGoogle": "Google orqali kirish",
     "continueWithTelegram": "Telegram orqali kirish",
+    "googleLoginFailed": "Google orqali kirish hozircha mavjud emas.",
+    "googleStateInvalid": "Google orqali kirish tekshiruvi muvaffaqiyatsiz tugadi. Qayta urinib ko'ring.",
     "telegramLoginFailed": "Telegram orqali kirish hozircha mavjud emas.",
     "telegramStateInvalid": "Telegram orqali kirish tekshiruvi muvaffaqiyatsiz tugadi. Qayta urinib ko'ring.",
     "error": {

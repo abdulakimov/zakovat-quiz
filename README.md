@@ -50,3 +50,19 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 In BotFather Web Login Allowed URLs, add both:
 - your origin (for example `https://xxxx.ngrok-free.app`)
 - your exact callback URL (for example `https://xxxx.ngrok-free.app/auth/telegram/callback`)
+
+## Google OIDC setup
+
+- Configure OAuth consent screen in Google Cloud Console.
+- Create OAuth 2.0 Client ID with application type `Web application`.
+- Set environment variables:
+  - `GOOGLE_OIDC_CLIENT_ID`
+  - `GOOGLE_OIDC_CLIENT_SECRET`
+  - `GOOGLE_OIDC_REDIRECT_URI` (full callback URL, for example `https://your-domain.com/auth/google/callback`)
+  - `GOOGLE_OIDC_SCOPES` (recommended: `openid email profile`)
+- Add Authorized redirect URIs:
+  - `https://<ngrok-domain>/auth/google/callback`
+  - `https://<prod-domain>/auth/google/callback`
+- Add Authorized JavaScript origins:
+  - `https://<ngrok-domain>`
+  - `https://<prod-domain>`

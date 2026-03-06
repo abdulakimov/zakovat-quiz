@@ -261,7 +261,10 @@
     "createAccount": "Create account",
     "alreadyAccount": "Already have an account?",
     "signupUnavailable": "Unable to create account right now.",
+    "continueWithGoogle": "Continue with Google",
     "continueWithTelegram": "Continue with Telegram",
+    "googleLoginFailed": "Google sign in is temporarily unavailable.",
+    "googleStateInvalid": "Google sign in validation failed. Please try again.",
     "telegramLoginFailed": "Telegram sign in is temporarily unavailable.",
     "telegramStateInvalid": "Telegram sign in validation failed. Please try again.",
     "error": {

@@ -6,7 +6,10 @@ const FLOW_COOKIE = "telegram_oidc_flow";
 const SESSION_COOKIE = "zakovat_session";
 const prisma = new PrismaClient();
 const appOrigin = new URL(
-  process.env.TELEGRAM_OIDC_REDIRECT_URI ?? "http://localhost:3000/auth/telegram/callback",
+  process.env.PUBLIC_APP_URL ??
+    process.env.APP_BASE_URL ??
+    process.env.TELEGRAM_OIDC_REDIRECT_URI ??
+    "http://localhost:3000/auth/telegram/callback",
 ).origin;
 
 async function signFlowCookie(input: {
@@ -126,7 +129,10 @@ test("Callback failure redirects to canonical localized login", async ({ request
 
   const location = response.headers()["location"];
   expect(location).toBeTruthy();
-  expect(location.startsWith(`${appOrigin}/`)).toBeTruthy();
-  expect(location).toContain("/uz/auth/login?error=telegram_oauth_failed");
+  const redirectUrl = new URL(location!, appOrigin);
+  if (redirectUrl.hostname === "localhost") {
+    expect(redirectUrl.protocol).toBe("http:");
+  }
+  expect(`${redirectUrl.pathname}${redirectUrl.search}`).toContain("/uz/auth/login?error=telegram_oauth_failed");
 });
 

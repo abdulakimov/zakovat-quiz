@@ -225,7 +225,7 @@ test("dark theme renders non-white surfaces across key pages", async ({ page }) 
 
   await page.goto(`/en/app/packs/${packId}/rounds/${roundId}`);
   await expect(page.locator("html")).toHaveClass(/dark/);
-  await expectNotWhiteBackground(page.getByTestId("round-header-card"));
+  await expectNotWhiteBackground(page.getByTestId("round-header-card").first());
 
   await page.goto(`/en/app/packs/${packId}/rounds/${roundId}/questions/new`);
   await expect(page.locator("html")).toHaveClass(/dark/);

@@ -13,6 +13,7 @@ import { localizeHref, normalizeLocale } from "@/src/i18n/config";
 import { FormFieldPassword } from "@/src/components/form/FormFieldPassword";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
 import { toast } from "@/src/components/ui/sonner";
+import { GoogleLoginButton } from "@/src/components/auth/GoogleLoginButton";
 import { TelegramLoginButton } from "@/src/components/auth/TelegramLoginButton";
 import { zodResolverCompat } from "@/src/validators/rhf-zod";
 import { signUpSchema, type SignUpInput } from "@/src/validators/auth";
@@ -194,6 +195,7 @@ export default function SignupForm() {
             {isPending ? tAuth("creatingAccount") : tAuth("createAccount")}
           </Button>
 
+          <GoogleLoginButton />
           <TelegramLoginButton />
 
           <p className="text-xs text-muted-foreground">

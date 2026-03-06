@@ -16,11 +16,22 @@ const telegramTokenUrl =
   process.env.TELEGRAM_OIDC_TOKEN_URL ?? "http://localhost:3000/api/test/telegram-oidc/token";
 const telegramJwksUrl =
   process.env.TELEGRAM_OIDC_JWKS_URL ?? "http://localhost:3000/api/test/telegram-oidc/jwks";
+const googleMockOrigin = process.env.GOOGLE_OIDC_MOCK_ORIGIN ?? "http://127.0.0.1:4011";
+const googleClientId = process.env.GOOGLE_OIDC_CLIENT_ID ?? "playwright-google-client-id";
+const googleClientSecret =
+  process.env.GOOGLE_OIDC_CLIENT_SECRET ?? "playwright-google-client-secret";
+const googleRedirectUri =
+  process.env.GOOGLE_OIDC_REDIRECT_URI ?? "http://localhost:3000/auth/google/callback";
+const googleScopes = process.env.GOOGLE_OIDC_SCOPES ?? "openid email profile";
+const googleAuthUrl = process.env.GOOGLE_OIDC_AUTH_URL ?? `${googleMockOrigin}/auth`;
+const googleTokenUrl = process.env.GOOGLE_OIDC_TOKEN_URL ?? `${googleMockOrigin}/token`;
+const googleJwksUrl = process.env.GOOGLE_OIDC_JWKS_URL ?? `${googleMockOrigin}/jwks`;
 const appBaseUrl =
-  process.env.PUBLIC_APP_URL ?? process.env.APP_BASE_URL ?? "https://9935-89-236-218-41.ngrok-free.app";
+  process.env.PUBLIC_APP_URL ?? process.env.APP_BASE_URL ?? "http://localhost:3000";
 
 process.env.SESSION_SECRET = sessionSecret;
 process.env.TELEGRAM_OIDC_CLIENT_ID = telegramClientId;
+process.env.GOOGLE_OIDC_CLIENT_ID = googleClientId;
 
 export default defineConfig({
   testDir: "tests",
@@ -44,7 +55,7 @@ export default defineConfig({
   webServer: {
     command: "pnpm dev",
     url: "http://localhost:3000",
-    reuseExistingServer: true,
+    reuseExistingServer: false,
     timeout: 120_000,
     env: {
       ...process.env,
@@ -56,6 +67,13 @@ export default defineConfig({
       TELEGRAM_OIDC_AUTH_URL: telegramAuthUrl,
       TELEGRAM_OIDC_TOKEN_URL: telegramTokenUrl,
       TELEGRAM_OIDC_JWKS_URL: telegramJwksUrl,
+      GOOGLE_OIDC_CLIENT_ID: googleClientId,
+      GOOGLE_OIDC_CLIENT_SECRET: googleClientSecret,
+      GOOGLE_OIDC_REDIRECT_URI: googleRedirectUri,
+      GOOGLE_OIDC_SCOPES: googleScopes,
+      GOOGLE_OIDC_AUTH_URL: googleAuthUrl,
+      GOOGLE_OIDC_TOKEN_URL: googleTokenUrl,
+      GOOGLE_OIDC_JWKS_URL: googleJwksUrl,
       APP_BASE_URL: appBaseUrl,
       PUBLIC_APP_URL: appBaseUrl,
     },

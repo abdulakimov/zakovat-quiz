@@ -12,6 +12,7 @@ import {
 
 const PUBLIC_FILE = /\.[^/]+$/;
 const TELEGRAM_AUTH_PATHS = new Set(["/auth/telegram/start", "/auth/telegram/callback"]);
+const GOOGLE_AUTH_PATHS = new Set(["/auth/google/start", "/auth/google/callback"]);
 
 function withLocale(url: URL, locale: AppLocale, pathname: string) {
   const localized = new URL(localizeHref(locale, pathname), url);
@@ -32,6 +33,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   if (TELEGRAM_AUTH_PATHS.has(pathname)) {
+    return NextResponse.next();
+  }
+  if (GOOGLE_AUTH_PATHS.has(pathname)) {
     return NextResponse.next();
   }
 

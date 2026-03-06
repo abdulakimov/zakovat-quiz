@@ -3,8 +3,11 @@
 const verificationEnabled = process.env.EMAIL_VERIFICATION_ENABLED !== "false";
 
 function makeUser(label: string) {
-  const nonce = `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-  const username = `pw_${label}_${nonce}`.replace(/[^a-zA-Z0-9_-]/g, "_");
+  const nonce = `${Date.now().toString(36)}${Math.floor(Math.random() * 10000)
+    .toString(36)
+    .padStart(3, "0")}`;
+  const sanitizedLabel = label.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 8);
+  const username = `pw_${sanitizedLabel}_${nonce}`.slice(0, 24);
   const email = `${username}@example.com`;
   return {
     name: "Playwright User",

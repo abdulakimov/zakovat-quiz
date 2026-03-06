@@ -80,6 +80,15 @@ const telegramOidcSchema = z.object({
   TELEGRAM_OIDC_TOKEN_URL: z.string().url().optional(),
   TELEGRAM_OIDC_JWKS_URL: z.string().url().optional(),
 });
+const googleOidcSchema = z.object({
+  GOOGLE_OIDC_CLIENT_ID: nonEmpty,
+  GOOGLE_OIDC_CLIENT_SECRET: nonEmpty,
+  GOOGLE_OIDC_REDIRECT_URI: z.string().url().optional(),
+  GOOGLE_OIDC_SCOPES: nonEmpty.optional(),
+  GOOGLE_OIDC_AUTH_URL: z.string().url().optional(),
+  GOOGLE_OIDC_TOKEN_URL: z.string().url().optional(),
+  GOOGLE_OIDC_JWKS_URL: z.string().url().optional(),
+});
 
 function formatEnvError(scope: string, error: z.ZodError) {
   const issues = error.issues
@@ -111,6 +120,7 @@ let prismaEnvCache: z.infer<typeof prismaSchema> | null = null;
 let sessionEnvCache: z.infer<typeof sessionSchema> | null = null;
 let appEnvCache: z.infer<typeof appSchema> | null = null;
 let telegramOidcEnvCache: z.infer<typeof telegramOidcSchema> | null = null;
+let googleOidcEnvCache: z.infer<typeof googleOidcSchema> | null = null;
 
 export function getPrismaEnv() {
   prismaEnvCache ??= parseEnv("prisma", prismaSchema);
@@ -130,4 +140,9 @@ export function getAppEnv() {
 export function getTelegramOidcEnv() {
   telegramOidcEnvCache ??= parseEnv("telegram-oidc", telegramOidcSchema);
   return telegramOidcEnvCache;
+}
+
+export function getGoogleOidcEnv() {
+  googleOidcEnvCache ??= parseEnv("google-oidc", googleOidcSchema);
+  return googleOidcEnvCache;
 }

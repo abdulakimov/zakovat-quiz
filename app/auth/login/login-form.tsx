@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { FormErrorSummary } from "@/src/components/form/FormErrorSummary";
 import { FormFieldPassword } from "@/src/components/form/FormFieldPassword";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
+import { GoogleLoginButton } from "@/src/components/auth/GoogleLoginButton";
 import { TelegramLoginButton } from "@/src/components/auth/TelegramLoginButton";
 import { toast } from "@/src/components/ui/sonner";
 import { useTranslations } from "@/src/i18n/client";
@@ -51,6 +52,10 @@ export default function LoginForm() {
       ? tAuth("telegramStateInvalid")
       : oauthError === "telegram_oauth_failed"
         ? tAuth("telegramLoginFailed")
+        : oauthError === "google_oauth_invalid_state"
+          ? tAuth("googleStateInvalid")
+          : oauthError === "google_oauth_failed"
+            ? tAuth("googleLoginFailed")
         : undefined;
 
   const form = useForm<SignInInput>({
@@ -173,6 +178,7 @@ export default function LoginForm() {
             {isPending ? tAuth("signingIn") : tAuth("signIn")}
           </Button>
 
+          <GoogleLoginButton />
           <TelegramLoginButton />
 
           <p className="text-xs text-muted-foreground">
