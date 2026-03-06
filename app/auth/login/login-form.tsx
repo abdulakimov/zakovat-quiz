@@ -140,9 +140,17 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
-      <h1 className="sr-only" data-testid="login-heading">
-        {tAuth("login.title")}
-      </h1>
+      <h2 className="sr-only" data-testid="login-heading">{tAuth("login.title")}</h2>
+      <SocialLoginButtons />
+      <p className="text-center text-xs text-muted-foreground">{tAuth("misc.termsNotice")}</p>
+
+      <div className="relative py-1">
+        <Separator />
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
+          {tAuth("misc.continueWithEmail")}
+        </span>
+      </div>
+
       <FormFieldText
         id="usernameOrEmail"
         name="usernameOrEmail"
@@ -173,15 +181,6 @@ export default function LoginForm() {
       <Button type="submit" className="h-10 w-full" disabled={isPending} data-testid="login-submit">
         {isPending ? tAuth("signingIn") : tAuth("actions.login")}
       </Button>
-
-      <div className="relative py-1">
-        <Separator />
-        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
-          {tAuth("misc.or")}
-        </span>
-      </div>
-
-      <SocialLoginButtons />
 
       <p className="text-center text-xs text-muted-foreground">
         {tAuth("misc.noAccount")}{" "}

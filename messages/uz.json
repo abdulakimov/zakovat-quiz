@@ -311,12 +311,12 @@
     },
     "eyebrow": "Autentifikatsiya",
     "login": {
-      "title": "Xush kelibsiz",
-      "subtitle": "Viktorina, media va ish maydoni sozlamalarini boshqarish uchun tizimga kiring."
+      "title": "Zakovatga kirish",
+      "subtitle": "Zakovat Quiz Creator ga kirish uchun qulay usulni tanlang."
     },
     "signup": {
       "title": "Akkaunt yarating",
-      "subtitle": "Ish maydoningizni sozlang va bir necha daqiqada viktorina yaratishni boshlang."
+      "subtitle": "Provider orqali bir zumda kirish yoki email bilan ro'yxatdan o'ting."
     },
     "fields": {
       "identifier": "Foydalanuvchi nomi yoki email",
@@ -335,13 +335,20 @@
     "misc": {
       "or": "yoki",
       "noAccount": "Akkauntingiz yo'qmi?",
-      "haveAccount": "Akkauntingiz bormi?"
+      "haveAccount": "Akkauntingiz bormi?",
+      "continueWithEmail": "yoki email orqali davom eting",
+      "termsNotice": "Davom etish orqali Foydalanish shartlari va Maxfiylik siyosatiga rozilik bildirasiz."
     },
     "benefits": {
       "fastAccess": "Ish maydoningizga tez va xavfsiz kirish imkoniyati.",
       "workspaceSync": "Paketlar, media va jamoa jarayoni qurilmalar bo'ylab sinxron ishlaydi.",
       "secureSession": "Jonli o'yinlar uchun barqaror sessiya boshqaruvi.",
       "privacyNote": "Maxfiylik: Telegram yoki Google orqali ruxsatsiz hech narsa e'lon qilinmaydi."
+    },
+    "visual": {
+      "phoneTitle": "Telefon orqali kirish ko'rinishi",
+      "phoneSubtitle": "Jonli o'yin jarayonlari uchun mobilga mos tezkor kirish.",
+      "phoneHelper": "Eng tezkor xavfsiz kirish uchun Telegram yoki Google dan foydalaning."
     }
   },
   "teams": {

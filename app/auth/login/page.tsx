@@ -7,15 +7,11 @@ export default async function LoginPage() {
 
   return (
     <AuthShell
-      eyebrow={tAuth("eyebrow")}
       title={tAuth("login.title")}
       subtitle={tAuth("login.subtitle")}
-      benefits={[
-        tAuth("benefits.fastAccess"),
-        tAuth("benefits.workspaceSync"),
-        tAuth("benefits.secureSession"),
-      ]}
-      privacyNote={tAuth("benefits.privacyNote")}
+      visualTitle={tAuth("visual.phoneTitle")}
+      visualSubtitle={tAuth("visual.phoneSubtitle")}
+      visualHelper={tAuth("visual.phoneHelper")}
     >
       <LoginForm />
     </AuthShell>

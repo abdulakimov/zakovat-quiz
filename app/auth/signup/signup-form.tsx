@@ -126,9 +126,17 @@ export default function SignupForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
-      <h1 className="sr-only" data-testid="signup-heading">
-        {tAuth("signup.title")}
-      </h1>
+      <h2 className="sr-only" data-testid="signup-heading">{tAuth("signup.title")}</h2>
+      <SocialLoginButtons />
+      <p className="text-center text-xs text-muted-foreground">{tAuth("misc.termsNotice")}</p>
+
+      <div className="relative py-1">
+        <Separator />
+        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
+          {tAuth("misc.continueWithEmail")}
+        </span>
+      </div>
+
       <FormFieldText
         id="name"
         name="name"
@@ -190,15 +198,6 @@ export default function SignupForm() {
       <Button type="submit" className="h-10 w-full" disabled={isPending} data-testid="signup-submit">
         {isPending ? tAuth("creatingAccount") : tAuth("actions.signup")}
       </Button>
-
-      <div className="relative py-1">
-        <Separator />
-        <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
-          {tAuth("misc.or")}
-        </span>
-      </div>
-
-      <SocialLoginButtons />
 
       <p className="text-center text-xs text-muted-foreground">
         {tAuth("misc.haveAccount")}{" "}

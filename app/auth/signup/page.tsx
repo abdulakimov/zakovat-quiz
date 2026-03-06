@@ -7,15 +7,11 @@ export default async function SignupPage() {
 
   return (
     <AuthShell
-      eyebrow={tAuth("eyebrow")}
       title={tAuth("signup.title")}
       subtitle={tAuth("signup.subtitle")}
-      benefits={[
-        tAuth("benefits.fastAccess"),
-        tAuth("benefits.workspaceSync"),
-        tAuth("benefits.secureSession"),
-      ]}
-      privacyNote={tAuth("benefits.privacyNote")}
+      visualTitle={tAuth("visual.phoneTitle")}
+      visualSubtitle={tAuth("visual.phoneSubtitle")}
+      visualHelper={tAuth("visual.phoneHelper")}
     >
       <SignupForm />
     </AuthShell>
