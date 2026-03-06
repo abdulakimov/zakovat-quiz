@@ -1,10 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
+import type { z } from "zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +19,7 @@ import { FormFieldText } from "@/src/components/form/FormFieldText";
 import { changePasswordAction, updateProfileAction } from "@/src/actions/profile";
 import { toast } from "@/src/components/ui/sonner";
 import { EyeIcon, EyeOffIcon, PencilIcon, UserIconLucide, ShieldIcon } from "@/src/ui/icons";
+import { zodResolverCompat } from "@/src/validators/rhf-zod";
 import {
   changePasswordSchema,
   updateProfileSchema,
@@ -96,7 +97,7 @@ export function ProfileSettingsForm({ user }: Props) {
   const [isProfileEditing, setIsProfileEditing] = React.useState(false);
 
   const form = useForm<UpdateProfileInput>({
-    resolver: zodResolver(updateProfileSchema),
+    resolver: zodResolverCompat(updateProfileSchema as z.ZodType<UpdateProfileInput>),
     defaultValues: {
       name: user.name ?? "",
       username: user.username,
