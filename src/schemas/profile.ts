@@ -6,6 +6,7 @@ const passwordBase = z
   .min(10, "Password must be at least 10 characters.")
   .refine((value) => /[A-Za-z]/.test(value), "Password must include at least 1 letter.")
   .refine((value) => /\d/.test(value), "Password must include at least 1 number.");
+const confirmPasswordBase = z.string().min(1, "Please confirm your new password.");
 
 export const updateProfileSchema = z.object({
   name: z
@@ -26,18 +27,29 @@ export const changePasswordSchema = z
   .object({
     currentPassword: z.string().min(1, "Current password is required."),
     newPassword: passwordBase,
-    confirmNewPassword: z.string().min(1, "Please confirm your new password."),
+    confirmNewPassword: confirmPasswordBase,
   })
   .refine((value) => value.newPassword === value.confirmNewPassword, {
     message: "New passwords do not match.",
     path: ["confirmNewPassword"],
   });
 
-export const changePasswordServerSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required."),
+export const setPasswordSchema = z
+  .object({
+    newPassword: passwordBase,
+    confirmNewPassword: confirmPasswordBase,
+  })
+  .refine((value) => value.newPassword === value.confirmNewPassword, {
+    message: "New passwords do not match.",
+    path: ["confirmNewPassword"],
+  });
+
+export const passwordUpdateServerSchema = z.object({
+  currentPassword: z.string().optional(),
   newPassword: passwordBase,
 });
 
 export type UpdateProfileInput = z.input<typeof updateProfileSchema>;
 export type UpdateProfileParsed = z.infer<typeof updateProfileSchema>;
 export type ChangePasswordInput = z.input<typeof changePasswordSchema>;
+export type SetPasswordInput = z.input<typeof setPasswordSchema>;

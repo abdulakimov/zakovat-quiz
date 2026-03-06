@@ -83,7 +83,10 @@
     "passwordHint": "Kamida 10 ta belgi, kamida 1 ta harf va 1 ta raqam bo'lishi kerak.",
     "passwordUpdated": "Parol yangilandi.",
     "hidePassword": "Parolni yashirish",
-    "showPassword": "Parolni ko'rsatish"
+    "showPassword": "Parolni ko'rsatish",
+    "setPasswordDescription": "Siz {providers} orqali kiryapsiz. Email/parol bilan kirishni yoqish uchun parol o'rnating.",
+    "providerGoogle": "Google",
+    "providerTelegram": "Telegram"
   },
   "packs": {
     "title": "Paketlar",

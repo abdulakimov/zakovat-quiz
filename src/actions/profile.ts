@@ -8,7 +8,7 @@ import { requireUser } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 import { consumeRateLimit } from "@/src/lib/rate-limit";
 import { safeAction, type ActionResult } from "@/src/lib/actions";
-import { changePasswordServerSchema, updateProfileSchema } from "@/src/schemas/profile";
+import { passwordUpdateServerSchema, updateProfileSchema } from "@/src/schemas/profile";
 import { getSessionCookieName, getSessionMaxAge, signSession } from "@/lib/session";
 import { getCanonicalBaseUrl, isSecureBaseUrl } from "@/src/lib/url";
 
@@ -109,7 +109,7 @@ export async function changePasswordAction(
   const user = await requireUser();
   const clientIp = await getClientIp();
 
-  const execute = safeAction(changePasswordServerSchema, async (parsed) => {
+  const execute = safeAction(passwordUpdateServerSchema, async (parsed) => {
     const rate = consumeRateLimit({
       ...PASSWORD_CHANGE_LIMIT,
       key: `${clientIp}:${user.id}`,
@@ -126,9 +126,17 @@ export async function changePasswordAction(
       throw new Error("User not found.");
     }
 
-    const matches = await bcrypt.compare(parsed.currentPassword, stored.passwordHash);
-    if (!matches) {
-      throw new Error("Current password is incorrect.");
+    const hasPassword = typeof stored.passwordHash === "string" && stored.passwordHash.length > 0;
+
+    if (hasPassword) {
+      if (!parsed.currentPassword) {
+        throw new Error("Current password is required.");
+      }
+
+      const matches = await bcrypt.compare(parsed.currentPassword, stored.passwordHash);
+      if (!matches) {
+        throw new Error("Current password is incorrect.");
+      }
     }
 
     const newHash = await bcrypt.hash(parsed.newPassword, 12);

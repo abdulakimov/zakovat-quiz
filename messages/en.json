@@ -83,7 +83,10 @@
     "passwordHint": "At least 10 characters and include at least 1 letter and 1 number.",
     "passwordUpdated": "Password updated.",
     "hidePassword": "Hide password",
-    "showPassword": "Show password"
+    "showPassword": "Show password",
+    "setPasswordDescription": "You're using {providers} login. Set a password to enable email/password login.",
+    "providerGoogle": "Google",
+    "providerTelegram": "Telegram"
   },
   "packs": {
     "title": "Packs",

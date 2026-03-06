@@ -83,7 +83,10 @@
     "passwordHint": "Минимум 10 символов, минимум 1 буква и 1 цифра.",
     "passwordUpdated": "Пароль обновлен.",
     "hidePassword": "Скрыть пароль",
-    "showPassword": "Показать пароль"
+    "showPassword": "Показать пароль",
+    "setPasswordDescription": "Вы используете вход через {providers}. Задайте пароль, чтобы включить вход по email/паролю.",
+    "providerGoogle": "Google",
+    "providerTelegram": "Telegram"
   },
   "packs": {
     "title": "Паки",

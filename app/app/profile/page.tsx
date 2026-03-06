@@ -1,5 +1,6 @@
 ﻿import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
+import { prisma } from "@/lib/prisma";
 import { getMyTeamsAndInvites } from "@/src/actions/teams";
 import { SettingsTabsLayout } from "@/src/components/layout/SettingsTabsLayout";
 import { PageHeader } from "@/src/components/layout/PageHeader";
@@ -16,6 +17,17 @@ export default async function ProfilePage() {
   const locale = (await getLocale()) as AppLocale;
   const [tProfile, tCommon] = await Promise.all([getTranslations("profile"), getTranslations("common")]);
   const { user, activeTeams, pendingInvites } = await getMyTeamsAndInvites();
+  const securityState = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: {
+      passwordHash: true,
+      authAccounts: {
+        select: { provider: true },
+      },
+    },
+  });
+  const hasPassword = Boolean(securityState?.passwordHash);
+  const providerNames = securityState?.authAccounts.map((account) => account.provider) ?? [];
 
   return (
     <div className="mx-auto w-full max-w-5xl space-y-8">
@@ -118,7 +130,7 @@ export default async function ProfilePage() {
             key: "security",
             label: tProfile("securityTabLabel"),
             icon: "security",
-            content: <ProfileSecurityForm />,
+            content: <ProfileSecurityForm hasPassword={hasPassword} providerNames={providerNames} />,
           },
         ]}
       />
@@ -126,3 +138,4 @@ export default async function ProfilePage() {
     </div>
   );
 }
+

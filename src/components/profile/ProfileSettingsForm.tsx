@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useForm } from "react-hook-form";
+import { useForm, type UseFormRegister } from "react-hook-form";
 import type { z } from "zod";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -22,8 +22,10 @@ import { EyeIcon, EyeOffIcon, PencilIcon, UserIconLucide, ShieldIcon } from "@/s
 import { zodResolverCompat } from "@/src/validators/rhf-zod";
 import {
   changePasswordSchema,
+  setPasswordSchema,
   updateProfileSchema,
   type ChangePasswordInput,
+  type SetPasswordInput,
   type UpdateProfileInput,
 } from "@/src/schemas/profile";
 
@@ -372,7 +374,75 @@ export function ProfileSettingsForm({ user }: Props) {
   );
 }
 
-export function ProfileSecurityForm() {
+type PasswordFormValues = ChangePasswordInput & SetPasswordInput;
+
+type PasswordInputRowProps = {
+  id: "profile-current-password" | "profile-new-password" | "profile-confirm-password";
+  name: "currentPassword" | "newPassword" | "confirmNewPassword";
+  label: string;
+  placeholder: string;
+  autoComplete: string;
+  isVisible: boolean;
+  isDisabled: boolean;
+  error?: string;
+  toggleLabel: string;
+  onToggleVisibility: () => void;
+  register: UseFormRegister<PasswordFormValues>;
+};
+
+function PasswordInputRow({
+  id,
+  name,
+  label,
+  placeholder,
+  autoComplete,
+  isVisible,
+  isDisabled,
+  error,
+  toggleLabel,
+  onToggleVisibility,
+  register,
+}: PasswordInputRowProps) {
+  return (
+    <div className="space-y-1.5">
+      <Label htmlFor={id} className="text-sm text-muted-foreground">
+        {label}
+      </Label>
+      <div className="relative">
+        <Input
+          id={id}
+          {...register(name)}
+          type={isVisible ? "text" : "password"}
+          autoComplete={autoComplete}
+          disabled={isDisabled}
+          placeholder={placeholder}
+          aria-invalid={error ? "true" : "false"}
+          className={cn("pr-10", error ? "border-destructive focus-visible:ring-destructive" : "")}
+        />
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="absolute right-1 top-1 h-8 w-8 text-muted-foreground"
+          disabled={isDisabled}
+          onClick={onToggleVisibility}
+          title={toggleLabel}
+        >
+          {isVisible ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
+          <span className="sr-only">{toggleLabel}</span>
+        </Button>
+      </div>
+      {error ? <p className="text-xs text-destructive">{error}</p> : null}
+    </div>
+  );
+}
+
+type ProfileSecurityFormProps = {
+  hasPassword: boolean;
+  providerNames?: string[];
+};
+
+export function ProfileSecurityForm({ hasPassword, providerNames = [] }: ProfileSecurityFormProps) {
   const tSecurity = useTranslations("security");
   const [passwordServerError, setPasswordServerError] = React.useState<string | null>(null);
   const [isChangingPassword, startPasswordTransition] = React.useTransition();
@@ -381,7 +451,7 @@ export function ProfileSecurityForm() {
     next: false,
     confirm: false,
   });
-  const passwordForm = useForm<ChangePasswordInput>({
+  const passwordForm = useForm<PasswordFormValues>({
     defaultValues: {
       currentPassword: "",
       newPassword: "",
@@ -391,103 +461,87 @@ export function ProfileSecurityForm() {
   });
 
   const passwordValues = passwordForm.watch();
-  const passwordClientValid = React.useMemo(
-    () => changePasswordSchema.safeParse(passwordValues).success,
-    [passwordValues],
-  );
+  const passwordClientValid = React.useMemo(() => {
+    if (hasPassword) {
+      return changePasswordSchema.safeParse(passwordValues).success;
+    }
+    return setPasswordSchema.safeParse(passwordValues).success;
+  }, [hasPassword, passwordValues]);
 
-  function PasswordInputRow({
-    id,
-    label,
-    placeholder,
-    autoComplete,
-    fieldKey,
-    error,
-  }: {
-    id: "profile-current-password" | "profile-new-password" | "profile-confirm-password";
-    label: string;
-    placeholder: string;
-    autoComplete: string;
-    fieldKey: keyof typeof showPasswords;
-    error?: string;
-  }) {
-    const isVisible = showPasswords[fieldKey];
-    const registration =
-      fieldKey === "current"
-        ? passwordForm.register("currentPassword")
-        : fieldKey === "next"
-          ? passwordForm.register("newPassword")
-          : passwordForm.register("confirmNewPassword");
-
-    return (
-      <div className="space-y-1.5">
-        <Label htmlFor={id} className="text-sm text-muted-foreground">
-          {label}
-        </Label>
-        <div className="relative">
-          <Input
-            id={id}
-            {...registration}
-            type={isVisible ? "text" : "password"}
-            autoComplete={autoComplete}
-            disabled={isChangingPassword}
-            placeholder={placeholder}
-            aria-invalid={error ? "true" : "false"}
-            className={cn("pr-10", error ? "border-destructive focus-visible:ring-destructive" : "")}
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="absolute right-1 top-1 h-8 w-8 text-muted-foreground"
-            disabled={isChangingPassword}
-            onClick={() => setShowPasswords((s) => ({ ...s, [fieldKey]: !s[fieldKey] }))}
-            title={isVisible ? tSecurity("hidePassword") : tSecurity("showPassword")}
-          >
-            {isVisible ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
-            <span className="sr-only">{isVisible ? tSecurity("hidePassword") : tSecurity("showPassword")}</span>
-          </Button>
-        </div>
-        {error ? <p className="text-xs text-destructive">{error}</p> : null}
-      </div>
-    );
-  }
+  const linkedProviderLabels = React.useMemo(() => {
+    const labels: string[] = [];
+    if (providerNames.includes("google")) {
+      labels.push(tSecurity("providerGoogle"));
+    }
+    if (providerNames.includes("telegram")) {
+      labels.push(tSecurity("providerTelegram"));
+    }
+    if (labels.length === 0) {
+      labels.push(tSecurity("providerGoogle"), tSecurity("providerTelegram"));
+    }
+    return labels.join(" / ");
+  }, [providerNames, tSecurity]);
 
   const onPasswordSubmit = passwordForm.handleSubmit((values) => {
     setPasswordServerError(null);
     passwordForm.clearErrors();
-    const parsed = changePasswordSchema.safeParse(values);
-    if (!parsed.success) {
-      const flattened = parsed.error.flatten();
-      const fields = flattened.fieldErrors;
-      if (fields.currentPassword?.[0]) {
-        passwordForm.setError("currentPassword", {
-          type: "manual",
-          message: fields.currentPassword[0],
-        });
+
+    if (hasPassword) {
+      const parsed = changePasswordSchema.safeParse(values);
+      if (!parsed.success) {
+        const flattened = parsed.error.flatten();
+        const fields = flattened.fieldErrors;
+        if (fields.currentPassword?.[0]) {
+          passwordForm.setError("currentPassword", {
+            type: "manual",
+            message: fields.currentPassword[0],
+          });
+        }
+        if (fields.newPassword?.[0]) {
+          passwordForm.setError("newPassword", {
+            type: "manual",
+            message: fields.newPassword[0],
+          });
+        }
+        if (fields.confirmNewPassword?.[0]) {
+          passwordForm.setError("confirmNewPassword", {
+            type: "manual",
+            message: fields.confirmNewPassword[0],
+          });
+        }
+        if (flattened.formErrors[0]) {
+          setPasswordServerError(flattened.formErrors[0]);
+        }
+        return;
       }
-      if (fields.newPassword?.[0]) {
-        passwordForm.setError("newPassword", {
-          type: "manual",
-          message: fields.newPassword[0],
-        });
+    } else {
+      const parsed = setPasswordSchema.safeParse(values);
+      if (!parsed.success) {
+        const flattened = parsed.error.flatten();
+        const fields = flattened.fieldErrors;
+        if (fields.newPassword?.[0]) {
+          passwordForm.setError("newPassword", {
+            type: "manual",
+            message: fields.newPassword[0],
+          });
+        }
+        if (fields.confirmNewPassword?.[0]) {
+          passwordForm.setError("confirmNewPassword", {
+            type: "manual",
+            message: fields.confirmNewPassword[0],
+          });
+        }
+        if (flattened.formErrors[0]) {
+          setPasswordServerError(flattened.formErrors[0]);
+        }
+        return;
       }
-      if (fields.confirmNewPassword?.[0]) {
-        passwordForm.setError("confirmNewPassword", {
-          type: "manual",
-          message: fields.confirmNewPassword[0],
-        });
-      }
-      if (flattened.formErrors[0]) {
-        setPasswordServerError(flattened.formErrors[0]);
-      }
-      return;
     }
 
     startPasswordTransition(() => {
       void (async () => {
         const result = await changePasswordAction({
-          currentPassword: values.currentPassword,
+          currentPassword: hasPassword ? values.currentPassword : undefined,
           newPassword: values.newPassword,
         });
 
@@ -518,44 +572,65 @@ export function ProfileSecurityForm() {
         <SettingsSectionGroup>
           <SettingsSectionCard icon={ShieldIcon} title={tSecurity("passwordTitle")} subtitle={tSecurity("passwordSubtitle")}>
             <form onSubmit={onPasswordSubmit} className="mx-auto w-full max-w-xl space-y-3" noValidate>
-            <PasswordInputRow
-              id="profile-current-password"
-              fieldKey="current"
-              label={tSecurity("currentPasswordLabel")}
-              placeholder={tSecurity("currentPasswordPlaceholder")}
-              autoComplete="current-password"
-              error={passwordForm.formState.errors.currentPassword?.message}
-            />
+              {!hasPassword ? (
+                <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
+                  {tSecurity("setPasswordDescription", { providers: linkedProviderLabels })}
+                </div>
+              ) : null}
 
-            <PasswordInputRow
-              id="profile-new-password"
-              fieldKey="next"
-              label={tSecurity("newPasswordLabel")}
-              placeholder={tSecurity("newPasswordPlaceholder")}
-              autoComplete="new-password"
-              error={passwordForm.formState.errors.newPassword?.message}
-            />
-            <p className="text-xs text-muted-foreground">
-              {tSecurity("passwordHint")}
-            </p>
+              {hasPassword ? (
+                <PasswordInputRow
+                  id="profile-current-password"
+                  name="currentPassword"
+                  label={tSecurity("currentPasswordLabel")}
+                  placeholder={tSecurity("currentPasswordPlaceholder")}
+                  autoComplete="current-password"
+                  isVisible={showPasswords.current}
+                  isDisabled={isChangingPassword}
+                  error={passwordForm.formState.errors.currentPassword?.message}
+                  toggleLabel={showPasswords.current ? tSecurity("hidePassword") : tSecurity("showPassword")}
+                  onToggleVisibility={() => setShowPasswords((s) => ({ ...s, current: !s.current }))}
+                  register={passwordForm.register}
+                />
+              ) : null}
 
-            <PasswordInputRow
-              id="profile-confirm-password"
-              fieldKey="confirm"
-              label={tSecurity("confirmNewPasswordLabel")}
-              placeholder={tSecurity("confirmNewPasswordPlaceholder")}
-              autoComplete="new-password"
-              error={passwordForm.formState.errors.confirmNewPassword?.message}
-            />
+              <PasswordInputRow
+                id="profile-new-password"
+                name="newPassword"
+                label={tSecurity("newPasswordLabel")}
+                placeholder={tSecurity("newPasswordPlaceholder")}
+                autoComplete="new-password"
+                isVisible={showPasswords.next}
+                isDisabled={isChangingPassword}
+                error={passwordForm.formState.errors.newPassword?.message}
+                toggleLabel={showPasswords.next ? tSecurity("hidePassword") : tSecurity("showPassword")}
+                onToggleVisibility={() => setShowPasswords((s) => ({ ...s, next: !s.next }))}
+                register={passwordForm.register}
+              />
+              <p className="text-xs text-muted-foreground">{tSecurity("passwordHint")}</p>
 
-            <FormErrorSummary
-              serverError={passwordServerError}
-              errors={[
-                passwordForm.formState.errors.currentPassword?.message,
-                passwordForm.formState.errors.newPassword?.message,
-                passwordForm.formState.errors.confirmNewPassword?.message,
-              ]}
-            />
+              <PasswordInputRow
+                id="profile-confirm-password"
+                name="confirmNewPassword"
+                label={tSecurity("confirmNewPasswordLabel")}
+                placeholder={tSecurity("confirmNewPasswordPlaceholder")}
+                autoComplete="new-password"
+                isVisible={showPasswords.confirm}
+                isDisabled={isChangingPassword}
+                error={passwordForm.formState.errors.confirmNewPassword?.message}
+                toggleLabel={showPasswords.confirm ? tSecurity("hidePassword") : tSecurity("showPassword")}
+                onToggleVisibility={() => setShowPasswords((s) => ({ ...s, confirm: !s.confirm }))}
+                register={passwordForm.register}
+              />
+
+              <FormErrorSummary
+                serverError={passwordServerError}
+                errors={[
+                  hasPassword ? passwordForm.formState.errors.currentPassword?.message : undefined,
+                  passwordForm.formState.errors.newPassword?.message,
+                  passwordForm.formState.errors.confirmNewPassword?.message,
+                ]}
+              />
 
               <StickySaveBar
                 dirty={passwordForm.formState.isDirty}
