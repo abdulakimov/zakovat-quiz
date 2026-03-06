@@ -82,7 +82,7 @@ test("auth background renders without console errors", async ({ page }) => {
   });
 
   await page.goto("/en/auth/login");
-  await expect(page.getByTestId("auth-bg")).toBeVisible();
+  await expect(page.getByTestId("auth-background")).toBeVisible();
   await expect(consoleErrors).toEqual([]);
 });
 
@@ -93,7 +93,7 @@ test.describe("reduced motion auth background", () => {
     const prefersReduced = await page.evaluate(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
     expect(prefersReduced).toBeTruthy();
     const animationName = await page
-      .locator(".auth-bg-float-slow")
+      .locator(".auth-float-slow")
       .first()
       .evaluate((node) => getComputedStyle(node).animationName);
     expect(animationName).toBe("none");

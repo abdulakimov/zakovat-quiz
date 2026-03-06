@@ -19,12 +19,12 @@ export function AuthShell({
   children,
 }: AuthShellProps) {
   return (
-    <div className="relative min-h-screen overflow-y-auto bg-background py-10">
+    <div className="relative min-h-screen bg-background">
       <AuthBackground />
-      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-80px)] w-full max-w-5xl items-start justify-center px-4 lg:items-center">
-        <div className="w-full rounded-3xl border border-border bg-card p-4 shadow-sm md:p-6 dark:shadow-none lg:max-h-[calc(100vh-96px)]">
+      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-5xl items-start px-4 py-8 lg:items-center">
+        <div className="w-full rounded-3xl border border-border bg-card p-4 shadow-sm md:p-6 dark:shadow-none">
           <div className="grid gap-6 lg:grid-cols-2 lg:items-stretch">
-            <section className="rounded-2xl border border-border/80 bg-card p-6 pb-6 md:p-8 lg:overflow-y-auto lg:pr-2" data-testid="auth-form-panel">
+            <section className="rounded-2xl border border-border/80 bg-card p-6 md:p-8" data-testid="auth-form-panel">
               <header className="mb-6 space-y-2">
                 <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
                 <p className="text-sm text-muted-foreground">{subtitle}</p>
