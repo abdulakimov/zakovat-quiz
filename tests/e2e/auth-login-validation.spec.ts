@@ -20,6 +20,32 @@ test("login page renders social buttons and no console errors", async ({ page })
   await expect(consoleErrors).toEqual([]);
 });
 
+test("provider buttons use full document navigation", async ({ page }) => {
+  const navigations: string[] = [];
+
+  page.on("request", (request) => {
+    if (request.isNavigationRequest() && request.resourceType() === "document") {
+      navigations.push(request.url());
+    }
+  });
+
+  await page.route("**/auth/google/start", async (route) => {
+    await route.fulfill({ status: 200, contentType: "text/html", body: "<html><body>google start</body></html>" });
+  });
+  await page.goto("/en/auth/login");
+  await page.getByTestId("google-login").click();
+  await page.waitForURL("**/auth/google/start");
+  expect(navigations.some((url) => url.includes("/auth/google/start"))).toBeTruthy();
+
+  await page.route("**/auth/telegram/start", async (route) => {
+    await route.fulfill({ status: 200, contentType: "text/html", body: "<html><body>telegram start</body></html>" });
+  });
+  await page.goto("/en/auth/login");
+  await page.getByTestId("telegram-login").click();
+  await page.waitForURL("**/auth/telegram/start");
+  expect(navigations.some((url) => url.includes("/auth/telegram/start"))).toBeTruthy();
+});
+
 test("mobile auth layout hides visual panel", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/en/auth/login");

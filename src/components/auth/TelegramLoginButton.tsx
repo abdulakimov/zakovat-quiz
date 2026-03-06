@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/src/i18n/client";
 
@@ -21,14 +20,15 @@ export function TelegramLoginButton() {
   const tAuth = useTranslations("auth");
 
   return (
-    <Button asChild variant="outline" className="w-full" data-testid="telegram-login-button">
-      <Link
+    <Button asChild variant="outline" className="w-full">
+      <a
         href="/auth/telegram/start"
         aria-label={tAuth("continueWithTelegram")}
+        data-testid="telegram-login-button"
       >
         <TelegramIcon />
         {tAuth("continueWithTelegram")}
-      </Link>
+      </a>
     </Button>
   );
 }

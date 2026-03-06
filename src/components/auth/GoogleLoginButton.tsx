@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/src/i18n/client";
 
@@ -31,11 +30,11 @@ export function GoogleLoginButton() {
   const tAuth = useTranslations("auth");
 
   return (
-    <Button asChild variant="outline" className="w-full" data-testid="google-login">
-      <Link href="/auth/google/start" aria-label={tAuth("continueWithGoogle")}>
+    <Button asChild variant="outline" className="w-full">
+      <a href="/auth/google/start" aria-label={tAuth("continueWithGoogle")} data-testid="google-login">
         <GoogleIcon />
         {tAuth("continueWithGoogle")}
-      </Link>
+      </a>
     </Button>
   );
 }
