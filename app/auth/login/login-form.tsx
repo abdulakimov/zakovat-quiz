@@ -12,6 +12,7 @@ import { FormErrorSummary } from "@/src/components/form/FormErrorSummary";
 import { FormFieldPassword } from "@/src/components/form/FormFieldPassword";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
 import { SocialLoginButtons } from "@/src/components/auth/SocialLoginButtons";
+import { QrLoginPanel } from "@/src/components/auth/QrLoginPanel";
 import { toast } from "@/src/components/ui/sonner";
 import { useTranslations } from "@/src/i18n/client";
 import { localizeHref, normalizeLocale } from "@/src/i18n/config";
@@ -141,7 +142,8 @@ export default function LoginForm() {
   return (
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       <h2 className="sr-only" data-testid="login-heading">{tAuth("login.title")}</h2>
-      <SocialLoginButtons />
+      <SocialLoginButtons nextPath={nextPath} />
+      <QrLoginPanel />
       <p className="text-center text-xs text-muted-foreground">{tAuth("misc.termsNotice")}</p>
 
       <div className="relative py-1">

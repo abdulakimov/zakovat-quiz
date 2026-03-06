@@ -26,6 +26,7 @@ type GoogleFlowPayload = {
   nonce: string;
   codeVerifier: string;
   locale: string;
+  nextPath: string;
 };
 
 export type GoogleIdTokenClaims = {

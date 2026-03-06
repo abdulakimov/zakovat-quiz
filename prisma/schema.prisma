@@ -42,6 +42,13 @@ enum TeamInviteStatus {
   EXPIRED
 }
 
+enum QrLoginStatus {
+  PENDING
+  APPROVED
+  CONSUMED
+  EXPIRED
+}
+
 enum PackVisibility {
   DRAFT
   PRIVATE
@@ -92,8 +99,27 @@ model User {
   teamInvites     TeamInvite[]             @relation("InvitedUser")
   sentTeamInvites TeamInvite[]             @relation("InvitedBy")
   authAccounts    AuthAccount[]
+  approvedQrLoginSessions QrLoginSession[] @relation("QrLoginApprovedUser")
 
   @@index([avatarAssetId])
+}
+
+model QrLoginSession {
+  id             String       @id @default(uuid())
+  tokenHash      String       @unique
+  status         QrLoginStatus @default(PENDING)
+  createdAt      DateTime     @default(now())
+  expiresAt      DateTime
+  approvedAt     DateTime?
+  consumedAt     DateTime?
+  approvedUserId String?
+  userAgent      String?
+  ip             String?
+  approvedUser   User?        @relation("QrLoginApprovedUser", fields: [approvedUserId], references: [id], onDelete: SetNull)
+
+  @@index([expiresAt])
+  @@index([status])
+  @@index([status, expiresAt])
 }
 
 model AuthAccount {

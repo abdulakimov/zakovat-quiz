@@ -93,8 +93,9 @@ export async function GET(request: NextRequest) {
     const user = await upsertTelegramUser(claims);
     await setUserSessionCookie(user, { secure: secureCookies });
 
-    const redirectLocale = normalizeLocale(cookieStore.get(localeCookieName)?.value ?? statePayload.locale);
-    const destination = new URL(joinUrl(baseUrl, localizeHref(redirectLocale, "/app")));
+    const destination = new URL(
+      joinUrl(baseUrl, statePayload.nextPath || localizeHref(normalizeLocale(statePayload.locale), "/app")),
+    );
     if (shouldDebugAuthLogs()) {
       logger.info("Telegram callback success redirect decision", getRedirectDebugMeta(request.headers, destination.toString()));
     }

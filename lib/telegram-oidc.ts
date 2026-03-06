@@ -30,6 +30,7 @@ type TelegramFlowPayload = {
   nonce: string;
   codeVerifier: string;
   locale: string;
+  nextPath: string;
 };
 
 type TelegramStatePayload = {
@@ -37,6 +38,7 @@ type TelegramStatePayload = {
   codeVerifier: string;
   locale: string;
   csrf: string;
+  nextPath: string;
 };
 
 type TelegramIdTokenClaims = {

@@ -95,8 +95,7 @@ export async function GET(request: NextRequest) {
     const user = await upsertGoogleUser(claims);
     await setUserSessionCookie(user, { secure: secureCookies });
 
-    const redirectLocale = normalizeLocale(cookieStore.get(localeCookieName)?.value ?? flow.locale);
-    const destination = new URL(joinUrl(baseUrl, localizeHref(redirectLocale, "/app")));
+    const destination = new URL(joinUrl(baseUrl, flow.nextPath || localizeHref(normalizeLocale(flow.locale), "/app")));
     if (shouldDebugAuthLogs()) {
       logger.info("Google callback success redirect decision", getRedirectDebugMeta(request.headers, destination.toString()));
     }

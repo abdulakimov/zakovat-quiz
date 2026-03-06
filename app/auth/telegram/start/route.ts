@@ -12,13 +12,15 @@ import {
   TELEGRAM_FLOW_COOKIE,
   TELEGRAM_FLOW_TTL_SECONDS,
 } from "@/lib/telegram-oidc";
+import { normalizeOAuthNextPath } from "@/src/auth/providers/next-path";
 import { getCanonicalBaseUrl, getRedirectDebugMeta, isSecureBaseUrl, joinUrl, shouldDebugAuthLogs } from "@/src/lib/url";
 import { defaultLocale, localeCookieName, localizeHref, normalizeLocale } from "@/src/i18n/config";
 
-export async function GET() {
+export async function GET(request: Request) {
   const headerStore = await headers();
   const cookieStore = await cookies();
   const locale = normalizeLocale(cookieStore.get(localeCookieName)?.value ?? headerStore.get("x-locale") ?? defaultLocale);
+  const nextPath = normalizeOAuthNextPath(new URL(request.url).searchParams.get("next"), locale);
   const baseUrl = getCanonicalBaseUrl(headerStore);
   const redirectUri = resolveTelegramRedirectUri(baseUrl);
   const secureCookies = isSecureBaseUrl(baseUrl);
@@ -34,12 +36,14 @@ export async function GET() {
       codeVerifier: flow.codeVerifier,
       locale,
       csrf: flow.state,
+      nextPath,
     });
     const flowCookie = await signTelegramFlowCookie({
       state: stateToken,
       nonce: flow.nonce,
       codeVerifier: flow.codeVerifier,
       locale,
+      nextPath,
     });
 
     const authUrl = buildTelegramAuthUrl({

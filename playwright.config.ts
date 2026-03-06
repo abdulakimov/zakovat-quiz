@@ -5,8 +5,7 @@ const sessionSecret =
 const telegramClientId = process.env.TELEGRAM_OIDC_CLIENT_ID ?? "123456789";
 const telegramClientSecret =
   process.env.TELEGRAM_OIDC_CLIENT_SECRET ?? "playwright-telegram-secret";
-const telegramRedirectUri =
-  process.env.TELEGRAM_OIDC_REDIRECT_URI ?? "http://localhost:3000/auth/telegram/callback";
+const telegramRedirectUri = "http://localhost:3000/auth/telegram/callback";
 const telegramDiscoveryUrl =
   process.env.TELEGRAM_OIDC_DISCOVERY_URL ??
   "http://localhost:3000/api/test/telegram-oidc/discovery";
@@ -20,8 +19,7 @@ const googleMockOrigin = process.env.GOOGLE_OIDC_MOCK_ORIGIN ?? "http://127.0.0.
 const googleClientId = process.env.GOOGLE_OIDC_CLIENT_ID ?? "playwright-google-client-id";
 const googleClientSecret =
   process.env.GOOGLE_OIDC_CLIENT_SECRET ?? "playwright-google-client-secret";
-const googleRedirectUri =
-  process.env.GOOGLE_OIDC_REDIRECT_URI ?? "http://localhost:3000/auth/google/callback";
+const googleRedirectUri = "http://localhost:3000/auth/google/callback";
 const googleScopes = process.env.GOOGLE_OIDC_SCOPES ?? "openid email profile";
 const googleAuthUrl = process.env.GOOGLE_OIDC_AUTH_URL ?? `${googleMockOrigin}/auth`;
 const googleTokenUrl = process.env.GOOGLE_OIDC_TOKEN_URL ?? `${googleMockOrigin}/token`;
@@ -32,6 +30,8 @@ const appBaseUrl =
 process.env.SESSION_SECRET = sessionSecret;
 process.env.TELEGRAM_OIDC_CLIENT_ID = telegramClientId;
 process.env.GOOGLE_OIDC_CLIENT_ID = googleClientId;
+process.env.TELEGRAM_OIDC_REDIRECT_URI = telegramRedirectUri;
+process.env.GOOGLE_OIDC_REDIRECT_URI = googleRedirectUri;
 
 export default defineConfig({
   testDir: "tests",
@@ -76,6 +76,7 @@ export default defineConfig({
       GOOGLE_OIDC_JWKS_URL: googleJwksUrl,
       APP_BASE_URL: appBaseUrl,
       PUBLIC_APP_URL: appBaseUrl,
+      PLAYWRIGHT_TEST: "1",
     },
   },
 });

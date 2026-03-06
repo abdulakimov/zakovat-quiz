@@ -9,7 +9,17 @@ import { TelegramIcon } from "@/src/components/icons/TelegramIcon";
 type SocialLoginButtonsProps = {
   showGoogle?: boolean;
   showTelegram?: boolean;
+  nextPath?: string | null;
 };
+
+function withNext(path: string, nextPath?: string | null) {
+  if (!nextPath) {
+    return path;
+  }
+
+  const encoded = encodeURIComponent(nextPath);
+  return `${path}?next=${encoded}`;
+}
 
 function SocialButton({
   href,
@@ -39,6 +49,7 @@ function SocialButton({
 export function SocialLoginButtons({
   showGoogle = true,
   showTelegram = true,
+  nextPath,
 }: SocialLoginButtonsProps) {
   const tAuth = useTranslations("auth");
 
@@ -46,7 +57,7 @@ export function SocialLoginButtons({
     <div className="space-y-2">
       {showTelegram ? (
         <SocialButton
-          href="/auth/telegram/start"
+          href={withNext("/auth/telegram/start", nextPath)}
           label={tAuth("actions.continueWithTelegram")}
           icon={<TelegramIcon />}
           testId="telegram-login"
@@ -54,7 +65,7 @@ export function SocialLoginButtons({
       ) : null}
       {showGoogle ? (
         <SocialButton
-          href="/auth/google/start"
+          href={withNext("/auth/google/start", nextPath)}
           label={tAuth("actions.continueWithGoogle")}
           icon={<GoogleIcon />}
           testId="google-login"
