@@ -371,6 +371,7 @@
       "desktop": {
         "title": "Approve sign in with your phone",
         "subtitle": "Scan this one-time QR code and confirm on your phone.",
+        "securityNote": "Only approve this sign in if you started it on your desktop.",
         "imageAlt": "QR login code",
         "loading": "Preparing QR code...",
         "waiting": "Waiting for confirmation...",
@@ -379,12 +380,14 @@
         "error": "Unable to check QR status right now.",
         "consumeError": "Confirmation received, but desktop sign in failed. Try again.",
         "restart": "Generate new QR",
+        "refresh": "Refresh QR",
         "expiresIn": "Expires in {count, plural, one {# second} other {# seconds}}"
       },
       "mobile": {
         "title": "Continue sign in",
         "subtitle": "Choose a provider and approve desktop sign in.",
-        "invalidToken": "Invalid or missing QR token. Please scan again from desktop."
+        "invalidToken": "Invalid or missing QR token. Please scan again from desktop.",
+        "entryLink": "Sign in by phone"
       },
       "finish": {
         "approvedTitle": "Approved",

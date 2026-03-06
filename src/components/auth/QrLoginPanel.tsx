@@ -136,50 +136,60 @@ export function QrLoginPanel() {
 
   return (
     <section
-      className="hidden rounded-xl border border-border/80 bg-card/70 p-4 md:block"
-      data-testid="qr-login-panel"
+      className="rounded-2xl border bg-card/50 p-6 backdrop-blur"
+      data-testid="qr-panel"
       data-session-id={data?.sessionId ?? ""}
     >
-      <p className="text-sm font-semibold text-foreground">{tAuth("qr.desktop.title")}</p>
-      <p className="mt-1 text-xs text-muted-foreground">{tAuth("qr.desktop.subtitle")}</p>
+      <p className="text-lg font-semibold text-foreground">{tAuth("qr.desktop.title")}</p>
+      <p className="mt-1 text-sm text-muted-foreground">{tAuth("qr.desktop.subtitle")}</p>
+      <p className="mt-2 text-xs text-muted-foreground">{tAuth("qr.desktop.securityNote")}</p>
 
-      <div className="mt-4 flex min-h-48 items-center justify-center rounded-lg border border-dashed border-border bg-background p-3">
+      <div className="mt-5 flex min-h-56 items-center justify-center rounded-xl border border-border bg-background/40 p-4">
         {data?.qrDataUrl ? (
-          <img src={data.qrDataUrl} alt={tAuth("qr.desktop.imageAlt")} className="h-44 w-44" data-testid="qr-code-image" />
+          <img
+            src={data.qrDataUrl}
+            alt={tAuth("qr.desktop.imageAlt")}
+            className="h-48 w-48 object-contain [image-rendering:pixelated]"
+            data-testid="qr-code-image"
+          />
         ) : (
-          <span className="text-xs text-muted-foreground">{tAuth("qr.desktop.loading")}</span>
+          <span className="text-sm text-muted-foreground">{tAuth("qr.desktop.loading")}</span>
         )}
       </div>
 
-      <p className="mt-3 text-xs text-muted-foreground" data-testid="qr-status-text">
-        {status === "expired"
-          ? tAuth("qr.desktop.expired")
-          : status === "error"
-            ? consumeError
-              ? tAuth("qr.desktop.consumeError")
-              : tAuth("qr.desktop.error")
-            : status === "approved"
-              ? tAuth("qr.desktop.approved")
-              : tAuth("qr.desktop.waiting")}
-      </p>
-      <p className="mt-1 text-xs text-muted-foreground" data-testid="qr-countdown">
-        {tAuth("qr.desktop.expiresIn", { count: remaining })}
-      </p>
-
-      {(status === "expired" || status === "error") ? (
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="mt-3 w-full"
-          onClick={() => {
-            void startSession().catch(() => setStatus("error"));
-          }}
-          data-testid="qr-restart"
-        >
-          {tAuth("qr.desktop.restart")}
-        </Button>
-      ) : null}
+      <div className="mt-4 min-h-24 border-t border-border/70 pt-3">
+        <p className="min-h-10 text-sm text-muted-foreground" data-testid="qr-status-text">
+          {status === "expired"
+            ? tAuth("qr.desktop.expired")
+            : status === "error"
+              ? consumeError
+                ? tAuth("qr.desktop.consumeError")
+                : tAuth("qr.desktop.error")
+              : status === "approved"
+                ? tAuth("qr.desktop.approved")
+                : tAuth("qr.desktop.waiting")}
+        </p>
+        <div className="mt-1 flex min-h-8 items-center justify-between gap-3">
+          <p className="text-xs text-muted-foreground" data-testid="qr-countdown">
+            {tAuth("qr.desktop.expiresIn", { count: remaining })}
+          </p>
+          {status === "expired" ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                void startSession().catch(() => setStatus("error"));
+              }}
+              data-testid="qr-restart"
+            >
+              {tAuth("qr.desktop.refresh")}
+            </Button>
+          ) : (
+            <span className="inline-block min-h-8" aria-hidden="true" />
+          )}
+        </div>
+      </div>
     </section>
   );
 }

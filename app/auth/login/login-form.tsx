@@ -12,7 +12,6 @@ import { FormErrorSummary } from "@/src/components/form/FormErrorSummary";
 import { FormFieldPassword } from "@/src/components/form/FormFieldPassword";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
 import { SocialLoginButtons } from "@/src/components/auth/SocialLoginButtons";
-import { QrLoginPanel } from "@/src/components/auth/QrLoginPanel";
 import { toast } from "@/src/components/ui/sonner";
 import { useTranslations } from "@/src/i18n/client";
 import { localizeHref, normalizeLocale } from "@/src/i18n/config";
@@ -143,7 +142,6 @@ export default function LoginForm() {
     <form onSubmit={onSubmit} className="space-y-4" noValidate>
       <h2 className="sr-only" data-testid="login-heading">{tAuth("login.title")}</h2>
       <SocialLoginButtons nextPath={nextPath} />
-      <QrLoginPanel />
       <p className="text-center text-xs text-muted-foreground">{tAuth("misc.termsNotice")}</p>
 
       <div className="relative py-1">
@@ -188,6 +186,16 @@ export default function LoginForm() {
         {tAuth("misc.noAccount")}{" "}
         <Link href={localizeHref(locale, "/auth/signup")} className="font-medium text-foreground underline">
           {tAuth("actions.signup")}
+        </Link>
+      </p>
+
+      <p className="text-center text-xs text-muted-foreground md:hidden">
+        <Link
+          href={localizeHref(locale, "/auth/qr")}
+          className="font-medium text-foreground underline"
+          data-testid="mobile-qr-entry-link"
+        >
+          {tAuth("qr.mobile.entryLink")}
         </Link>
       </p>
     </form>

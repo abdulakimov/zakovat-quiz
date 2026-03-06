@@ -13,11 +13,16 @@ async function getPlaywrightUserId() {
 test("desktop shows QR panel and mobile hides it", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/uz/auth/login");
-  await expect(page.getByTestId("qr-login-panel")).toBeVisible();
+  const qrPanel = page.getByTestId("qr-panel");
+  await expect(qrPanel).toBeVisible();
+  await expect(page.getByTestId("auth-right").locator('[data-testid="qr-panel"]')).toBeVisible();
+  await expect(page.getByTestId("auth-left").locator('[data-testid="qr-panel"]')).toHaveCount(0);
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/uz/auth/login");
-  await expect(page.getByTestId("qr-login-panel")).toBeHidden();
+  await expect(page.getByTestId("auth-right")).toBeHidden();
+  await expect(page.getByTestId("qr-panel")).toBeHidden();
+  await expect(page.getByTestId("mobile-qr-entry-link")).toBeVisible();
 });
 
 test("start QR session returns url and login page renders QR image", async ({ page, request }) => {
@@ -47,9 +52,9 @@ test("approved QR session is consumed and redirects desktop to app", async ({ pa
   await page.goto("/uz/auth/login");
 
   await expect
-    .poll(async () => (await page.getByTestId("qr-login-panel").getAttribute("data-session-id")) ?? "")
+    .poll(async () => (await page.getByTestId("qr-panel").getAttribute("data-session-id")) ?? "")
     .not.toEqual("");
-  const sid = (await page.getByTestId("qr-login-panel").getAttribute("data-session-id")) ?? "";
+  const sid = (await page.getByTestId("qr-panel").getAttribute("data-session-id")) ?? "";
   expect(sid.length).toBeGreaterThan(0);
 
   const approveResponse = await request.post("/auth/qr/test-approve", {
@@ -71,9 +76,9 @@ test("expired QR session shows expired state", async ({ page, request }) => {
   await page.goto("/uz/auth/login");
 
   await expect
-    .poll(async () => (await page.getByTestId("qr-login-panel").getAttribute("data-session-id")) ?? "")
+    .poll(async () => (await page.getByTestId("qr-panel").getAttribute("data-session-id")) ?? "")
     .not.toEqual("");
-  const sid = (await page.getByTestId("qr-login-panel").getAttribute("data-session-id")) ?? "";
+  const sid = (await page.getByTestId("qr-panel").getAttribute("data-session-id")) ?? "";
 
   const expireResponse = await request.post("/auth/qr/test-expire", {
     data: { sid },

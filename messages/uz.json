@@ -371,6 +371,7 @@
       "desktop": {
         "title": "Telefon orqali kirishni tasdiqlang",
         "subtitle": "Bir martalik QR kodni skaner qiling va telefonda tasdiqlang.",
+        "securityNote": "Faqat ushbu kirishni o'zingiz desktopda boshlagan bo'lsangiz tasdiqlang.",
         "imageAlt": "QR kirish kodi",
         "loading": "QR kod tayyorlanmoqda...",
         "waiting": "Tasdiqlash kutilmoqda...",
@@ -379,12 +380,14 @@
         "error": "QR holatini hozir tekshirib bo'lmadi.",
         "consumeError": "Tasdiq olindi, lekin desktopga kirishda xatolik yuz berdi. Qayta urinib ko'ring.",
         "restart": "Yangi QR yaratish",
+        "refresh": "QR ni yangilash",
         "expiresIn": "{count, plural, one {# soniyada tugaydi} other {# soniyada tugaydi}}"
       },
       "mobile": {
         "title": "Kirishni davom ettiring",
         "subtitle": "Provider tanlang va desktop kirishni tasdiqlang.",
-        "invalidToken": "QR token noto'g'ri yoki yo'q. Iltimos, desktopdan qayta skaner qiling."
+        "invalidToken": "QR token noto'g'ri yoki yo'q. Iltimos, desktopdan qayta skaner qiling.",
+        "entryLink": "Telefon orqali kirish"
       },
       "finish": {
         "approvedTitle": "Tasdiqlandi",

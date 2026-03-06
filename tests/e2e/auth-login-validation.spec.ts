@@ -49,8 +49,8 @@ test("provider buttons use full document navigation", async ({ page }) => {
 test("mobile auth layout hides visual panel", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/en/auth/login");
-  await expect(page.getByTestId("auth-visual-panel")).toBeVisible();
-  await expect(page.getByTestId("auth-form-panel")).toBeVisible();
+  await expect(page.getByTestId("auth-right")).toBeHidden();
+  await expect(page.getByTestId("auth-left")).toBeVisible();
 });
 
 async function ensureSignupSubmitReachable(page: import("@playwright/test").Page) {
