@@ -86,7 +86,21 @@
     "showPassword": "Показать пароль",
     "setPasswordDescription": "Вы используете вход через {providers}. Задайте пароль, чтобы включить вход по email/паролю.",
     "providerGoogle": "Google",
-    "providerTelegram": "Telegram"
+    "providerTelegram": "Telegram",
+    "checkOkLength": "Минимум 10 символов.",
+    "checkMissingLength": "Добавьте минимум 10 символов.",
+    "checkOkLetter": "Есть минимум 1 буква.",
+    "checkMissingLetter": "Добавьте хотя бы 1 букву.",
+    "checkOkNumber": "Есть минимум 1 цифра.",
+    "checkMissingNumber": "Добавьте хотя бы 1 цифру.",
+    "checkOkMatch": "Пароли совпадают.",
+    "checkMissingMatch": "Подтверждение должно совпадать с паролем.",
+    "saveHint": "Чтобы сохранить: {items}.",
+    "saveHintCurrentPassword": "введите текущий пароль",
+    "saveHintMinLength": "используйте минимум 10 символов",
+    "saveHintLetter": "добавьте букву",
+    "saveHintNumber": "добавьте цифру",
+    "saveHintConfirmMatch": "подтвердите пароль"
   },
   "packs": {
     "title": "Паки",

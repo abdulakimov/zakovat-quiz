@@ -86,7 +86,21 @@
     "showPassword": "Parolni ko'rsatish",
     "setPasswordDescription": "Siz {providers} orqali kiryapsiz. Email/parol bilan kirishni yoqish uchun parol o'rnating.",
     "providerGoogle": "Google",
-    "providerTelegram": "Telegram"
+    "providerTelegram": "Telegram",
+    "checkOkLength": "Kamida 10 ta belgi kiritildi.",
+    "checkMissingLength": "Kamida 10 ta belgi kiriting.",
+    "checkOkLetter": "Kamida 1 ta harf bor.",
+    "checkMissingLetter": "Kamida 1 ta harf qo'shing.",
+    "checkOkNumber": "Kamida 1 ta raqam bor.",
+    "checkMissingNumber": "Kamida 1 ta raqam qo'shing.",
+    "checkOkMatch": "Parollar mos.",
+    "checkMissingMatch": "Tasdiqlash paroli mos bo'lishi kerak.",
+    "saveHint": "Saqlash uchun: {items}.",
+    "saveHintCurrentPassword": "joriy parolni kiriting",
+    "saveHintMinLength": "kamida 10 ta belgi kiriting",
+    "saveHintLetter": "harf qo'shing",
+    "saveHintNumber": "raqam qo'shing",
+    "saveHintConfirmMatch": "parolni tasdiqlang"
   },
   "packs": {
     "title": "Paketlar",

@@ -446,27 +446,70 @@ export function ProfileSecurityForm({ hasPassword, providerNames = [] }: Profile
   const tSecurity = useTranslations("security");
   const [passwordServerError, setPasswordServerError] = React.useState<string | null>(null);
   const [isChangingPassword, startPasswordTransition] = React.useTransition();
+  const passwordSchema = React.useMemo(
+    () => (hasPassword ? changePasswordSchema : setPasswordSchema),
+    [hasPassword],
+  );
   const [showPasswords, setShowPasswords] = React.useState({
     current: false,
     next: false,
     confirm: false,
   });
   const passwordForm = useForm<PasswordFormValues>({
+    resolver: zodResolverCompat(passwordSchema as unknown as z.ZodType<PasswordFormValues>),
     defaultValues: {
       currentPassword: "",
       newPassword: "",
       confirmNewPassword: "",
     },
-    mode: "onSubmit",
+    mode: "onChange",
+    reValidateMode: "onChange",
   });
 
-  const passwordValues = passwordForm.watch();
-  const passwordClientValid = React.useMemo(() => {
-    if (hasPassword) {
-      return changePasswordSchema.safeParse(passwordValues).success;
+  const newPasswordValue = passwordForm.watch("newPassword") ?? "";
+  const confirmPasswordValue = passwordForm.watch("confirmNewPassword") ?? "";
+  const currentPasswordValue = passwordForm.watch("currentPassword") ?? "";
+  const passwordHasMinLength = newPasswordValue.length >= 10;
+  const passwordHasLetter = /[A-Za-z]/.test(newPasswordValue);
+  const passwordHasNumber = /\d/.test(newPasswordValue);
+  const confirmMatches = confirmPasswordValue.length > 0 && confirmPasswordValue === newPasswordValue;
+  const isSubmitting = isChangingPassword || passwordForm.formState.isSubmitting;
+  const canSave = passwordForm.formState.isDirty && passwordForm.formState.isValid && !isSubmitting;
+
+  const missingItems = React.useMemo(() => {
+    const missing: string[] = [];
+
+    if (hasPassword && currentPasswordValue.trim().length === 0) {
+      missing.push(tSecurity("saveHintCurrentPassword"));
     }
-    return setPasswordSchema.safeParse(passwordValues).success;
-  }, [hasPassword, passwordValues]);
+    if (!passwordHasMinLength) {
+      missing.push(tSecurity("saveHintMinLength"));
+    }
+    if (!passwordHasLetter) {
+      missing.push(tSecurity("saveHintLetter"));
+    }
+    if (!passwordHasNumber) {
+      missing.push(tSecurity("saveHintNumber"));
+    }
+    if (!confirmMatches) {
+      missing.push(tSecurity("saveHintConfirmMatch"));
+    }
+
+    return missing;
+  }, [
+    confirmMatches,
+    currentPasswordValue,
+    hasPassword,
+    passwordHasLetter,
+    passwordHasMinLength,
+    passwordHasNumber,
+    tSecurity,
+  ]);
+
+  const disabledSaveHint =
+    !canSave && missingItems.length > 0
+      ? tSecurity("saveHint", { items: missingItems.join(", ") })
+      : null;
 
   const linkedProviderLabels = React.useMemo(() => {
     const labels: string[] = [];
@@ -484,59 +527,6 @@ export function ProfileSecurityForm({ hasPassword, providerNames = [] }: Profile
 
   const onPasswordSubmit = passwordForm.handleSubmit((values) => {
     setPasswordServerError(null);
-    passwordForm.clearErrors();
-
-    if (hasPassword) {
-      const parsed = changePasswordSchema.safeParse(values);
-      if (!parsed.success) {
-        const flattened = parsed.error.flatten();
-        const fields = flattened.fieldErrors;
-        if (fields.currentPassword?.[0]) {
-          passwordForm.setError("currentPassword", {
-            type: "manual",
-            message: fields.currentPassword[0],
-          });
-        }
-        if (fields.newPassword?.[0]) {
-          passwordForm.setError("newPassword", {
-            type: "manual",
-            message: fields.newPassword[0],
-          });
-        }
-        if (fields.confirmNewPassword?.[0]) {
-          passwordForm.setError("confirmNewPassword", {
-            type: "manual",
-            message: fields.confirmNewPassword[0],
-          });
-        }
-        if (flattened.formErrors[0]) {
-          setPasswordServerError(flattened.formErrors[0]);
-        }
-        return;
-      }
-    } else {
-      const parsed = setPasswordSchema.safeParse(values);
-      if (!parsed.success) {
-        const flattened = parsed.error.flatten();
-        const fields = flattened.fieldErrors;
-        if (fields.newPassword?.[0]) {
-          passwordForm.setError("newPassword", {
-            type: "manual",
-            message: fields.newPassword[0],
-          });
-        }
-        if (fields.confirmNewPassword?.[0]) {
-          passwordForm.setError("confirmNewPassword", {
-            type: "manual",
-            message: fields.confirmNewPassword[0],
-          });
-        }
-        if (flattened.formErrors[0]) {
-          setPasswordServerError(flattened.formErrors[0]);
-        }
-        return;
-      }
-    }
 
     startPasswordTransition(() => {
       void (async () => {
@@ -608,6 +598,20 @@ export function ProfileSecurityForm({ hasPassword, providerNames = [] }: Profile
                 register={passwordForm.register}
               />
               <p className="text-xs text-muted-foreground">{tSecurity("passwordHint")}</p>
+              <div className="space-y-1 text-xs" data-testid="password-checklist">
+                <p className={cn(passwordHasMinLength ? "text-emerald-600" : "text-muted-foreground")}>
+                  {passwordHasMinLength ? tSecurity("checkOkLength") : tSecurity("checkMissingLength")}
+                </p>
+                <p className={cn(passwordHasLetter ? "text-emerald-600" : "text-muted-foreground")}>
+                  {passwordHasLetter ? tSecurity("checkOkLetter") : tSecurity("checkMissingLetter")}
+                </p>
+                <p className={cn(passwordHasNumber ? "text-emerald-600" : "text-muted-foreground")}>
+                  {passwordHasNumber ? tSecurity("checkOkNumber") : tSecurity("checkMissingNumber")}
+                </p>
+                <p className={cn(confirmMatches ? "text-emerald-600" : "text-muted-foreground")}>
+                  {confirmMatches ? tSecurity("checkOkMatch") : tSecurity("checkMissingMatch")}
+                </p>
+              </div>
 
               <PasswordInputRow
                 id="profile-confirm-password"
@@ -632,10 +636,16 @@ export function ProfileSecurityForm({ hasPassword, providerNames = [] }: Profile
                 ]}
               />
 
+              {disabledSaveHint ? (
+                <p className="text-xs text-muted-foreground" data-testid="security-save-hint">
+                  {disabledSaveHint}
+                </p>
+              ) : null}
+
               <StickySaveBar
                 dirty={passwordForm.formState.isDirty}
-                pending={isChangingPassword}
-                canSave={passwordClientValid && !isChangingPassword}
+                pending={isSubmitting}
+                canSave={canSave}
               />
             </form>
           </SettingsSectionCard>

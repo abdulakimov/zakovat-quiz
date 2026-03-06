@@ -86,7 +86,21 @@
     "showPassword": "Show password",
     "setPasswordDescription": "You're using {providers} login. Set a password to enable email/password login.",
     "providerGoogle": "Google",
-    "providerTelegram": "Telegram"
+    "providerTelegram": "Telegram",
+    "checkOkLength": "Minimum 10 characters.",
+    "checkMissingLength": "Add at least 10 characters.",
+    "checkOkLetter": "Contains at least 1 letter.",
+    "checkMissingLetter": "Add at least 1 letter.",
+    "checkOkNumber": "Contains at least 1 number.",
+    "checkMissingNumber": "Add at least 1 number.",
+    "checkOkMatch": "Passwords match.",
+    "checkMissingMatch": "Confirm password must match.",
+    "saveHint": "To save: {items}.",
+    "saveHintCurrentPassword": "enter current password",
+    "saveHintMinLength": "use at least 10 characters",
+    "saveHintLetter": "add a letter",
+    "saveHintNumber": "add a number",
+    "saveHintConfirmMatch": "confirm the password"
   },
   "packs": {
     "title": "Packs",
