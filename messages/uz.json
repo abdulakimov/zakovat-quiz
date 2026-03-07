@@ -329,7 +329,7 @@
     "eyebrow": "Autentifikatsiya",
     "login": {
       "title": "Zakovatga kirish",
-      "subtitle": "Davom etish uchun qulay usulni tanlang.",
+      "subtitle": "Telegram yoki Google orqali tizimga kiring.",
       "termsShort": "Davom etish orqali shartlar va maxfiylik siyosatiga rozilik bildirasiz."
     },
     "signup": {
@@ -375,6 +375,7 @@
       "title": "Telefon kamerangiz bilan skanerlang",
       "subtitle": "Desktopdagi kirishni telefonda tez tasdiqlang.",
       "countdown": "{count, plural, one {# soniya} other {# soniya}}",
+      "refreshing": "Yangilanmoqda...",
       "desktop": {
         "title": "Telefon orqali kirishni tasdiqlang",
         "subtitle": "Bir martalik QR kodni skaner qiling va telefonda tasdiqlang.",

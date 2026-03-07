@@ -23,9 +23,9 @@ export function ProviderLoginPanel({ nextPath, info }: ProviderLoginPanelProps) 
 
   return (
     <div className="space-y-4 pt-0">
-      <header className="flex min-h-[88px] flex-col justify-start space-y-1.5" data-testid="left-header">
-        <h1 className="text-2xl font-semibold text-foreground md:text-3xl">{tAuth("login.title")}</h1>
-        <p className="max-w-sm text-sm text-muted-foreground">{tAuth("login.subtitle")}</p>
+      <header className="mx-auto flex min-h-[88px] flex-col justify-start space-y-1.5 text-center" data-testid="left-header">
+        <h1 className="text-4xl font-semibold tracking-tight text-foreground">{tAuth("login.title")}</h1>
+        <p className="mx-auto mt-4 max-w-md text-base text-muted-foreground">{tAuth("login.subtitle")}</p>
       </header>
 
       {info === "signup_disabled" ? (
@@ -37,7 +37,7 @@ export function ProviderLoginPanel({ nextPath, info }: ProviderLoginPanelProps) 
         </p>
       ) : null}
 
-      <div className="mt-4 space-y-3">
+      <div className="mx-auto mt-10 max-w-sm space-y-4">
         <div data-testid="provider-telegram">
           <Button
             asChild
@@ -79,7 +79,7 @@ export function ProviderLoginPanel({ nextPath, info }: ProviderLoginPanelProps) 
         </div>
       </div>
 
-      <p className="pt-1 text-xs text-muted-foreground">{tAuth("login.termsShort")}</p>
+      <p className="mx-auto mt-8 max-w-sm text-center text-xs text-muted-foreground">{tAuth("login.termsShort")}</p>
     </div>
   );
 }

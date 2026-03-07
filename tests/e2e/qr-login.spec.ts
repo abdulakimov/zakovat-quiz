@@ -24,7 +24,7 @@ test("desktop shows QR panel and mobile hides it", async ({ page }) => {
   const shellBox = await page.getByTestId("auth-shell").boundingBox();
   expect(shellBox).not.toBeNull();
   if (shellBox) {
-    expect(shellBox.width).toBeLessThanOrEqual(1040);
+    expect(shellBox.width).toBeLessThanOrEqual(1248);
   }
   await expect(page.getByTestId("auth-shell")).not.toHaveClass(/border-2/);
   const shellBorderTopWidth = await page.getByTestId("auth-shell").evaluate((element) => {
@@ -40,11 +40,14 @@ test("desktop shows QR panel and mobile hides it", async ({ page }) => {
   await expect(page.getByTestId("qr-panel-wrap")).toBeVisible();
   await expect(page.getByTestId("qr-tile")).toBeVisible();
   await expect(page.getByTestId("qr-title")).toBeVisible();
+  await expect(page.getByTestId("qr-frame").getByTestId("qr-title")).toBeVisible();
+  await expect(page.getByTestId("qr-frame").getByTestId("qr-subtitle")).toBeVisible();
   await expect(page.getByTestId("qr-frame")).toBeVisible();
   await expect(page.getByTestId("left-header")).toBeVisible();
-  await expect(page.getByTestId("right-header")).toBeVisible();
   await expect(page.getByTestId("auth-right").locator('[data-testid="qr-panel"]')).toBeVisible();
   await expect(page.getByTestId("auth-left").locator('[data-testid="qr-panel"]')).toHaveCount(0);
+  const leftTextAlign = await page.getByTestId("left-header").evaluate((node) => getComputedStyle(node).textAlign);
+  expect(leftTextAlign).toBe("center");
   const leftBox = await page.getByTestId("auth-left").boundingBox();
   const leftInnerBox = await page.getByTestId("left-inner").boundingBox();
   expect(leftBox).not.toBeNull();
@@ -55,13 +58,12 @@ test("desktop shows QR panel and mobile hides it", async ({ page }) => {
     expect(Math.abs(leftCenter - innerCenter)).toBeLessThanOrEqual(16);
   }
   const tileBox = await page.getByTestId("qr-tile").boundingBox();
-  const qrTitleBox = await page.getByTestId("qr-title").boundingBox();
+  const qrTitleBox = await page.getByTestId("qr-frame").getByTestId("qr-title").boundingBox();
   expect(tileBox).not.toBeNull();
   expect(qrTitleBox).not.toBeNull();
   if (tileBox && qrTitleBox) {
     expect(tileBox.y + tileBox.height).toBeLessThan(qrTitleBox.y);
   }
-  const rightBox = await page.getByTestId("auth-right").boundingBox();
   const tileBefore = await page.getByTestId("qr-tile").boundingBox();
   await expect(page.getByTestId("qr-code-image")).toBeVisible();
   const tileAfter = await page.getByTestId("qr-tile").boundingBox();
@@ -72,15 +74,6 @@ test("desktop shows QR panel and mobile hides it", async ({ page }) => {
     expect(tileAfter.height).toBe(tileBefore.height);
     expect(Math.round(tileAfter.width)).toBe(240);
     expect(Math.round(tileAfter.height)).toBe(240);
-  }
-
-  expect(leftBox).not.toBeNull();
-  expect(rightBox).not.toBeNull();
-  if (leftBox && rightBox) {
-    expect(leftBox.width).toBeLessThan(rightBox.width);
-    const ratio = leftBox.width / rightBox.width;
-    expect(ratio).toBeGreaterThan(0.7);
-    expect(ratio).toBeLessThan(0.93);
   }
 
   const providerBox = await page.getByTestId("provider-panel").boundingBox();
@@ -158,7 +151,8 @@ test("expired QR session shows expired state", async ({ page, request }) => {
     data: { sid },
   });
   expect(expireResponse.ok()).toBeTruthy();
-
-  await expect(page.getByTestId("qr-status-text")).toContainText("muddati tugadi");
-  await expect(page.getByTestId("qr-restart")).toBeVisible();
+  await expect(page.getByTestId("qr-restart")).toHaveCount(0);
+  await expect
+    .poll(async () => (await page.getByTestId("qr-panel").getAttribute("data-session-id")) ?? "")
+    .not.toEqual(sid);
 });

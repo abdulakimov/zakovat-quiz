@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Button } from "@/components/ui/button";
 import { useTranslations } from "@/src/i18n/client";
 
 type QrStartResponse = {
@@ -26,25 +25,36 @@ export function QrLoginPanel() {
   const [status, setStatus] = React.useState<QrStatus>("idle");
   const [remaining, setRemaining] = React.useState(0);
   const [consumeError, setConsumeError] = React.useState(false);
+  const [isRefreshing, setIsRefreshing] = React.useState(false);
   const consumeStartedRef = React.useRef(false);
+  const autoRestartRef = React.useRef(false);
 
-  const startSession = React.useCallback(async () => {
+  const startSession = React.useCallback(async (showRefreshing = false) => {
+    if (showRefreshing) {
+      setIsRefreshing(true);
+    }
     setStatus("idle");
     setConsumeError(false);
     consumeStartedRef.current = false;
 
-    const response = await fetch("/auth/qr/start", {
-      method: "POST",
-      cache: "no-store",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to start QR session");
-    }
+    try {
+      const response = await fetch("/auth/qr/start", {
+        method: "POST",
+        cache: "no-store",
+      });
+      if (!response.ok) {
+        throw new Error("Failed to start QR session");
+      }
 
-    const payload = (await response.json()) as QrStartResponse;
-    setData(payload);
-    setRemaining(secondsLeft(payload.expiresAt));
-    setStatus("waiting");
+      const payload = (await response.json()) as QrStartResponse;
+      setData(payload);
+      setRemaining(secondsLeft(payload.expiresAt));
+      setStatus("waiting");
+    } finally {
+      if (showRefreshing) {
+        setIsRefreshing(false);
+      }
+    }
   }, []);
 
   React.useEffect(() => {
@@ -107,6 +117,20 @@ export function QrLoginPanel() {
   }, [data?.sessionId, status]);
 
   React.useEffect(() => {
+    if (status !== "expired" || autoRestartRef.current) {
+      return;
+    }
+    autoRestartRef.current = true;
+    void startSession(true)
+      .catch(() => {
+        setStatus("error");
+      })
+      .finally(() => {
+        autoRestartRef.current = false;
+      });
+  }, [startSession, status]);
+
+  React.useEffect(() => {
     if (status !== "approved" || !data?.sessionId || consumeStartedRef.current) {
       return;
     }
@@ -134,29 +158,21 @@ export function QrLoginPanel() {
     });
   }, [data?.sessionId, status]);
 
-  const statusText =
-    status === "expired"
-      ? tAuth("qr.desktop.expired")
-      : status === "error"
-        ? consumeError
-          ? tAuth("qr.desktop.consumeError")
-          : tAuth("qr.desktop.error")
-        : status === "approved"
-          ? tAuth("qr.desktop.approved")
-          : tAuth("qr.desktop.waiting");
+  const statusText = status === "error" ? (consumeError ? tAuth("qr.desktop.consumeError") : tAuth("qr.desktop.error")) : null;
 
   return (
-    <section className="flex flex-col items-center space-y-4 pt-0" data-testid="qr-panel" data-session-id={data?.sessionId ?? ""}>
+    <section className="flex flex-col items-center pt-0" data-testid="qr-panel" data-session-id={data?.sessionId ?? ""}>
       <div
-        className="mx-auto w-full max-w-[460px] rounded-2xl border border-border/40 bg-gradient-to-br from-primary/8 via-background/0 to-indigo-500/10 p-5 dark:from-primary/10 dark:to-sky-500/10"
+        className="mx-auto flex w-full rounded-3xl bg-gradient-to-br from-primary/10 via-background/0 to-indigo-500/10 p-10 dark:to-indigo-400/10"
         data-testid="qr-panel-wrap"
       >
-        <div className="mx-auto w-full max-w-[420px] rounded-2xl border border-border/60 bg-background/40 p-6" data-testid="qr-frame">
+        <div
+          className="mx-auto flex w-full max-w-[420px] flex-col items-center gap-4 rounded-2xl border border-border/60 bg-background/35 p-8 text-center"
+          data-testid="qr-frame"
+        >
           <div className="flex items-center justify-center">
-            <div
-              className="mx-auto flex h-[240px] w-[240px] items-center justify-center rounded-xl bg-white p-4 shadow-sm"
-              data-testid="qr-tile"
-            >
+            <div className="h-[240px] w-[240px]" data-testid="qr-tile-wrapper">
+              <div className="mx-auto flex h-[240px] w-[240px] items-center justify-center rounded-xl bg-white p-4 shadow-sm" data-testid="qr-tile">
               {data?.qrDataUrl ? (
                 <img
                   src={data.qrDataUrl}
@@ -167,48 +183,37 @@ export function QrLoginPanel() {
               ) : (
                 <div className="h-full w-full animate-pulse rounded-lg bg-slate-200/70 dark:bg-slate-700/50" />
               )}
+              </div>
             </div>
           </div>
 
-          <div className="mt-3 flex min-h-8 items-center justify-center gap-6 text-xs">
-            <p className="flex items-center gap-2 text-xs text-muted-foreground" data-testid="qr-status-text">
-              {status === "waiting" ? (
-                <span
-                  aria-hidden="true"
-                  className="inline-flex h-3.5 w-3.5 animate-spin rounded-full border-2 border-muted-foreground/40 border-t-foreground"
-                />
-              ) : null}
-              <span>{statusText}</span>
-            </p>
-            <p className="text-xs text-muted-foreground" data-testid="qr-countdown">
-              {tAuth("qr.countdown", { count: remaining })}
+          <div className="space-y-1" data-testid="qr-meta">
+            <h2 className="text-sm font-medium text-foreground" data-testid="qr-title">
+              {tAuth("qr.title")}
+            </h2>
+            <p className="mx-auto max-w-[260px] text-xs text-muted-foreground" data-testid="qr-subtitle">
+              {tAuth("qr.subtitle")}
             </p>
           </div>
 
-          <div className="mt-2 flex min-h-8 items-center justify-end">
-            {status === "expired" ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  void startSession().catch(() => setStatus("error"));
-                }}
-                data-testid="qr-restart"
-              >
-                {tAuth("qr.desktop.refresh")}
-              </Button>
-            ) : (
-              <span className="inline-block min-h-8" aria-hidden="true" />
-            )}
+          <div className="flex min-h-5 items-center justify-center gap-2 text-xs text-muted-foreground" data-testid="qr-status-row">
+            <span
+              aria-hidden="true"
+              className="inline-flex h-2 w-2 rounded-full bg-primary/70"
+              data-testid="qr-status-dot"
+            />
+            <p className="text-xs text-muted-foreground" data-testid="qr-countdown">
+              {tAuth("qr.countdown", { count: remaining })}
+            </p>
+            {statusText ? <span data-testid="qr-status-text">{statusText}</span> : null}
           </div>
+
+          {isRefreshing ? (
+            <p className="text-xs text-muted-foreground" data-testid="qr-refreshing">
+              {tAuth("qr.refreshing")}
+            </p>
+          ) : null}
         </div>
-      </div>
-      <div className="mt-4 text-center" data-testid="right-header">
-        <h2 className="text-lg font-semibold text-foreground" data-testid="qr-title">
-          {tAuth("qr.title")}
-        </h2>
-        <p className="text-sm text-muted-foreground">{tAuth("qr.subtitle")}</p>
       </div>
     </section>
   );

@@ -329,7 +329,7 @@
     "eyebrow": "Authentication",
     "login": {
       "title": "Sign in to Zakovat",
-      "subtitle": "Choose a quick way to continue.",
+      "subtitle": "Sign in with Telegram or Google.",
       "termsShort": "By continuing, you agree to our terms and privacy policy."
     },
     "signup": {
@@ -375,6 +375,7 @@
       "title": "Scan with your phone camera",
       "subtitle": "Approve this desktop sign in from your phone.",
       "countdown": "{count, plural, one {# second} other {# seconds}}",
+      "refreshing": "Refreshing...",
       "desktop": {
         "title": "Approve sign in with your phone",
         "subtitle": "Scan this one-time QR code and confirm on your phone.",
