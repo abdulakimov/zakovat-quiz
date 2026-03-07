@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { GoogleIcon } from "@/src/components/icons/GoogleIcon";
 import { TelegramIcon } from "@/src/components/icons/TelegramIcon";
@@ -80,12 +79,6 @@ export function ProviderLoginPanel({ nextPath, info }: ProviderLoginPanelProps) 
       </div>
 
       <p className="text-xs text-muted-foreground">{tAuth("provider.footnote")}</p>
-
-      <div>
-        <Link href="#" className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
-          {tAuth("provider.help")}
-        </Link>
-      </div>
     </div>
   );
 }

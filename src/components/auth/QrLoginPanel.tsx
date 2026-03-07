@@ -146,35 +146,31 @@ export function QrLoginPanel() {
           : tAuth("qr.desktop.waiting");
 
   return (
-    <section
-      className="space-y-4 rounded-xl border bg-card/30 p-4"
-      data-testid="qr-panel"
-      data-session-id={data?.sessionId ?? ""}
-    >
+    <section className="space-y-3" data-testid="qr-panel" data-session-id={data?.sessionId ?? ""}>
       <div className="space-y-1">
         <p className="text-xl font-semibold text-foreground">{tAuth("qr.desktop.title")}</p>
         <p className="max-w-xs text-sm text-muted-foreground">{tAuth("qr.desktop.subtitle")}</p>
       </div>
 
-      <div className="flex items-center justify-center" data-testid="qr-frame">
-        {data?.qrDataUrl ? (
-          <div className="rounded-lg border border-border bg-white p-2">
-            <img
-              src={data.qrDataUrl}
-              alt={tAuth("qr.desktop.imageAlt")}
-              className="h-[210px] w-[210px] object-contain [image-rendering:pixelated]"
-              data-testid="qr-code-image"
-            />
-          </div>
-        ) : (
-          <div className="rounded-lg border border-border bg-white px-6 py-16">
-            <span className="text-sm text-muted-foreground">{tAuth("qr.desktop.loading")}</span>
-          </div>
-        )}
-      </div>
+      <div className="rounded-xl border border-border bg-card/30 p-4" data-testid="qr-frame">
+        <div className="flex items-center justify-center">
+          {data?.qrDataUrl ? (
+            <div className="rounded-lg border border-border/40 bg-white p-3">
+              <img
+                src={data.qrDataUrl}
+                alt={tAuth("qr.desktop.imageAlt")}
+                className="h-[210px] w-[210px] object-contain [image-rendering:pixelated]"
+                data-testid="qr-code-image"
+              />
+            </div>
+          ) : (
+            <div className="rounded-lg border border-border/40 bg-white px-6 py-16">
+              <span className="text-sm text-muted-foreground">{tAuth("qr.desktop.loading")}</span>
+            </div>
+          )}
+        </div>
 
-      <div className="border-t border-border/60 pt-2">
-        <div className="flex min-h-8 items-center justify-between gap-3">
+        <div className="mt-3 flex min-h-7 items-center justify-between gap-3">
           <p className="flex items-center gap-2 text-xs text-muted-foreground" data-testid="qr-status-text">
             {status === "waiting" ? (
               <span
@@ -188,6 +184,7 @@ export function QrLoginPanel() {
             {tAuth("qr.desktop.expiresIn", { count: remaining })}
           </p>
         </div>
+
         <div className="mt-2 flex min-h-8 items-center justify-end">
           {status === "expired" ? (
             <Button

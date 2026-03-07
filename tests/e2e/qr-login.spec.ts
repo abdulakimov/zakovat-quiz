@@ -21,6 +21,12 @@ test("desktop shows QR panel and mobile hides it", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/uz/auth/login");
   await expect(page.getByTestId("auth-shell")).toBeVisible();
+  await expect(page.getByTestId("auth-shell")).not.toHaveClass(/border-2/);
+  const shellBorderTopWidth = await page.getByTestId("auth-shell").evaluate((element) => {
+    const value = window.getComputedStyle(element).borderTopWidth;
+    return Number.parseFloat(value);
+  });
+  expect(shellBorderTopWidth).toBeLessThanOrEqual(1);
   await expect(page.getByTestId("provider-panel")).toBeVisible();
   const qrPanel = page.getByTestId("qr-panel");
   await expect(qrPanel).toBeVisible();
