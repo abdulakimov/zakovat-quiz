@@ -1,15 +1,7 @@
-import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 import { getTranslations } from "@/src/i18n/server";
 import { PageHeader } from "@/src/components/layout/PageHeader";
 import { localizeHref, type AppLocale } from "@/src/i18n/config";
-
-export async function generateMetadata(): Promise<Metadata> {
-  const tMeta = await getTranslations("meta");
-  return {
-    title: tMeta("settings"),
-  };
-}
 
 export default async function SettingsPage() {
   const locale = (await getLocale()) as AppLocale;

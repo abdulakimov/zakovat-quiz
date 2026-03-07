@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { getLocale } from "next-intl/server";
 import { PageHeader } from "@/src/components/layout/PageHeader";
 import { getMyPacks } from "@/src/actions/packs";
@@ -7,13 +6,6 @@ import { localizeHref, type AppLocale } from "@/src/i18n/config";
 import { getTranslations } from "@/src/i18n/server";
 
 type PackListItem = Awaited<ReturnType<typeof getMyPacks>>["packs"][number];
-
-export async function generateMetadata(): Promise<Metadata> {
-  const tMeta = await getTranslations("meta");
-  return {
-    title: tMeta("packs"),
-  };
-}
 
 export default async function PacksPage() {
   const locale = (await getLocale()) as AppLocale;

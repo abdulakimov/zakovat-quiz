@@ -7,7 +7,7 @@ exports.runAuthSchemaTests = runAuthSchemaTests;
 const strict_1 = __importDefault(require("node:assert/strict"));
 const auth_1 = require("./auth");
 function runAuthSchemaTests() {
-    var _a, _b, _c, _d, _e, _f;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     const validSignIn = auth_1.signInSchema.safeParse({
         usernameOrEmail: "User.Name",
         password: "abc12345",
@@ -23,6 +23,17 @@ function runAuthSchemaTests() {
     strict_1.default.equal(invalidEmail.success, false);
     if (!invalidEmail.success) {
         strict_1.default.equal((_a = invalidEmail.error.issues[0]) === null || _a === void 0 ? void 0 : _a.message, "auth.validation.email.invalid");
+    }
+    const trimmedEmail = auth_1.signUpSchema.safeParse({
+        name: "John Doe",
+        username: "valid_user",
+        email: "  USER@Example.COM ",
+        password: "abc12345",
+        confirmPassword: "abc12345",
+    });
+    strict_1.default.equal(trimmedEmail.success, true);
+    if (trimmedEmail.success) {
+        strict_1.default.equal(trimmedEmail.data.email, "user@example.com");
     }
     const shortPassword = auth_1.signInSchema.safeParse({
         usernameOrEmail: "user@example.com",
@@ -56,12 +67,38 @@ function runAuthSchemaTests() {
     if (!missingNumber.success) {
         strict_1.default.equal((_e = missingNumber.error.issues[0]) === null || _e === void 0 ? void 0 : _e.message, "auth.validation.password.missingNumber");
     }
-    const invalidIdentifier = auth_1.signInSchema.safeParse({
-        usernameOrEmail: "__invalid",
+    const mismatchConfirmPassword = auth_1.signUpSchema.safeParse({
+        name: "John Doe",
+        username: "valid_user",
+        email: "john@example.com",
         password: "abc12345",
+        confirmPassword: "abc12346",
     });
-    strict_1.default.equal(invalidIdentifier.success, false);
-    if (!invalidIdentifier.success) {
-        strict_1.default.equal((_f = invalidIdentifier.error.issues[0]) === null || _f === void 0 ? void 0 : _f.message, "auth.validation.username.invalidEdge");
+    strict_1.default.equal(mismatchConfirmPassword.success, false);
+    if (!mismatchConfirmPassword.success) {
+        strict_1.default.equal((_f = mismatchConfirmPassword.error.issues[0]) === null || _f === void 0 ? void 0 : _f.path[0], "confirmPassword");
+        strict_1.default.equal((_g = mismatchConfirmPassword.error.issues[0]) === null || _g === void 0 ? void 0 : _g.message, "auth.validation.confirmPassword.mismatch");
+    }
+    const invalidUsernamePattern = auth_1.signUpSchema.safeParse({
+        name: "John Doe",
+        username: "__invalid",
+        email: "john@example.com",
+        password: "abc12345",
+        confirmPassword: "abc12345",
+    });
+    strict_1.default.equal(invalidUsernamePattern.success, false);
+    if (!invalidUsernamePattern.success) {
+        strict_1.default.equal((_h = invalidUsernamePattern.error.issues[0]) === null || _h === void 0 ? void 0 : _h.message, "auth.validation.username.invalidEdge");
+    }
+    const normalizedUsername = auth_1.signUpSchema.safeParse({
+        name: "John Doe",
+        username: "Valid_User",
+        email: "john@example.com",
+        password: "abc12345",
+        confirmPassword: "abc12345",
+    });
+    strict_1.default.equal(normalizedUsername.success, true);
+    if (normalizedUsername.success) {
+        strict_1.default.equal(normalizedUsername.data.username, "valid_user");
     }
 }

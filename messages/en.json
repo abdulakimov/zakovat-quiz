@@ -356,9 +356,6 @@
       "continueWithEmail": "or continue with email",
       "termsNotice": "By continuing, you agree to our Terms and Privacy policy."
     },
-    "info": {
-      "signupDisabled": "No sign-up needed. Continue with Telegram or Google."
-    },
     "benefits": {
       "fastAccess": "Access your workspace in seconds with secure sign in.",
       "workspaceSync": "Keep packs, media, and team progress in sync across devices.",
@@ -577,15 +574,5 @@
     },
     "footerNote": "Zakovat Quiz Creator",
     "footerSupport": "Built for quiz workflows"
-  },
-  "meta": {
-    "home": "Home",
-    "teams": "Teams",
-    "packs": "Packs",
-    "profile": "Profile",
-    "settings": "Settings",
-    "presenter": "Presenter",
-    "login": "Log in",
-    "signup": "Sign up"
   }
 }

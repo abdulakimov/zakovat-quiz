@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import { Boxes, FolderKanban, Settings, Users } from "lucide-react";
 import { getLocale } from "next-intl/server";
 import { getMyPacks } from "@/src/actions/packs";
@@ -6,13 +5,6 @@ import { getMyTeamsAndInvites } from "@/src/actions/teams";
 import { getTranslations } from "@/src/i18n/server";
 import { AppDashboard } from "@/src/components/dashboard/AppDashboard";
 import { localizeHref, type AppLocale } from "@/src/i18n/config";
-
-export async function generateMetadata(): Promise<Metadata> {
-  const tMeta = await getTranslations("meta");
-  return {
-    title: tMeta("home"),
-  };
-}
 
 export default async function AppHomePage() {
   const locale = (await getLocale()) as AppLocale;

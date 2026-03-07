@@ -50,7 +50,7 @@ async function authSession(page: import("@playwright/test").Page, locale: "uz" |
 test("logged-out user sees localized landing with CTA buttons", async ({ page }) => {
   await page.goto("/uz");
   await expect(page.getByTestId("landing-title")).toBeVisible();
-  await expect(page.getByTestId("cta-start")).toBeVisible();
+  await expect(page.getByTestId("cta-signup")).toBeVisible();
   await expect(page.getByTestId("cta-login")).toBeVisible();
 });
 

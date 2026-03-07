@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { signInSchema } from "./auth";
+import { signInSchema, signUpSchema } from "./auth";
 
 export function runAuthSchemaTests() {
   const validSignIn = signInSchema.safeParse({
@@ -18,6 +18,18 @@ export function runAuthSchemaTests() {
   assert.equal(invalidEmail.success, false);
   if (!invalidEmail.success) {
     assert.equal(invalidEmail.error.issues[0]?.message, "auth.validation.email.invalid");
+  }
+
+  const trimmedEmail = signUpSchema.safeParse({
+    name: "John Doe",
+    username: "valid_user",
+    email: "  USER@Example.COM ",
+    password: "abc12345",
+    confirmPassword: "abc12345",
+  });
+  assert.equal(trimmedEmail.success, true);
+  if (trimmedEmail.success) {
+    assert.equal(trimmedEmail.data.email, "user@example.com");
   }
 
   const shortPassword = signInSchema.safeParse({
@@ -56,12 +68,40 @@ export function runAuthSchemaTests() {
     assert.equal(missingNumber.error.issues[0]?.message, "auth.validation.password.missingNumber");
   }
 
-  const invalidIdentifier = signInSchema.safeParse({
-    usernameOrEmail: "__invalid",
+  const mismatchConfirmPassword = signUpSchema.safeParse({
+    name: "John Doe",
+    username: "valid_user",
+    email: "john@example.com",
     password: "abc12345",
+    confirmPassword: "abc12346",
   });
-  assert.equal(invalidIdentifier.success, false);
-  if (!invalidIdentifier.success) {
-    assert.equal(invalidIdentifier.error.issues[0]?.message, "auth.validation.username.invalidEdge");
+  assert.equal(mismatchConfirmPassword.success, false);
+  if (!mismatchConfirmPassword.success) {
+    assert.equal(mismatchConfirmPassword.error.issues[0]?.path[0], "confirmPassword");
+    assert.equal(mismatchConfirmPassword.error.issues[0]?.message, "auth.validation.confirmPassword.mismatch");
+  }
+
+  const invalidUsernamePattern = signUpSchema.safeParse({
+    name: "John Doe",
+    username: "__invalid",
+    email: "john@example.com",
+    password: "abc12345",
+    confirmPassword: "abc12345",
+  });
+  assert.equal(invalidUsernamePattern.success, false);
+  if (!invalidUsernamePattern.success) {
+    assert.equal(invalidUsernamePattern.error.issues[0]?.message, "auth.validation.username.invalidEdge");
+  }
+
+  const normalizedUsername = signUpSchema.safeParse({
+    name: "John Doe",
+    username: "Valid_User",
+    email: "john@example.com",
+    password: "abc12345",
+    confirmPassword: "abc12345",
+  });
+  assert.equal(normalizedUsername.success, true);
+  if (normalizedUsername.success) {
+    assert.equal(normalizedUsername.data.username, "valid_user");
   }
 }

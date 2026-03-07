@@ -356,9 +356,6 @@
       "continueWithEmail": "yoki email orqali davom eting",
       "termsNotice": "Davom etish orqali Foydalanish shartlari va Maxfiylik siyosatiga rozilik bildirasiz."
     },
-    "info": {
-      "signupDisabled": "Ro‘yxatdan o‘tish talab qilinmaydi. Telegram yoki Google orqali kiring."
-    },
     "benefits": {
       "fastAccess": "Ish maydoningizga tez va xavfsiz kirish imkoniyati.",
       "workspaceSync": "Paketlar, media va jamoa jarayoni qurilmalar bo'ylab sinxron ishlaydi.",
@@ -577,15 +574,5 @@
     },
     "footerNote": "Zakovat Quiz Creator",
     "footerSupport": "Viktorina workflow'i uchun"
-  },
-  "meta": {
-    "home": "Bosh sahifa",
-    "teams": "Jamoalar",
-    "packs": "Paketlar",
-    "profile": "Profil",
-    "settings": "Sozlamalar",
-    "presenter": "Prezenter",
-    "login": "Kirish",
-    "signup": "Ro'yxatdan o'tish"
   }
 }

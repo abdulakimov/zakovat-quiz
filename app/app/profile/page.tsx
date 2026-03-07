@@ -1,5 +1,4 @@
-﻿import type { Metadata } from "next";
-import Link from "next/link";
+﻿import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/prisma";
 import { getMyTeamsAndInvites } from "@/src/actions/teams";
@@ -13,13 +12,6 @@ import { MAX_ACTIVE_TEAMS } from "@/src/lib/teams";
 
 type ActiveTeamMembership = Awaited<ReturnType<typeof getMyTeamsAndInvites>>["activeTeams"][number];
 type PendingInvite = Awaited<ReturnType<typeof getMyTeamsAndInvites>>["pendingInvites"][number];
-
-export async function generateMetadata(): Promise<Metadata> {
-  const tMeta = await getTranslations("meta");
-  return {
-    title: tMeta("profile"),
-  };
-}
 
 export default async function ProfilePage() {
   const locale = (await getLocale()) as AppLocale;
@@ -146,5 +138,4 @@ export default async function ProfilePage() {
     </div>
   );
 }
-
 

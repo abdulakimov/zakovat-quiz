@@ -1,20 +1,11 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/current-user";
 import { LanguageSwitcher } from "@/src/components/LanguageSwitcher";
-import { SiteLogo } from "@/src/components/layout/SiteLogo";
 import { ThemeSwitcher } from "@/src/components/theme/ThemeSwitcher";
 import { localizeHref, type AppLocale } from "@/src/i18n/config";
-
-export async function generateMetadata(): Promise<Metadata> {
-  const tMeta = await getTranslations("meta");
-  return {
-    title: tMeta("home"),
-  };
-}
 
 export default async function HomePage() {
   const [locale, tLanding, user] = await Promise.all([
@@ -32,12 +23,8 @@ export default async function HomePage() {
       <header className="border-b border-border bg-background/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-6">
           <div className="space-y-0.5">
-            <SiteLogo
-              href={localizeHref(activeLocale, "/")}
-              ariaLabel={tLanding("brand")}
-              name={tLanding("brand")}
-              subtitle={tLanding("brandTagline")}
-            />
+            <p className="text-sm font-semibold tracking-tight">{tLanding("brand")}</p>
+            <p className="text-xs text-muted-foreground">{tLanding("brandTagline")}</p>
           </div>
           <div className="flex items-center gap-2">
             <ThemeSwitcher />
@@ -59,8 +46,8 @@ export default async function HomePage() {
               </h1>
               <p className="max-w-xl text-base text-muted-foreground sm:text-lg">{tLanding("heroDescription")}</p>
               <div className="flex flex-wrap gap-3">
-                <Button asChild size="lg" data-testid="cta-start">
-                  <Link href={localizeHref(activeLocale, "/auth/login")}>{tLanding("ctaStartFree")}</Link>
+                <Button asChild size="lg" data-testid="cta-signup">
+                  <Link href={localizeHref(activeLocale, "/auth/signup")}>{tLanding("ctaStartFree")}</Link>
                 </Button>
                 <Button asChild size="lg" variant="outline" data-testid="cta-login">
                   <Link href={localizeHref(activeLocale, "/auth/login")}>{tLanding("ctaLogIn")}</Link>
