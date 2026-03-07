@@ -146,12 +146,7 @@ export function QrLoginPanel() {
           : tAuth("qr.desktop.waiting");
 
   return (
-    <section className="space-y-4 pt-0" data-testid="qr-panel" data-session-id={data?.sessionId ?? ""}>
-      <div className="flex min-h-[88px] flex-col justify-start space-y-1.5" data-testid="right-header">
-        <h2 className="text-2xl font-semibold text-foreground">{tAuth("qr.title")}</h2>
-        <p className="max-w-sm text-sm text-muted-foreground">{tAuth("qr.subtitle")}</p>
-      </div>
-
+    <section className="flex flex-col items-center space-y-4 pt-0" data-testid="qr-panel" data-session-id={data?.sessionId ?? ""}>
       <div
         className="mx-auto w-full max-w-[460px] rounded-2xl border border-border/40 bg-gradient-to-br from-primary/8 via-background/0 to-indigo-500/10 p-5 dark:from-primary/10 dark:to-sky-500/10"
         data-testid="qr-panel-wrap"
@@ -175,7 +170,7 @@ export function QrLoginPanel() {
             </div>
           </div>
 
-          <div className="mt-3 flex min-h-8 items-center justify-between gap-3">
+          <div className="mt-3 flex min-h-8 items-center justify-center gap-6 text-xs">
             <p className="flex items-center gap-2 text-xs text-muted-foreground" data-testid="qr-status-text">
               {status === "waiting" ? (
                 <span
@@ -208,6 +203,12 @@ export function QrLoginPanel() {
             )}
           </div>
         </div>
+      </div>
+      <div className="mt-4 text-center" data-testid="right-header">
+        <h2 className="text-lg font-semibold text-foreground" data-testid="qr-title">
+          {tAuth("qr.title")}
+        </h2>
+        <p className="text-sm text-muted-foreground">{tAuth("qr.subtitle")}</p>
       </div>
     </section>
   );

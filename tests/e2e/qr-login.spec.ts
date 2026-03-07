@@ -39,19 +39,28 @@ test("desktop shows QR panel and mobile hides it", async ({ page }) => {
   await expect(qrPanel).toBeVisible();
   await expect(page.getByTestId("qr-panel-wrap")).toBeVisible();
   await expect(page.getByTestId("qr-tile")).toBeVisible();
+  await expect(page.getByTestId("qr-title")).toBeVisible();
   await expect(page.getByTestId("qr-frame")).toBeVisible();
   await expect(page.getByTestId("left-header")).toBeVisible();
   await expect(page.getByTestId("right-header")).toBeVisible();
   await expect(page.getByTestId("auth-right").locator('[data-testid="qr-panel"]')).toBeVisible();
   await expect(page.getByTestId("auth-left").locator('[data-testid="qr-panel"]')).toHaveCount(0);
-  const leftHeaderBox = await page.getByTestId("left-header").boundingBox();
-  const rightHeaderBox = await page.getByTestId("right-header").boundingBox();
-  expect(leftHeaderBox).not.toBeNull();
-  expect(rightHeaderBox).not.toBeNull();
-  if (leftHeaderBox && rightHeaderBox) {
-    expect(Math.abs(leftHeaderBox.y - rightHeaderBox.y)).toBeLessThanOrEqual(4);
-  }
   const leftBox = await page.getByTestId("auth-left").boundingBox();
+  const leftInnerBox = await page.getByTestId("left-inner").boundingBox();
+  expect(leftBox).not.toBeNull();
+  expect(leftInnerBox).not.toBeNull();
+  if (leftBox && leftInnerBox) {
+    const leftCenter = leftBox.x + leftBox.width / 2;
+    const innerCenter = leftInnerBox.x + leftInnerBox.width / 2;
+    expect(Math.abs(leftCenter - innerCenter)).toBeLessThanOrEqual(16);
+  }
+  const tileBox = await page.getByTestId("qr-tile").boundingBox();
+  const qrTitleBox = await page.getByTestId("qr-title").boundingBox();
+  expect(tileBox).not.toBeNull();
+  expect(qrTitleBox).not.toBeNull();
+  if (tileBox && qrTitleBox) {
+    expect(tileBox.y + tileBox.height).toBeLessThan(qrTitleBox.y);
+  }
   const rightBox = await page.getByTestId("auth-right").boundingBox();
   const tileBefore = await page.getByTestId("qr-tile").boundingBox();
   await expect(page.getByTestId("qr-code-image")).toBeVisible();
@@ -71,7 +80,7 @@ test("desktop shows QR panel and mobile hides it", async ({ page }) => {
     expect(leftBox.width).toBeLessThan(rightBox.width);
     const ratio = leftBox.width / rightBox.width;
     expect(ratio).toBeGreaterThan(0.7);
-    expect(ratio).toBeLessThan(0.9);
+    expect(ratio).toBeLessThan(0.93);
   }
 
   const providerBox = await page.getByTestId("provider-panel").boundingBox();

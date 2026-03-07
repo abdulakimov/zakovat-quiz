@@ -24,7 +24,7 @@ export function ProviderLoginPanel({ nextPath, info }: ProviderLoginPanelProps) 
   return (
     <div className="space-y-4 pt-0">
       <header className="flex min-h-[88px] flex-col justify-start space-y-1.5" data-testid="left-header">
-        <h1 className="text-2xl font-semibold text-foreground">{tAuth("login.title")}</h1>
+        <h1 className="text-2xl font-semibold text-foreground md:text-3xl">{tAuth("login.title")}</h1>
         <p className="max-w-sm text-sm text-muted-foreground">{tAuth("login.subtitle")}</p>
       </header>
 
