@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "@/src/i18n/server";
 import LoginForm from "@/app/auth/login/login-form";
-import { LoginShell } from "@/src/components/auth/LoginShell";
+import { AuthShell } from "@/src/components/auth/AuthShell";
 import { QrLoginPanel } from "@/src/components/auth/QrLoginPanel";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -12,7 +12,18 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function LoginPage() {
+  const tAuth = await getTranslations("auth");
+
   return (
-    <LoginShell leftContent={<LoginForm />} rightContent={<QrLoginPanel />} />
+    <AuthShell
+      title={tAuth("login.title")}
+      subtitle={tAuth("login.subtitle")}
+      visualTitle={tAuth("visual.phoneTitle")}
+      visualSubtitle={tAuth("visual.phoneSubtitle")}
+      visualHelper={tAuth("visual.phoneHelper")}
+      rightContent={<QrLoginPanel />}
+    >
+      <LoginForm />
+    </AuthShell>
   );
 }

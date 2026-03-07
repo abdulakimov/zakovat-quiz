@@ -400,14 +400,6 @@
         "invalidTitle": "Noto'g'ri so'rov",
         "invalidSubtitle": "QR token topilmadi. Iltimos, qayta skaner qiling."
       }
-    },
-    "provider": {
-      "subtitle": "Kirish uchun Telegram yoki Google akkauntingizdan foydalaning.",
-      "whyTitle": "Nega shunday?",
-      "bulletSecure": "Tez va xavfsiz kirish",
-      "bulletPasswordless": "Parol eslab yurish shart emas",
-      "footnote": "Faqat siz boshlagan kirishni tasdiqlang.",
-      "help": "Muammo bormi?"
     }
   },
   "teams": {

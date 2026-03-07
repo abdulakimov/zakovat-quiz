@@ -9,8 +9,6 @@ test("login page renders social buttons and no console errors", async ({ page })
   });
 
   await page.goto("/en/auth/login");
-  await expect(page.getByTestId("provider-telegram")).toBeVisible();
-  await expect(page.getByTestId("provider-google")).toBeVisible();
   await expect(page.getByTestId("google-login")).toBeVisible();
   await expect(page.getByTestId("telegram-login")).toBeVisible();
   await expect(page.locator('svg[data-icon="google"]')).toBeVisible();
