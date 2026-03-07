@@ -15,9 +15,11 @@ export function LoginShell({ leftContent, rightContent }: LoginShellProps) {
           className="w-full rounded-2xl border border-border bg-card/60 p-6 shadow-sm backdrop-blur-xl md:p-7"
           data-testid="auth-shell"
         >
-          <div className="grid gap-6 md:grid-cols-[1.1fr_0.9fr]">
-            <section className="mx-auto w-full max-w-md space-y-4 md:max-w-none" data-testid="provider-panel">
-              <div data-testid="auth-left">{leftContent}</div>
+          <div className="grid gap-6 md:grid-cols-[0.8fr_1fr]">
+            <section className="mx-auto flex w-full max-w-md space-y-4 md:max-w-none md:items-center" data-testid="provider-panel">
+              <div className="mx-auto w-full max-w-[440px] text-left" data-testid="auth-left">
+                {leftContent}
+              </div>
             </section>
             <section className="hidden md:block" data-testid="auth-right">
               {rightContent}

@@ -1,31 +1,35 @@
 import { defineConfig, devices } from "@playwright/test";
 
+const playwrightPort = process.env.PLAYWRIGHT_PORT ?? "3001";
+const playwrightBaseUrl = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${playwrightPort}`;
+const appOrigin = new URL(playwrightBaseUrl).origin;
+
 const sessionSecret =
   process.env.SESSION_SECRET ?? "playwright-session-secret-0123456789abcdef";
 const telegramClientId = process.env.TELEGRAM_OIDC_CLIENT_ID ?? "123456789";
 const telegramClientSecret =
   process.env.TELEGRAM_OIDC_CLIENT_SECRET ?? "playwright-telegram-secret";
-const telegramRedirectUri = "http://localhost:3000/auth/telegram/callback";
+const telegramRedirectUri = process.env.TELEGRAM_OIDC_REDIRECT_URI ?? `${appOrigin}/auth/telegram/callback`;
 const telegramDiscoveryUrl =
   process.env.TELEGRAM_OIDC_DISCOVERY_URL ??
-  "http://localhost:3000/api/test/telegram-oidc/discovery";
+  `${appOrigin}/api/test/telegram-oidc/discovery`;
 const telegramAuthUrl =
-  process.env.TELEGRAM_OIDC_AUTH_URL ?? "http://localhost:3000/api/test/telegram-oidc/auth";
+  process.env.TELEGRAM_OIDC_AUTH_URL ?? `${appOrigin}/api/test/telegram-oidc/auth`;
 const telegramTokenUrl =
-  process.env.TELEGRAM_OIDC_TOKEN_URL ?? "http://localhost:3000/api/test/telegram-oidc/token";
+  process.env.TELEGRAM_OIDC_TOKEN_URL ?? `${appOrigin}/api/test/telegram-oidc/token`;
 const telegramJwksUrl =
-  process.env.TELEGRAM_OIDC_JWKS_URL ?? "http://localhost:3000/api/test/telegram-oidc/jwks";
+  process.env.TELEGRAM_OIDC_JWKS_URL ?? `${appOrigin}/api/test/telegram-oidc/jwks`;
 const googleMockOrigin = process.env.GOOGLE_OIDC_MOCK_ORIGIN ?? "http://127.0.0.1:4011";
 const googleClientId = process.env.GOOGLE_OIDC_CLIENT_ID ?? "playwright-google-client-id";
 const googleClientSecret =
   process.env.GOOGLE_OIDC_CLIENT_SECRET ?? "playwright-google-client-secret";
-const googleRedirectUri = "http://localhost:3000/auth/google/callback";
+const googleRedirectUri = process.env.GOOGLE_OIDC_REDIRECT_URI ?? `${appOrigin}/auth/google/callback`;
 const googleScopes = process.env.GOOGLE_OIDC_SCOPES ?? "openid email profile";
 const googleAuthUrl = process.env.GOOGLE_OIDC_AUTH_URL ?? `${googleMockOrigin}/auth`;
 const googleTokenUrl = process.env.GOOGLE_OIDC_TOKEN_URL ?? `${googleMockOrigin}/token`;
 const googleJwksUrl = process.env.GOOGLE_OIDC_JWKS_URL ?? `${googleMockOrigin}/jwks`;
 const appBaseUrl =
-  process.env.PUBLIC_APP_URL ?? process.env.APP_BASE_URL ?? "http://localhost:3000";
+  process.env.PUBLIC_APP_URL ?? process.env.APP_BASE_URL ?? playwrightBaseUrl;
 
 process.env.SESSION_SECRET = sessionSecret;
 process.env.TELEGRAM_OIDC_CLIENT_ID = telegramClientId;
@@ -41,7 +45,7 @@ export default defineConfig({
   retries: 0,
   globalSetup: "./tests/e2e/global-setup.ts",
   use: {
-    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000",
+    baseURL: playwrightBaseUrl,
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
@@ -53,12 +57,14 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "pnpm dev",
-    url: "http://localhost:3000",
+    command: `pnpm exec next dev -p ${playwrightPort}`,
+    url: playwrightBaseUrl,
     reuseExistingServer: false,
     timeout: 120_000,
     env: {
       ...process.env,
+      PLAYWRIGHT_BASE_URL: playwrightBaseUrl,
+      PLAYWRIGHT_PORT: playwrightPort,
       SESSION_SECRET: sessionSecret,
       TELEGRAM_OIDC_CLIENT_ID: telegramClientId,
       TELEGRAM_OIDC_CLIENT_SECRET: telegramClientSecret,

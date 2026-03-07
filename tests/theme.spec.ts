@@ -7,6 +7,7 @@ import { expect, test } from "@playwright/test";
 const SESSION_COOKIE_NAME = "zakovat_session";
 const LOCALE_COOKIE_NAME = "NEXT_LOCALE";
 const prisma = new PrismaClient();
+const APP_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
 
 type TestUser = { id: string; username: string; name: string | null };
 
@@ -37,14 +38,14 @@ async function authSession(page: import("@playwright/test").Page, locale: "uz" |
     {
       name: SESSION_COOKIE_NAME,
       value: token,
-      url: "http://localhost:3000/",
+      url: `${APP_BASE_URL}/`,
       httpOnly: true,
       sameSite: "Lax",
     },
     {
       name: LOCALE_COOKIE_NAME,
       value: locale,
-      url: "http://localhost:3000/",
+      url: `${APP_BASE_URL}/`,
       sameSite: "Lax",
     },
   ]);

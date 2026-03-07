@@ -5,9 +5,10 @@ import { expect, test } from "@playwright/test";
 
 const FLOW_COOKIE = "google_oidc_flow";
 const SESSION_COOKIE = "zakovat_session";
+const APP_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
 const MOCK_ORIGIN = process.env.GOOGLE_OIDC_MOCK_ORIGIN ?? "http://127.0.0.1:4011";
 const MOCK_PORT = Number(new URL(MOCK_ORIGIN).port || "4011");
-const REDIRECT_URI = process.env.GOOGLE_OIDC_REDIRECT_URI ?? "http://localhost:3000/auth/google/callback";
+const REDIRECT_URI = process.env.GOOGLE_OIDC_REDIRECT_URI ?? `${APP_BASE_URL}/auth/google/callback`;
 const prisma = new PrismaClient();
 
 let signingKey: KeyLike | null = null;
@@ -208,7 +209,7 @@ test("Callback validates id_token, creates session, and redirects to app", async
     {
       name: FLOW_COOKIE,
       value: flowCookieValue,
-      url: "http://localhost:3000/",
+      url: `${APP_BASE_URL}/`,
       httpOnly: true,
       sameSite: "Lax",
     },

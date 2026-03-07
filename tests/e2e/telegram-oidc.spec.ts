@@ -4,12 +4,13 @@ import { expect, test } from "@playwright/test";
 
 const FLOW_COOKIE = "telegram_oidc_flow";
 const SESSION_COOKIE = "zakovat_session";
+const APP_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
 const prisma = new PrismaClient();
 const appOrigin = new URL(
   process.env.PUBLIC_APP_URL ??
     process.env.APP_BASE_URL ??
     process.env.TELEGRAM_OIDC_REDIRECT_URI ??
-    "http://localhost:3000/auth/telegram/callback",
+    `${APP_BASE_URL}/auth/telegram/callback`,
 ).origin;
 
 async function signFlowCookie(input: {
@@ -88,7 +89,7 @@ test("Callback validates id_token, creates session, and redirects to app", async
     {
       name: FLOW_COOKIE,
       value: flowToken,
-      url: "http://localhost:3000/",
+      url: `${APP_BASE_URL}/`,
       httpOnly: true,
       sameSite: "Lax",
     },

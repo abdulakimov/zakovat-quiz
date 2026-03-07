@@ -152,25 +152,28 @@ export function QrLoginPanel() {
         <p className="max-w-xs text-sm text-muted-foreground">{tAuth("qr.desktop.subtitle")}</p>
       </div>
 
-      <div className="rounded-xl border border-border bg-card/30 p-4" data-testid="qr-frame">
+      <div className="min-h-[360px] rounded-xl border border-border bg-card/30 p-4" data-testid="qr-frame">
         <div className="flex items-center justify-center">
-          {data?.qrDataUrl ? (
-            <div className="rounded-lg border border-border/40 bg-white p-3">
+          <div
+            className="mx-auto flex h-[260px] w-[260px] items-center justify-center rounded-lg border border-border/40 bg-white p-3"
+            data-testid="qr-tile"
+          >
+            {data?.qrDataUrl ? (
               <img
                 src={data.qrDataUrl}
                 alt={tAuth("qr.desktop.imageAlt")}
                 className="h-[210px] w-[210px] object-contain [image-rendering:pixelated]"
                 data-testid="qr-code-image"
               />
-            </div>
-          ) : (
-            <div className="rounded-lg border border-border/40 bg-white px-6 py-16">
-              <span className="text-sm text-muted-foreground">{tAuth("qr.desktop.loading")}</span>
-            </div>
-          )}
+            ) : (
+              <div className="flex h-full w-full items-center justify-center rounded-md bg-muted/30">
+                <span className="text-sm text-muted-foreground">{tAuth("qr.desktop.loading")}</span>
+              </div>
+            )}
+          </div>
         </div>
 
-        <div className="mt-3 flex min-h-7 items-center justify-between gap-3">
+        <div className="mt-3 flex min-h-[44px] items-center justify-between gap-3">
           <p className="flex items-center gap-2 text-xs text-muted-foreground" data-testid="qr-status-text">
             {status === "waiting" ? (
               <span

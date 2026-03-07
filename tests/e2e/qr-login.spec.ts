@@ -30,9 +30,31 @@ test("desktop shows QR panel and mobile hides it", async ({ page }) => {
   await expect(page.getByTestId("provider-panel")).toBeVisible();
   const qrPanel = page.getByTestId("qr-panel");
   await expect(qrPanel).toBeVisible();
+  await expect(page.getByTestId("qr-tile")).toBeVisible();
   await expect(page.getByTestId("qr-frame")).toBeVisible();
   await expect(page.getByTestId("auth-right").locator('[data-testid="qr-panel"]')).toBeVisible();
   await expect(page.getByTestId("auth-left").locator('[data-testid="qr-panel"]')).toHaveCount(0);
+  const leftBox = await page.getByTestId("auth-left").boundingBox();
+  const rightBox = await page.getByTestId("auth-right").boundingBox();
+  const tileBefore = await page.getByTestId("qr-tile").boundingBox();
+  await expect(page.getByTestId("qr-code-image")).toBeVisible();
+  const tileAfter = await page.getByTestId("qr-tile").boundingBox();
+  expect(tileBefore).not.toBeNull();
+  expect(tileAfter).not.toBeNull();
+  if (tileBefore && tileAfter) {
+    expect(tileAfter.width).toBe(tileBefore.width);
+    expect(tileAfter.height).toBe(tileBefore.height);
+  }
+
+  expect(leftBox).not.toBeNull();
+  expect(rightBox).not.toBeNull();
+  if (leftBox && rightBox) {
+    expect(leftBox.width).toBeLessThan(rightBox.width);
+    const ratio = leftBox.width / rightBox.width;
+    expect(ratio).toBeGreaterThan(0.7);
+    expect(ratio).toBeLessThan(0.9);
+  }
+
   const providerBox = await page.getByTestId("provider-panel").boundingBox();
   const qrBox = await page.getByTestId("qr-panel").boundingBox();
   expect(providerBox).not.toBeNull();
