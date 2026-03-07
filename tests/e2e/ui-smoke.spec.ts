@@ -101,7 +101,7 @@ test("Question editor is compact with checks panel and blocks save when answer i
   await page.getByLabel("Question text").fill("What is the capital of France?");
   await page.getByRole("textbox", { name: /^Answer$/ }).focus();
   await page.getByRole("textbox", { name: /^Answer$/ }).blur();
-  await expect(page.getByText("Answer is required")).toBeVisible();
+  await expect(page.getByTestId("answer-text-error")).toHaveText("Answer is required");
   await expect(page.getByRole("button", { name: /^save$/i })).toBeDisabled();
 });
 

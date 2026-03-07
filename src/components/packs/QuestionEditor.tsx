@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
+import type { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,6 +15,7 @@ import { MediaPickerSheet, type MediaPickerAsset } from "@/src/components/media/
 import { PageHeader } from "@/src/components/layout/PageHeader";
 import { toast } from "@/src/components/ui/sonner";
 import { answerTypeSchema, createQuestionSchema, questionTypeSchema, updateQuestionSchema } from "@/src/schemas/questions";
+import { zodResolverCompat } from "@/src/validators/rhf-zod";
 import { cn } from "@/lib/utils";
 import { AlertTriangleIcon, CheckCircle2Icon, ClockIcon, FilmIcon, ImageIcon, ListChecksIcon, MusicIcon, PlayIcon, SettingsIcon } from "@/src/ui/icons";
 const OPTION_LABELS = ["A", "B", "C", "D"] as const;
@@ -318,7 +319,7 @@ export function QuestionEditor({
   );
 
   const form = useForm<QuestionFormValues>({
-    resolver: zodResolver(schema as typeof createQuestionSchema),
+    resolver: zodResolverCompat(schema as z.ZodType<QuestionFormValues>),
     defaultValues: initialValues,
     mode: "onChange",
   });
@@ -420,8 +421,11 @@ export function QuestionEditor({
   }, [form.formState.isDirty]);
 
   React.useEffect(() => {
-    void form.trigger();
-  }, [form, selectedType, selectedAnswerType, primaryMediaAssetId, answerPrimaryMediaAssetId]);
+    if (!form.formState.isDirty && !form.formState.isSubmitted) return;
+    void form.trigger().catch(() => {
+      // Prevent unhandled promise rejections from bubbling as runtime errors.
+    });
+  }, [form, form.formState.isDirty, form.formState.isSubmitted, selectedType, selectedAnswerType, primaryMediaAssetId, answerPrimaryMediaAssetId]);
 
   React.useEffect(() => {
     if (!form.formState.isDirty) return;
@@ -626,7 +630,7 @@ export function QuestionEditor({
                       </Label>
                       <Input id="answer-text" {...form.register("answerText")} disabled={isPending} />
                       {form.formState.errors.answerText ? (
-                        <p className="text-xs text-destructive">{form.formState.errors.answerText.message as string}</p>
+                        <p data-testid="answer-text-error" className="text-xs text-destructive">{form.formState.errors.answerText.message as string}</p>
                       ) : null}
                     </div>
                   </div>
