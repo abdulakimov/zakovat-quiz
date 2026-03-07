@@ -54,6 +54,12 @@ export async function middleware(request: NextRequest) {
   const locale = segmentLocale;
   const rewrittenPathname = getPathWithoutLocale(pathname);
 
+  if (rewrittenPathname === "/auth/signup") {
+    const loginUrl = withLocale(request.nextUrl, locale, "/auth/login");
+    loginUrl.searchParams.set("info", "signup_disabled");
+    return NextResponse.redirect(loginUrl, 302);
+  }
+
   if (rewrittenPathname.startsWith("/app")) {
     const token = request.cookies.get(getSessionCookieName())?.value;
     if (!token) {

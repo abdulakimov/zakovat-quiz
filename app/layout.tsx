@@ -8,8 +8,15 @@ import { Toaster } from "@/src/components/ui/sonner";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Zakovat Quiz Creator",
+  title: {
+    default: "zakovatquiz.uz",
+    template: "%s | zakovatquiz.uz",
+  },
   description: "Quiz authoring workspace",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
 };
 
 export default async function RootLayout({

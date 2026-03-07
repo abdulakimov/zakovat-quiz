@@ -16,6 +16,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { signOut } from "@/app/auth/actions";
 import { LanguageSwitcher } from "@/src/components/LanguageSwitcher";
 import { PageMotion } from "@/src/components/layout/PageMotion";
+import { SiteLogo } from "@/src/components/layout/SiteLogo";
 import { ThemeSwitcher } from "@/src/components/theme/ThemeSwitcher";
 import {
   BoxIcon,
@@ -257,15 +258,7 @@ export async function AppShell({ children, user }: AppShellProps) {
           />
 
           <div className="flex min-w-0 items-center gap-3">
-            <Link href={localizeHref(locale, "/app")} className="inline-flex items-center gap-2 rounded-md px-1 py-1">
-              <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
-                Z
-              </span>
-              <div className="min-w-0">
-                <p className="truncate text-sm font-semibold tracking-tight text-foreground">Zakovat</p>
-                <p className="hidden text-xs text-muted-foreground sm:block">Quiz Creator</p>
-              </div>
-            </Link>
+            <SiteLogo href={localizeHref(locale, "/app")} ariaLabel={tCommon("app")} />
           </div>
 
           <Separator orientation="vertical" className="hidden h-6 md:block" />
