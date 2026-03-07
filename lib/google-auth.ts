@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { GOOGLE_PROVIDER, type GoogleIdTokenClaims } from "@/src/auth/providers/google";
+import { getInitialProviderImageUrl, getProviderAvatarUpdate } from "@/src/lib/provider-avatar";
 
 function sanitizeUsername(value: string | undefined) {
   const normalized = (value ?? "").trim().toLowerCase().replace(/[^a-z0-9_.]/g, "");
@@ -65,14 +66,27 @@ export async function upsertGoogleUser(claims: GoogleIdTokenClaims) {
   const existingAccount = existingRows[0];
   const emailVerified = isEmailVerified(claims.email_verified);
   const metadata = JSON.stringify(toMetadataJson(claims));
+  const providerImageUrl = getInitialProviderImageUrl(claims.picture);
 
   if (existingAccount) {
+    const currentUser = await prisma.user.findUnique({
+      where: { id: existingAccount.userId },
+      select: {
+        imageUrl: true,
+        avatarSource: true,
+      },
+    });
     const updatedUser = await prisma.user.update({
       where: { id: existingAccount.userId },
       data: {
         email,
         name: claims.name?.trim() || null,
         emailVerifiedAt: emailVerified ? new Date() : undefined,
+        ...getProviderAvatarUpdate({
+          providerPicture: claims.picture,
+          currentImageUrl: currentUser?.imageUrl ?? null,
+          avatarSource: currentUser?.avatarSource ?? "PROVIDER",
+        }),
       },
       select: {
         id: true,
@@ -94,7 +108,7 @@ export async function upsertGoogleUser(claims: GoogleIdTokenClaims) {
 
   const byEmail = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, role: true, username: true, name: true, emailVerifiedAt: true },
+    select: { id: true, role: true, username: true, name: true, emailVerifiedAt: true, imageUrl: true, avatarSource: true },
   });
 
   const user =
@@ -106,6 +120,8 @@ export async function upsertGoogleUser(claims: GoogleIdTokenClaims) {
         ),
         email,
         name: claims.name?.trim() || null,
+        imageUrl: providerImageUrl,
+        avatarSource: "PROVIDER",
         passwordHash: await bcrypt.hash(randomBytes(32).toString("hex"), 12),
         role: "USER",
         status: "ACTIVE",
@@ -118,6 +134,20 @@ export async function upsertGoogleUser(claims: GoogleIdTokenClaims) {
         name: true,
       },
     }));
+
+  if (byEmail) {
+    const avatarUpdate = getProviderAvatarUpdate({
+      providerPicture: claims.picture,
+      currentImageUrl: byEmail.imageUrl,
+      avatarSource: byEmail.avatarSource,
+    });
+    if (Object.keys(avatarUpdate).length > 0) {
+      await prisma.user.update({
+        where: { id: byEmail.id },
+        data: avatarUpdate,
+      });
+    }
+  }
 
   try {
     await prisma.$executeRaw`

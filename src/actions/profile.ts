@@ -17,6 +17,8 @@ type UpdateProfileResult = {
   name: string | null;
   username: string;
   displayName: string | null;
+  imageUrl: string | null;
+  avatarSource: "PROVIDER" | "CUSTOM";
   avatarAssetId: string | null;
   avatarUrl: string | null;
 };
@@ -75,11 +77,14 @@ export async function updateProfileAction(
         username: normalizedUsername,
         displayName: parsed.displayName,
         avatarAssetId: parsed.avatarAssetId,
+        avatarSource: parsed.avatarAssetId ? "CUSTOM" : "PROVIDER",
       },
       select: {
         name: true,
         username: true,
         displayName: true,
+        imageUrl: true,
+        avatarSource: true,
         avatarAssetId: true,
         avatarAsset: {
           select: { path: true },
@@ -95,8 +100,10 @@ export async function updateProfileAction(
       name: updated.name,
       username: updated.username,
       displayName: updated.displayName,
+      imageUrl: updated.imageUrl,
+      avatarSource: updated.avatarSource,
       avatarAssetId: updated.avatarAssetId,
-      avatarUrl: updated.avatarAsset?.path ? `/api/media/${updated.avatarAsset.path}` : null,
+      avatarUrl: updated.avatarAsset?.path ? `/api/media/${updated.avatarAsset.path}` : updated.imageUrl,
     };
   });
 

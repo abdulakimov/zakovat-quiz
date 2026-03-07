@@ -47,7 +47,6 @@ type TelegramIdTokenClaims = {
   name?: string;
   preferred_username?: string;
   picture?: string;
-  phone_number?: string;
   id?: string | number;
 };
 
@@ -211,7 +210,7 @@ export function buildTelegramAuthUrl(input: {
   url.searchParams.set("client_id", input.clientId);
   url.searchParams.set("redirect_uri", input.redirectUri);
   url.searchParams.set("response_type", "code");
-  url.searchParams.set("scope", "openid profile phone");
+  url.searchParams.set("scope", "openid profile");
   url.searchParams.set("state", input.state);
   url.searchParams.set("nonce", input.nonce);
   url.searchParams.set("code_challenge", input.codeChallenge);

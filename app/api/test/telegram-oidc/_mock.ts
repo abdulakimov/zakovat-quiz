@@ -37,7 +37,6 @@ export async function signMockIdToken(input: MockTokenClaims) {
     name: "Telegram Test User",
     preferred_username: "telegram_test_user",
     picture: "https://example.com/avatar.png",
-    phone_number: "+998900000000",
   })
     .setProtectedHeader({ alg: "RS256", kid: KEY_ID, typ: "JWT" })
     .setIssuer(MOCK_ISSUER)
@@ -46,4 +45,3 @@ export async function signMockIdToken(input: MockTokenClaims) {
     .setExpirationTime("10m")
     .sign(privateKey);
 }
-

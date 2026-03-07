@@ -57,7 +57,7 @@ test("Start route sets PKCE cookie and redirects to OIDC authorization endpoint"
   expect(url.pathname).toBe("/api/test/telegram-oidc/auth");
   expect(url.searchParams.get("client_id")).toBe(process.env.TELEGRAM_OIDC_CLIENT_ID);
   expect(url.searchParams.get("response_type")).toBe("code");
-  expect(url.searchParams.get("scope")).toBe("openid profile phone");
+  expect(url.searchParams.get("scope")).toBe("openid profile");
   const redirectUri = url.searchParams.get("redirect_uri");
   expect(redirectUri).toBeTruthy();
   const parsedRedirectUri = new URL(redirectUri!);
@@ -121,6 +121,16 @@ test("Callback validates id_token, creates session, and redirects to app", async
     LIMIT 1
   `;
   expect(accounts.length).toBe(1);
+
+  const user = await prisma.user.findUnique({
+    where: { id: accounts[0].userId },
+    select: { imageUrl: true },
+  });
+  expect(user?.imageUrl).toBe("https://example.com/avatar.png");
+
+  await expect(page.getByTestId("header-avatar-image")).toBeVisible();
+  await page.goto("/uz/app/profile");
+  await expect(page.getByTestId("profile-avatar-image")).toBeVisible();
 });
 
 test("Callback failure redirects to canonical localized login", async ({ request }) => {

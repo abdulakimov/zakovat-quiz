@@ -1,7 +1,6 @@
 ﻿import type { ReactNode } from "react";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,6 +16,7 @@ import { signOut } from "@/app/auth/actions";
 import { LanguageSwitcher } from "@/src/components/LanguageSwitcher";
 import { PageMotion } from "@/src/components/layout/PageMotion";
 import { SiteLogo } from "@/src/components/layout/SiteLogo";
+import { UserAvatar } from "@/src/components/layout/UserAvatar";
 import { ThemeSwitcher } from "@/src/components/theme/ThemeSwitcher";
 import {
   BoxIcon,
@@ -35,6 +35,8 @@ type AppShellUser = {
   username: string;
   name: string | null;
   displayName?: string | null;
+  imageUrl?: string | null;
+  avatarSource?: "PROVIDER" | "CUSTOM";
   avatarAsset?: { id: string; path: string } | null;
 };
 
@@ -171,7 +173,9 @@ function ProfileMenu({
 }) {
   const displayName = user?.displayName ?? user?.name ?? user?.username ?? "User";
   const username = user?.username ? `@${user.username}` : "";
-  const avatarUrl = user?.avatarAsset?.path ? `/api/media/${user.avatarAsset.path}` : null;
+  const customAvatarUrl = user?.avatarAsset?.path ? `/api/media/${user.avatarAsset.path}` : null;
+  const avatarUrl =
+    user?.avatarSource === "CUSTOM" ? customAvatarUrl : user?.imageUrl ?? customAvatarUrl;
 
   return (
     <DropdownMenu>
@@ -182,12 +186,16 @@ function ProfileMenu({
               <Button
                 type="button"
                 variant="ghost"
-                className="h-10 gap-1 rounded-full p-1 hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-9 gap-1 rounded-full p-1 hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <Avatar className="h-10 w-10">
-                  {avatarUrl ? <AvatarImage src={avatarUrl} alt={displayName} /> : null}
-                  {!avatarUrl ? <AvatarFallback>{getInitials(user)}</AvatarFallback> : null}
-                </Avatar>
+                <UserAvatar
+                  imageUrl={avatarUrl}
+                  alt={displayName}
+                  fallback={getInitials(user)}
+                  className="h-8 w-8"
+                  sizes="32px"
+                  imageTestId="header-avatar-image"
+                />
                 <ChevronDownIcon className="h-3.5 w-3.5 text-muted-foreground" />
               </Button>
             </DropdownMenuTrigger>

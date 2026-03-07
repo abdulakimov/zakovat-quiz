@@ -229,6 +229,16 @@ test("Callback validates id_token, creates session, and redirects to app", async
     LIMIT 1
   `;
   expect(accounts.length).toBe(1);
+
+  const user = await prisma.user.findUnique({
+    where: { id: accounts[0].userId },
+    select: { imageUrl: true },
+  });
+  expect(user?.imageUrl).toBe("https://example.com/avatar.png");
+
+  await expect(page.getByTestId("header-avatar-image")).toBeVisible();
+  await page.goto("/uz/app/profile");
+  await expect(page.getByTestId("profile-avatar-image")).toBeVisible();
 });
 
 test("Callback with wrong state rejects login", async ({ request }) => {

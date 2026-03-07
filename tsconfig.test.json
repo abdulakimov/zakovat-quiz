@@ -9,6 +9,8 @@
   },
   "include": [
     "src/lib/url.ts",
+    "src/lib/provider-avatar.ts",
+    "src/lib/provider-avatar.test.ts",
     "src/lib/presenter/reducer.ts",
     "src/lib/presenter/reducer.test.ts",
     "src/validators/auth.ts",
@@ -16,6 +18,7 @@
     "src/validators/rhf-zod.ts",
     "src/validators/rhf-zod.test.ts",
     "scripts/auth-schema-test.ts",
+    "scripts/provider-avatar-test.ts",
     "scripts/rhf-zod-resolver-test.ts",
     "scripts/presenter-reducer-test.ts",
     "scripts/url-origin-test.ts"

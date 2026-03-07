@@ -22,6 +22,8 @@ export async function getCurrentUser() {
       name: true,
       email: true,
       displayName: true,
+      imageUrl: true,
+      avatarSource: true,
       avatarAssetId: true,
       avatarAsset: {
         select: {

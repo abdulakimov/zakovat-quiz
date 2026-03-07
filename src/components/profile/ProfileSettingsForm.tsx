@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useForm, type UseFormRegister } from "react-hook-form";
 import type { z } from "zod";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,6 +16,7 @@ import { SettingsSectionCard, SettingsSectionGroup } from "@/src/components/layo
 import { StickySaveBar } from "@/src/components/layout/StickySaveBar";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
 import { changePasswordAction, updateProfileAction } from "@/src/actions/profile";
+import { UserAvatar } from "@/src/components/layout/UserAvatar";
 import { toast } from "@/src/components/ui/sonner";
 import { EyeIcon, EyeOffIcon, PencilIcon, UserIconLucide, ShieldIcon } from "@/src/ui/icons";
 import { zodResolverCompat } from "@/src/validators/rhf-zod";
@@ -36,6 +36,8 @@ type Props = {
     name: string | null;
     email?: string | null;
     displayName?: string | null;
+    imageUrl?: string | null;
+    avatarSource?: "PROVIDER" | "CUSTOM";
     avatarAssetId?: string | null;
     avatarAsset?: { path: string } | null;
   };
@@ -53,6 +55,14 @@ function initials(user: Props["user"]) {
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase() ?? "")
     .join("");
+}
+
+function getResolvedAvatarUrl(user: Props["user"]) {
+  const customAvatar = user.avatarAsset?.path ? `/api/media/${user.avatarAsset.path}` : null;
+  if (user.avatarSource === "CUSTOM") {
+    return customAvatar;
+  }
+  return user.imageUrl ?? customAvatar;
 }
 
 function uploadAvatar(file: File, onProgress: (percent: number) => void) {
@@ -91,9 +101,7 @@ export function ProfileSettingsForm({ user }: Props) {
   const [isSaving, startTransition] = React.useTransition();
   const [isUploading, setIsUploading] = React.useState(false);
   const [uploadProgress, setUploadProgress] = React.useState(0);
-  const [previewUrl, setPreviewUrl] = React.useState<string | null>(
-    user.avatarAsset?.path ? `/api/media/${user.avatarAsset.path}` : null,
-  );
+  const [previewUrl, setPreviewUrl] = React.useState<string | null>(getResolvedAvatarUrl(user));
   const [serverError, setServerError] = React.useState<string | null>(null);
   const [serverFieldErrors, setServerFieldErrors] = React.useState<Record<string, string[] | undefined>>({});
   const [isProfileEditing, setIsProfileEditing] = React.useState(false);
@@ -155,7 +163,7 @@ export function ProfileSettingsForm({ user }: Props) {
     } catch (error) {
       setPreviewUrl((prev) => {
         if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
-        return user.avatarAsset?.path ? `/api/media/${user.avatarAsset.path}` : null;
+        return getResolvedAvatarUrl(user);
       });
       toast.error(error instanceof Error ? error.message : "Upload failed.");
     } finally {
@@ -216,7 +224,7 @@ export function ProfileSettingsForm({ user }: Props) {
       displayName: user.displayName ?? "",
       avatarAssetId: user.avatarAssetId ?? "",
     });
-    setPreviewUrl(user.avatarAsset?.path ? `/api/media/${user.avatarAsset.path}` : null);
+    setPreviewUrl(getResolvedAvatarUrl(user));
     setServerError(null);
     setServerFieldErrors({});
   }
@@ -269,10 +277,15 @@ export function ProfileSettingsForm({ user }: Props) {
               <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:items-start">
                 <div className="space-y-4 rounded-lg border border-border p-4">
                   <div className="flex flex-col items-center gap-3 text-center">
-                    <Avatar className="h-24 w-24 border-border">
-                      {previewUrl ? <AvatarImage src={previewUrl} alt={String(displayNameValue)} /> : null}
-                      {!previewUrl ? <AvatarFallback className="text-xl">{initials(user)}</AvatarFallback> : null}
-                    </Avatar>
+                    <UserAvatar
+                      imageUrl={previewUrl}
+                      alt={String(displayNameValue)}
+                      fallback={initials(user)}
+                      className="h-24 w-24 border-border"
+                      fallbackClassName="text-xl"
+                      sizes="96px"
+                      imageTestId="profile-avatar-image"
+                    />
                     <div>
                       <p className="text-sm font-semibold text-foreground">{displayNameValue}</p>
                       <p className="text-xs text-muted-foreground">@{watchedUsername}</p>

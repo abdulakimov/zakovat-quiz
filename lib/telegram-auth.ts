@@ -3,13 +3,13 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/logger";
 import { TELEGRAM_PROVIDER } from "@/lib/telegram-oidc";
+import { getInitialProviderImageUrl, getProviderAvatarUpdate } from "@/src/lib/provider-avatar";
 
 type TelegramClaims = {
   sub: string;
   name?: string;
   preferred_username?: string;
   picture?: string;
-  phone_number?: string;
   id?: string | number;
 };
 
@@ -43,7 +43,6 @@ function toMetadataJson(claims: TelegramClaims) {
     name: claims.name ?? null,
     preferred_username: claims.preferred_username ?? null,
     picture: claims.picture ?? null,
-    phone_number: claims.phone_number ?? null,
     id: claims.id ?? null,
   };
 }
@@ -58,16 +57,24 @@ export async function upsertTelegramUser(claims: TelegramClaims) {
     LIMIT 1
   `;
   const existing = existingRows[0];
+  const providerImageUrl = getInitialProviderImageUrl(claims.picture);
 
   if (existing) {
     const currentUser = await prisma.user.findUnique({
       where: { id: existing.userId },
-      select: { name: true },
+      select: { name: true, imageUrl: true, avatarSource: true },
     });
     const name = claims.name?.trim() || currentUser?.name || null;
     const updatedUser = await prisma.user.update({
       where: { id: existing.userId },
-      data: { name },
+      data: {
+        name,
+        ...getProviderAvatarUpdate({
+          providerPicture: claims.picture,
+          currentImageUrl: currentUser?.imageUrl ?? null,
+          avatarSource: currentUser?.avatarSource ?? "PROVIDER",
+        }),
+      },
       select: {
         id: true,
         role: true,
@@ -97,6 +104,8 @@ export async function upsertTelegramUser(claims: TelegramClaims) {
         username,
         email,
         name: claims.name?.trim() || null,
+        imageUrl: providerImageUrl,
+        avatarSource: "PROVIDER",
         passwordHash,
         role: "USER",
         status: "ACTIVE",

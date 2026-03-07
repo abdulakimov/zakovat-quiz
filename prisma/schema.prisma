@@ -18,6 +18,11 @@ enum UserStatus {
   DISABLED
 }
 
+enum AvatarSource {
+  PROVIDER
+  CUSTOM
+}
+
 enum MediaType {
   IMAGE
   AUDIO
@@ -83,6 +88,8 @@ model User {
   email           String                   @unique
   name            String?
   displayName     String?                  @db.VarChar(32)
+  imageUrl        String?
+  avatarSource    AvatarSource             @default(PROVIDER)
   avatarAssetId   String?
   passwordHash    String
   role            Role                     @default(USER)
