@@ -146,64 +146,67 @@ export function QrLoginPanel() {
           : tAuth("qr.desktop.waiting");
 
   return (
-    <section className="space-y-3" data-testid="qr-panel" data-session-id={data?.sessionId ?? ""}>
-      <div className="space-y-1">
-        <p className="text-xl font-semibold text-foreground">{tAuth("qr.desktop.title")}</p>
-        <p className="max-w-xs text-sm text-muted-foreground">{tAuth("qr.desktop.subtitle")}</p>
+    <section className="space-y-4 pt-0" data-testid="qr-panel" data-session-id={data?.sessionId ?? ""}>
+      <div className="flex min-h-[88px] flex-col justify-start space-y-1.5" data-testid="right-header">
+        <h2 className="text-2xl font-semibold text-foreground">{tAuth("qr.title")}</h2>
+        <p className="max-w-sm text-sm text-muted-foreground">{tAuth("qr.subtitle")}</p>
       </div>
 
-      <div className="min-h-[360px] rounded-xl border border-border bg-card/30 p-4" data-testid="qr-frame">
-        <div className="flex items-center justify-center">
-          <div
-            className="mx-auto flex h-[260px] w-[260px] items-center justify-center rounded-lg border border-border/40 bg-white p-3"
-            data-testid="qr-tile"
-          >
-            {data?.qrDataUrl ? (
-              <img
-                src={data.qrDataUrl}
-                alt={tAuth("qr.desktop.imageAlt")}
-                className="h-[210px] w-[210px] object-contain [image-rendering:pixelated]"
-                data-testid="qr-code-image"
-              />
+      <div
+        className="mx-auto w-full max-w-[460px] rounded-2xl border border-border/40 bg-gradient-to-br from-primary/8 via-background/0 to-indigo-500/10 p-5 dark:from-primary/10 dark:to-sky-500/10"
+        data-testid="qr-panel-wrap"
+      >
+        <div className="mx-auto w-full max-w-[420px] rounded-2xl border border-border/60 bg-background/40 p-6" data-testid="qr-frame">
+          <div className="flex items-center justify-center">
+            <div
+              className="mx-auto flex h-[240px] w-[240px] items-center justify-center rounded-xl bg-white p-4 shadow-sm"
+              data-testid="qr-tile"
+            >
+              {data?.qrDataUrl ? (
+                <img
+                  src={data.qrDataUrl}
+                  alt={tAuth("qr.desktop.imageAlt")}
+                  className="h-full w-full object-contain [image-rendering:pixelated]"
+                  data-testid="qr-code-image"
+                />
+              ) : (
+                <div className="h-full w-full animate-pulse rounded-lg bg-slate-200/70 dark:bg-slate-700/50" />
+              )}
+            </div>
+          </div>
+
+          <div className="mt-3 flex min-h-8 items-center justify-between gap-3">
+            <p className="flex items-center gap-2 text-xs text-muted-foreground" data-testid="qr-status-text">
+              {status === "waiting" ? (
+                <span
+                  aria-hidden="true"
+                  className="inline-flex h-3.5 w-3.5 animate-spin rounded-full border-2 border-muted-foreground/40 border-t-foreground"
+                />
+              ) : null}
+              <span>{statusText}</span>
+            </p>
+            <p className="text-xs text-muted-foreground" data-testid="qr-countdown">
+              {tAuth("qr.countdown", { count: remaining })}
+            </p>
+          </div>
+
+          <div className="mt-2 flex min-h-8 items-center justify-end">
+            {status === "expired" ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  void startSession().catch(() => setStatus("error"));
+                }}
+                data-testid="qr-restart"
+              >
+                {tAuth("qr.desktop.refresh")}
+              </Button>
             ) : (
-              <div className="flex h-full w-full items-center justify-center rounded-md bg-muted/30">
-                <span className="text-sm text-muted-foreground">{tAuth("qr.desktop.loading")}</span>
-              </div>
+              <span className="inline-block min-h-8" aria-hidden="true" />
             )}
           </div>
-        </div>
-
-        <div className="mt-3 flex min-h-[44px] items-center justify-between gap-3">
-          <p className="flex items-center gap-2 text-xs text-muted-foreground" data-testid="qr-status-text">
-            {status === "waiting" ? (
-              <span
-                aria-hidden="true"
-                className="inline-flex h-3.5 w-3.5 animate-spin rounded-full border-2 border-muted-foreground/40 border-t-foreground"
-              />
-            ) : null}
-            <span>{statusText}</span>
-          </p>
-          <p className="text-xs text-muted-foreground" data-testid="qr-countdown">
-            {tAuth("qr.desktop.expiresIn", { count: remaining })}
-          </p>
-        </div>
-
-        <div className="mt-2 flex min-h-8 items-center justify-end">
-          {status === "expired" ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                void startSession().catch(() => setStatus("error"));
-              }}
-              data-testid="qr-restart"
-            >
-              {tAuth("qr.desktop.refresh")}
-            </Button>
-          ) : (
-            <span className="inline-block min-h-8" aria-hidden="true" />
-          )}
         </div>
       </div>
     </section>

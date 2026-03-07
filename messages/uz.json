@@ -329,7 +329,8 @@
     "eyebrow": "Autentifikatsiya",
     "login": {
       "title": "Zakovatga kirish",
-      "subtitle": "Zakovat Quiz Creator ga kirish uchun qulay usulni tanlang."
+      "subtitle": "Davom etish uchun qulay usulni tanlang.",
+      "termsShort": "Davom etish orqali shartlar va maxfiylik siyosatiga rozilik bildirasiz."
     },
     "signup": {
       "title": "Akkaunt yarating",
@@ -371,6 +372,9 @@
       "phoneHelper": "Eng tezkor xavfsiz kirish uchun Telegram yoki Google dan foydalaning."
     },
     "qr": {
+      "title": "Telefon kamerangiz bilan skanerlang",
+      "subtitle": "Desktopdagi kirishni telefonda tez tasdiqlang.",
+      "countdown": "{count, plural, one {# soniya} other {# soniya}}",
       "desktop": {
         "title": "Telefon orqali kirishni tasdiqlang",
         "subtitle": "Bir martalik QR kodni skaner qiling va telefonda tasdiqlang.",

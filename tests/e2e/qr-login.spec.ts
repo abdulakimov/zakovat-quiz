@@ -21,6 +21,11 @@ test("desktop shows QR panel and mobile hides it", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/uz/auth/login");
   await expect(page.getByTestId("auth-shell")).toBeVisible();
+  const shellBox = await page.getByTestId("auth-shell").boundingBox();
+  expect(shellBox).not.toBeNull();
+  if (shellBox) {
+    expect(shellBox.width).toBeLessThanOrEqual(1040);
+  }
   await expect(page.getByTestId("auth-shell")).not.toHaveClass(/border-2/);
   const shellBorderTopWidth = await page.getByTestId("auth-shell").evaluate((element) => {
     const value = window.getComputedStyle(element).borderTopWidth;
@@ -28,12 +33,24 @@ test("desktop shows QR panel and mobile hides it", async ({ page }) => {
   });
   expect(shellBorderTopWidth).toBeLessThanOrEqual(1);
   await expect(page.getByTestId("provider-panel")).toBeVisible();
+  await expect(page.getByTestId("provider-telegram")).toBeVisible();
+  await expect(page.getByTestId("provider-google")).toBeVisible();
   const qrPanel = page.getByTestId("qr-panel");
   await expect(qrPanel).toBeVisible();
+  await expect(page.getByTestId("qr-panel-wrap")).toBeVisible();
   await expect(page.getByTestId("qr-tile")).toBeVisible();
   await expect(page.getByTestId("qr-frame")).toBeVisible();
+  await expect(page.getByTestId("left-header")).toBeVisible();
+  await expect(page.getByTestId("right-header")).toBeVisible();
   await expect(page.getByTestId("auth-right").locator('[data-testid="qr-panel"]')).toBeVisible();
   await expect(page.getByTestId("auth-left").locator('[data-testid="qr-panel"]')).toHaveCount(0);
+  const leftHeaderBox = await page.getByTestId("left-header").boundingBox();
+  const rightHeaderBox = await page.getByTestId("right-header").boundingBox();
+  expect(leftHeaderBox).not.toBeNull();
+  expect(rightHeaderBox).not.toBeNull();
+  if (leftHeaderBox && rightHeaderBox) {
+    expect(Math.abs(leftHeaderBox.y - rightHeaderBox.y)).toBeLessThanOrEqual(4);
+  }
   const leftBox = await page.getByTestId("auth-left").boundingBox();
   const rightBox = await page.getByTestId("auth-right").boundingBox();
   const tileBefore = await page.getByTestId("qr-tile").boundingBox();
@@ -44,6 +61,8 @@ test("desktop shows QR panel and mobile hides it", async ({ page }) => {
   if (tileBefore && tileAfter) {
     expect(tileAfter.width).toBe(tileBefore.width);
     expect(tileAfter.height).toBe(tileBefore.height);
+    expect(Math.round(tileAfter.width)).toBe(240);
+    expect(Math.round(tileAfter.height)).toBe(240);
   }
 
   expect(leftBox).not.toBeNull();

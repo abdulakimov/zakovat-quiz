@@ -10,19 +10,19 @@ export function LoginShell({ leftContent, rightContent }: LoginShellProps) {
   return (
     <div className="relative min-h-screen bg-background">
       <AuthBackground />
-      <div className="relative z-10 mx-auto flex min-h-screen w-full max-w-5xl items-start px-4 py-8 lg:items-center">
+      <div className="relative z-10 mx-auto flex min-h-screen w-full items-center justify-center p-4 md:p-6">
         <div
-          className="w-full rounded-2xl border border-border bg-card/60 p-6 shadow-sm backdrop-blur-xl md:p-7"
+          className="w-full max-w-md rounded-3xl border border-border bg-card/50 p-5 shadow-sm backdrop-blur-xl md:max-w-5xl md:p-6"
           data-testid="auth-shell"
         >
-          <div className="grid gap-6 md:grid-cols-[0.8fr_1fr]">
-            <section className="mx-auto flex w-full max-w-md space-y-4 md:max-w-none md:items-center" data-testid="provider-panel">
-              <div className="mx-auto w-full max-w-[440px] text-left" data-testid="auth-left">
+          <div className="grid items-start gap-6 md:grid-cols-[1fr_1.1fr] md:gap-10">
+            <section className="mx-auto w-full max-w-md pt-0 md:max-w-none" data-testid="provider-panel">
+              <div className="mx-auto w-full max-w-[420px] space-y-4 pt-0 text-left" data-testid="auth-left">
                 {leftContent}
               </div>
             </section>
-            <section className="hidden md:block" data-testid="auth-right">
-              {rightContent}
+            <section className="mx-auto hidden w-full max-w-md pt-0 md:block md:max-w-none" data-testid="auth-right">
+              <div className="mx-auto w-full max-w-[480px] space-y-4 pt-0">{rightContent}</div>
             </section>
           </div>
         </div>

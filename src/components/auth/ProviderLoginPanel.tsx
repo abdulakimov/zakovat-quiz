@@ -22,10 +22,10 @@ export function ProviderLoginPanel({ nextPath, info }: ProviderLoginPanelProps) 
   const tAuth = useTranslations("auth");
 
   return (
-    <div className="space-y-4">
-      <header className="max-w-md space-y-1.5">
-        <h1 className="text-xl font-semibold text-foreground md:text-2xl">{tAuth("login.title")}</h1>
-        <p className="max-w-sm text-sm text-muted-foreground">{tAuth("provider.subtitle")}</p>
+    <div className="space-y-4 pt-0">
+      <header className="flex min-h-[88px] flex-col justify-start space-y-1.5" data-testid="left-header">
+        <h1 className="text-2xl font-semibold text-foreground">{tAuth("login.title")}</h1>
+        <p className="max-w-sm text-sm text-muted-foreground">{tAuth("login.subtitle")}</p>
       </header>
 
       {info === "signup_disabled" ? (
@@ -37,11 +37,12 @@ export function ProviderLoginPanel({ nextPath, info }: ProviderLoginPanelProps) 
         </p>
       ) : null}
 
-      <div className="space-y-3">
+      <div className="mt-4 space-y-3">
         <div data-testid="provider-telegram">
           <Button
             asChild
-            className="h-11 w-full rounded-xl shadow-sm transition-colors hover:opacity-95 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            variant="outline"
+            className="h-12 w-full rounded-xl border-border/70 bg-background/70 text-foreground shadow-sm transition-colors hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <a
               href={withNext("/auth/telegram/start", nextPath)}
@@ -61,7 +62,7 @@ export function ProviderLoginPanel({ nextPath, info }: ProviderLoginPanelProps) 
           <Button
             asChild
             variant="outline"
-            className="h-11 w-full rounded-xl border-border bg-card text-foreground shadow-sm transition-colors hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            className="h-12 w-full rounded-xl border-border/70 bg-background/70 text-foreground shadow-sm transition-colors hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           >
             <a
               href={withNext("/auth/google/start", nextPath)}
@@ -78,7 +79,7 @@ export function ProviderLoginPanel({ nextPath, info }: ProviderLoginPanelProps) 
         </div>
       </div>
 
-      <p className="text-xs text-muted-foreground">{tAuth("provider.footnote")}</p>
+      <p className="pt-1 text-xs text-muted-foreground">{tAuth("login.termsShort")}</p>
     </div>
   );
 }
