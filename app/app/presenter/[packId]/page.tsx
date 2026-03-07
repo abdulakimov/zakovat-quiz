@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getLocale } from "next-intl/server";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,13 @@ import { localizeHref, type AppLocale } from "@/src/i18n/config";
 import { PageHeader } from "@/src/components/layout/PageHeader";
 import { PresenterPlayer } from "@/src/components/presenter/PresenterPlayer";
 import { ArrowRightIcon } from "@/src/ui/icons";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const tMeta = await getTranslations("meta");
+  return {
+    title: tMeta("presenter"),
+  };
+}
 
 function NotAuthorized({ locale, tCommon, tPacks, tPresenter }: { locale: AppLocale; tCommon: Awaited<ReturnType<typeof getTranslations>>; tPacks: Awaited<ReturnType<typeof getTranslations>>; tPresenter: Awaited<ReturnType<typeof getTranslations>> }) {
   return (

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getLocale } from "next-intl/server";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -14,6 +15,13 @@ import { localizeHref, type AppLocale } from "@/src/i18n/config";
 import { SettingsIcon, UserPlusIcon } from "@/src/ui/icons";
 
 type ActiveTeamMembership = Awaited<ReturnType<typeof getMyTeamsAndInvites>>["activeTeams"][number];
+
+export async function generateMetadata(): Promise<Metadata> {
+  const tMeta = await getTranslations("meta");
+  return {
+    title: tMeta("teams"),
+  };
+}
 
 function getTeamInitials(name: string) {
   return name

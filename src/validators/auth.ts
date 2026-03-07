@@ -78,30 +78,5 @@ export const signInSchema = z.object({
   password: passwordSchema,
 });
 
-export const signUpSchema = z
-  .object({
-    name: z
-      .string()
-      .trim()
-      .optional()
-      .transform((value) => (value && value.length > 0 ? value : undefined))
-      .pipe(displayNameSchema.optional()),
-    username: usernameSchema,
-    email: emailSchema,
-    password: passwordSchema,
-    confirmPassword: z.string().min(1, "auth.validation.confirmPassword.required"),
-  })
-  .superRefine((input, ctx) => {
-    if (input.confirmPassword !== input.password) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ["confirmPassword"],
-        message: "auth.validation.confirmPassword.mismatch",
-      });
-    }
-  });
-
 export type SignInInput = z.infer<typeof signInSchema>;
-export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInRawInput = z.input<typeof signInSchema>;
-export type SignUpRawInput = z.input<typeof signUpSchema>;

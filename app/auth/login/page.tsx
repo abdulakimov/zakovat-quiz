@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import { getTranslations } from "@/src/i18n/server";
 import LoginForm from "@/app/auth/login/login-form";
 import { AuthShell } from "@/src/components/auth/AuthShell";
 import { QrLoginPanel } from "@/src/components/auth/QrLoginPanel";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const tMeta = await getTranslations("meta");
+  return {
+    title: tMeta("login"),
+  };
+}
 
 export default async function LoginPage() {
   const tAuth = await getTranslations("auth");

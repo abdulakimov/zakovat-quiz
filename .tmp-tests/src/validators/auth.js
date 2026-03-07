@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signUpSchema = exports.signInSchema = exports.displayNameSchema = exports.passwordSchema = exports.usernameSchema = exports.emailSchema = void 0;
+exports.signInSchema = exports.displayNameSchema = exports.passwordSchema = exports.usernameSchema = exports.emailSchema = void 0;
 const zod_1 = require("zod");
 const EMAIL_MAX = 254;
 const USERNAME_MIN = 3;
@@ -71,26 +71,4 @@ const usernameOrEmailSchema = zod_1.z
 exports.signInSchema = zod_1.z.object({
     usernameOrEmail: usernameOrEmailSchema,
     password: exports.passwordSchema,
-});
-exports.signUpSchema = zod_1.z
-    .object({
-    name: zod_1.z
-        .string()
-        .trim()
-        .optional()
-        .transform((value) => (value && value.length > 0 ? value : undefined))
-        .pipe(exports.displayNameSchema.optional()),
-    username: exports.usernameSchema,
-    email: exports.emailSchema,
-    password: exports.passwordSchema,
-    confirmPassword: zod_1.z.string().min(1, "auth.validation.confirmPassword.required"),
-})
-    .superRefine((input, ctx) => {
-    if (input.confirmPassword !== input.password) {
-        ctx.addIssue({
-            code: zod_1.z.ZodIssueCode.custom,
-            path: ["confirmPassword"],
-            message: "auth.validation.confirmPassword.mismatch",
-        });
-    }
 });

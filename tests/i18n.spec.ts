@@ -147,15 +147,12 @@ test("locale persists across navigation to settings and presenter", async ({ pag
   await expect(page.getByTestId("presenter-heading")).toBeVisible();
 });
 
-test("auth signup page renders translated heading by locale", async ({ page }) => {
+test("auth signup route redirects to localized login", async ({ page }) => {
   await page.goto("/uz/auth/signup");
-  const uzText = (await page.getByTestId("signup-heading").textContent()) ?? "";
-  expect(uzText.length).toBeGreaterThan(0);
+  await expect(page).toHaveURL(/\/uz\/auth\/login\?info=signup_disabled/);
 
   await page.goto("/ru/auth/signup");
-  const ruText = (await page.getByTestId("signup-heading").textContent()) ?? "";
-  expect(ruText.length).toBeGreaterThan(0);
-  expect(ruText).not.toEqual(uzText);
+  await expect(page).toHaveURL(/\/ru\/auth\/login\?info=signup_disabled/);
 });
 
 test("no console errors on localized app routes", async ({ page }) => {
