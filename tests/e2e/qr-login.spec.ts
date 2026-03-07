@@ -11,18 +11,36 @@ async function getPlaywrightUserId() {
 }
 
 test("desktop shows QR panel and mobile hides it", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") {
+      errors.push(message.text());
+    }
+  });
+
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/uz/auth/login");
+  await expect(page.getByTestId("auth-shell")).toBeVisible();
+  await expect(page.getByTestId("provider-panel")).toBeVisible();
   const qrPanel = page.getByTestId("qr-panel");
   await expect(qrPanel).toBeVisible();
+  await expect(page.getByTestId("qr-frame")).toBeVisible();
   await expect(page.getByTestId("auth-right").locator('[data-testid="qr-panel"]')).toBeVisible();
   await expect(page.getByTestId("auth-left").locator('[data-testid="qr-panel"]')).toHaveCount(0);
+  const providerBox = await page.getByTestId("provider-panel").boundingBox();
+  const qrBox = await page.getByTestId("qr-panel").boundingBox();
+  expect(providerBox).not.toBeNull();
+  expect(qrBox).not.toBeNull();
+  if (providerBox && qrBox) {
+    expect(qrBox.x).toBeGreaterThan(providerBox.x);
+  }
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/uz/auth/login");
+  await expect(page.getByTestId("provider-panel")).toBeVisible();
   await expect(page.getByTestId("auth-right")).toBeHidden();
   await expect(page.getByTestId("qr-panel")).toBeHidden();
-  await expect(page.getByTestId("mobile-qr-entry-link")).toBeVisible();
+  expect(errors).toEqual([]);
 });
 
 test("start QR session returns url and login page renders QR image", async ({ page, request }) => {
