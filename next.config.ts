@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "t.me",
+        pathname: "/i/userpic/**",
+      },
+      {
+        protocol: "https",
         hostname: "example.com",
       },
     ],
