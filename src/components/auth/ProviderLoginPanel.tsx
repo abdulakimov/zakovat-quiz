@@ -1,0 +1,91 @@
+"use client";
+
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { GoogleIcon } from "@/src/components/icons/GoogleIcon";
+import { TelegramIcon } from "@/src/components/icons/TelegramIcon";
+import { useTranslations } from "@/src/i18n/client";
+
+type ProviderLoginPanelProps = {
+  nextPath?: string | null;
+  info?: string | null;
+};
+
+function withNext(path: string, nextPath?: string | null) {
+  if (!nextPath) {
+    return path;
+  }
+
+  return `${path}?next=${encodeURIComponent(nextPath)}`;
+}
+
+export function ProviderLoginPanel({ nextPath, info }: ProviderLoginPanelProps) {
+  const tAuth = useTranslations("auth");
+
+  return (
+    <div className="space-y-4">
+      <header className="max-w-md space-y-1.5">
+        <h1 className="text-xl font-semibold text-foreground md:text-2xl">{tAuth("login.title")}</h1>
+        <p className="max-w-sm text-sm text-muted-foreground">{tAuth("provider.subtitle")}</p>
+      </header>
+
+      {info === "signup_disabled" ? (
+        <p
+          className="rounded-xl border border-border bg-background/50 px-3 py-2 text-sm text-foreground"
+          data-testid="signup-disabled-info"
+        >
+          {tAuth("info.signupDisabled")}
+        </p>
+      ) : null}
+
+      <div className="space-y-3">
+        <div data-testid="provider-telegram">
+          <Button
+            asChild
+            className="h-11 w-full rounded-xl shadow-sm transition-colors hover:opacity-95 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <a
+              href={withNext("/auth/telegram/start", nextPath)}
+              aria-label={tAuth("actions.continueWithTelegram")}
+              data-testid="telegram-login"
+              className="relative flex w-full items-center justify-center"
+            >
+              <span className="absolute left-4 top-1/2 -translate-y-1/2">
+                <TelegramIcon className="h-5 w-5" />
+              </span>
+              <span className="text-sm font-medium">{tAuth("actions.continueWithTelegram")}</span>
+            </a>
+          </Button>
+        </div>
+
+        <div data-testid="provider-google">
+          <Button
+            asChild
+            variant="outline"
+            className="h-11 w-full rounded-xl border-border bg-card text-foreground shadow-sm transition-colors hover:bg-accent/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+          >
+            <a
+              href={withNext("/auth/google/start", nextPath)}
+              aria-label={tAuth("actions.continueWithGoogle")}
+              data-testid="google-login"
+              className="relative flex w-full items-center justify-center"
+            >
+              <span className="absolute left-4 top-1/2 -translate-y-1/2">
+                <GoogleIcon className="h-5 w-5" />
+              </span>
+              <span className="text-sm font-medium">{tAuth("actions.continueWithGoogle")}</span>
+            </a>
+          </Button>
+        </div>
+      </div>
+
+      <p className="text-xs text-muted-foreground">{tAuth("provider.footnote")}</p>
+
+      <div>
+        <Link href="#" className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground">
+          {tAuth("provider.help")}
+        </Link>
+      </div>
+    </div>
+  );
+}

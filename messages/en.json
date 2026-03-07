@@ -400,6 +400,14 @@
         "invalidTitle": "Invalid request",
         "invalidSubtitle": "QR token was not found. Please scan again."
       }
+    },
+    "provider": {
+      "subtitle": "Use Telegram or Google to sign in quickly and securely.",
+      "whyTitle": "Why this?",
+      "bulletSecure": "Fast and secure sign in",
+      "bulletPasswordless": "No password to remember",
+      "footnote": "Only approve sign-ins that you started.",
+      "help": "Having trouble?"
     }
   },
   "teams": {
