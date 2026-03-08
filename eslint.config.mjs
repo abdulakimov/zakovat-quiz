@@ -23,6 +23,12 @@ const eslintConfig = defineConfig([
       "no-console": "off",
     },
   },
+  {
+    files: ["scripts/**/*.mjs"],
+    rules: {
+      "no-console": "off",
+    },
+  },
   prettier,
   // Override default ignores of eslint-config-next.
   globalIgnores([
@@ -31,6 +37,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    ".tmp-tests/**",
+    ".tmp-tests-run/**",
   ]),
 ]);
 

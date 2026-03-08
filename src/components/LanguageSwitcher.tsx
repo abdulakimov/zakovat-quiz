@@ -49,6 +49,7 @@ export function LanguageSwitcher() {
     const nextPathname = buildLocalizedPath(pathname, nextLocale);
     const query = searchParams.toString();
     const href = query ? `${nextPathname}?${query}` : nextPathname;
+    // eslint-disable-next-line react-hooks/immutability
     document.cookie = `${localeCookieName}=${nextLocale}; path=/; max-age=31536000; samesite=lax`;
     router.push(href);
     router.refresh();

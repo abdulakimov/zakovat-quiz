@@ -147,6 +147,7 @@ function CompactMediaCheck({
               return;
             }
             try {
+              // eslint-disable-next-line react-hooks/immutability
               audioEl.currentTime = 0;
               await audioEl.play();
             } catch {}

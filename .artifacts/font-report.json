@@ -1,0 +1,89 @@
+{
+  "createdAt": "2026-03-08T12:30:02.269Z",
+  "baseUrl": "http://127.0.0.1:3100",
+  "expectedFontTokens": [
+    "Geist",
+    "__Geist",
+    "--font-sans",
+    "var(--font-sans)"
+  ],
+  "buildFontAssets": {
+    "dir": "D:\\projects\\nextjs\\quiz-creator\\.next\\static\\media",
+    "total": 0,
+    "files": []
+  },
+  "pages": [
+    {
+      "key": "login",
+      "url": "http://127.0.0.1:3100/uz/auth/login",
+      "finalUrl": "chrome-error://chromewebdata/",
+      "screenshotPath": ".artifacts\\screenshots\\login.png",
+      "computed": {
+        "documentElementFontSize": null,
+        "bodyFontSize": null,
+        "bodyFontFamily": "",
+        "bodyFontWeight": null,
+        "fontSansVariable": "",
+        "documentFontsStatus": "unknown",
+        "documentFontsSize": null
+      },
+      "expectedFontMatched": false,
+      "fallbackOnlyBodyFont": true,
+      "fontRequests": [],
+      "failedFontRequests": [],
+      "navigationError": "page.goto: net::ERR_TOO_MANY_REDIRECTS at http://127.0.0.1:3100/uz/auth/login\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3100/uz/auth/login\", waiting until \"networkidle\"\u001b[22m\n"
+    },
+    {
+      "key": "app",
+      "url": "http://127.0.0.1:3100/uz/app",
+      "finalUrl": "chrome-error://chromewebdata/",
+      "screenshotPath": ".artifacts\\screenshots\\app.png",
+      "computed": {
+        "documentElementFontSize": null,
+        "bodyFontSize": null,
+        "bodyFontFamily": "",
+        "bodyFontWeight": null,
+        "fontSansVariable": "",
+        "documentFontsStatus": "unknown",
+        "documentFontsSize": null
+      },
+      "expectedFontMatched": false,
+      "fallbackOnlyBodyFont": true,
+      "fontRequests": [],
+      "failedFontRequests": [],
+      "navigationError": "page.goto: net::ERR_TOO_MANY_REDIRECTS at http://127.0.0.1:3100/uz/app\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3100/uz/app\", waiting until \"networkidle\"\u001b[22m\n"
+    },
+    {
+      "key": "profile",
+      "url": "http://127.0.0.1:3100/uz/app/profile?tab=profile",
+      "finalUrl": "chrome-error://chromewebdata/",
+      "screenshotPath": ".artifacts\\screenshots\\profile.png",
+      "computed": {
+        "documentElementFontSize": null,
+        "bodyFontSize": null,
+        "bodyFontFamily": "",
+        "bodyFontWeight": null,
+        "fontSansVariable": "",
+        "documentFontsStatus": "unknown",
+        "documentFontsSize": null
+      },
+      "expectedFontMatched": false,
+      "fallbackOnlyBodyFont": true,
+      "fontRequests": [],
+      "failedFontRequests": [],
+      "navigationError": "page.goto: net::ERR_TOO_MANY_REDIRECTS at http://127.0.0.1:3100/uz/app/profile?tab=profile\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3100/uz/app/profile?tab=profile\", waiting until \"networkidle\"\u001b[22m\n"
+    }
+  ],
+  "totals": {
+    "pages": 3,
+    "fontRequests": 0,
+    "failedFontRequests": 0,
+    "externalFontRequests": 0
+  },
+  "failReasons": [
+    "No font requests were captured.",
+    "Fallback-only body font-family detected on: login, app, profile",
+    "Navigation failed on: login (page.goto: net::ERR_TOO_MANY_REDIRECTS at http://127.0.0.1:3100/uz/auth/login\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3100/uz/auth/login\", waiting until \"networkidle\"\u001b[22m\n), app (page.goto: net::ERR_TOO_MANY_REDIRECTS at http://127.0.0.1:3100/uz/app\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3100/uz/app\", waiting until \"networkidle\"\u001b[22m\n), profile (page.goto: net::ERR_TOO_MANY_REDIRECTS at http://127.0.0.1:3100/uz/app/profile?tab=profile\nCall log:\n\u001b[2m  - navigating to \"http://127.0.0.1:3100/uz/app/profile?tab=profile\", waiting until \"networkidle\"\u001b[22m\n)"
+  ],
+  "ok": false
+}

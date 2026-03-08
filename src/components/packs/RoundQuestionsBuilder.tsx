@@ -96,6 +96,21 @@ function answerIcon(type: AnswerType) {
   return CheckCircle2Icon;
 }
 
+function renderQuestionTypeIcon(type: QuestionType) {
+  if (type === "IMAGE") return <ImageIcon className="mr-1 h-3.5 w-3.5" aria-hidden />;
+  if (type === "AUDIO") return <MusicIcon className="mr-1 h-3.5 w-3.5" aria-hidden />;
+  if (type === "VIDEO") return <FilmIcon className="mr-1 h-3.5 w-3.5" aria-hidden />;
+  if (type === "OPTIONS") return <ListChecksIcon className="mr-1 h-3.5 w-3.5" aria-hidden />;
+  return <CheckCircle2Icon className="mr-1 h-3.5 w-3.5" aria-hidden />;
+}
+
+function renderAnswerTypeIcon(type: AnswerType) {
+  if (type === "IMAGE") return <ImageIcon className="mr-1 h-3.5 w-3.5" aria-hidden />;
+  if (type === "AUDIO") return <MusicIcon className="mr-1 h-3.5 w-3.5" aria-hidden />;
+  if (type === "VIDEO") return <FilmIcon className="mr-1 h-3.5 w-3.5" aria-hidden />;
+  return <CheckCircle2Icon className="mr-1 h-3.5 w-3.5" aria-hidden />;
+}
+
 function QuestionRow({
   q,
   index,
@@ -119,8 +134,6 @@ function QuestionRow({
 }) {
   const primary = q.media.find((m) => m.role === "QUESTION_PRIMARY")?.asset;
   const answerPrimary = q.media.find((m) => m.role === "ANSWER_PRIMARY")?.asset;
-  const TypeIcon = typeIcon(q.type);
-  const AnswerIcon = answerIcon(q.answerType);
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: q.id,
     disabled: !reorderMode,
@@ -158,7 +171,7 @@ function QuestionRow({
             </p>
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="secondary" className={cn("border", accent.badge)}>
-                <TypeIcon className="mr-1 h-3.5 w-3.5" aria-hidden />
+                {renderQuestionTypeIcon(q.type)}
                 {questionBadgeLabel(q.type)}
               </Badge>
               <Badge variant="secondary">
@@ -172,7 +185,7 @@ function QuestionRow({
                 </Badge>
               ) : null}
               <Badge variant="secondary" className={cn("border", accent.badge)}>
-                <AnswerIcon className="mr-1 h-3.5 w-3.5" aria-hidden />
+                {renderAnswerTypeIcon(q.answerType)}
                 {q.answerType}
               </Badge>
             </div>

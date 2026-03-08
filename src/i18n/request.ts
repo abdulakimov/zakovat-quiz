@@ -31,8 +31,10 @@ export default getRequestConfig(async () => {
       if (details.code === IntlErrorCode.MISSING_MESSAGE) {
         const warning = `[i18n] Missing message: ${details.locale ?? locale} ${messagePath}`;
         if (process.env.NODE_ENV === "development") {
+          // eslint-disable-next-line no-console
           console.warn(warning, details.stack ?? error);
         } else {
+          // eslint-disable-next-line no-console
           console.warn(warning);
         }
         if (process.env.NEXT_PUBLIC_I18N_STRICT === "true") {

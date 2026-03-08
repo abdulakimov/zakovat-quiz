@@ -35,8 +35,10 @@ export function IntlProvider({
           const warning = `[i18n] Missing message: ${details.locale ?? locale} ${messagePath}`;
           if (typeof console !== "undefined") {
             if (process.env.NODE_ENV === "development") {
+              // eslint-disable-next-line no-console
               console.warn(warning, details.stack ?? error);
             } else {
+              // eslint-disable-next-line no-console
               console.warn(warning);
             }
           }
@@ -48,6 +50,7 @@ export function IntlProvider({
         if (process.env.NODE_ENV === "development") {
           const detailsMessage = error instanceof Error ? error.message : String(error);
           const warning = `[i18n] Non-fatal intl error: ${messagePath || "unknown"} ${detailsMessage}`;
+          // eslint-disable-next-line no-console
           console.warn(warning);
           return;
         }
@@ -59,8 +62,10 @@ export function IntlProvider({
         if (typeof console !== "undefined") {
           const warning = `[i18n] Missing message: ${locale} ${messagePath}`;
           if (process.env.NODE_ENV === "development") {
+            // eslint-disable-next-line no-console
             console.warn(warning, { namespace, key });
           } else {
+            // eslint-disable-next-line no-console
             console.warn(warning);
           }
         }
