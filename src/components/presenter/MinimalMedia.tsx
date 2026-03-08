@@ -23,7 +23,7 @@ export function MinimalMedia({
 }) {
   if (media.kind === "IMAGE") {
     // eslint-disable-next-line @next/next/no-img-element
-    return <img src={media.url} alt={media.name} className={cn("max-h-[28rem] w-full object-contain", className)} />;
+    return <img data-testid="presenter-media-image" src={media.url} alt={media.name} className={cn("max-h-[28rem] w-full object-contain", className)} />;
   }
 
   if (media.kind === "VIDEO") {

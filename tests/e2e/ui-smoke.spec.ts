@@ -1,11 +1,13 @@
 ﻿import { test, expect } from "@playwright/test";
 import fs from "fs/promises";
 import path from "path";
+import { PrismaClient } from "@prisma/client";
 import { SignJWT } from "jose";
 
 const SESSION_COOKIE_NAME = "zakovat_session";
 const LOCALE_COOKIE_NAME = "NEXT_LOCALE";
 const APP_BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000";
+const prisma = new PrismaClient();
 
 async function authSession(page: import("@playwright/test").Page) {
   const secret = process.env.SESSION_SECRET;
@@ -40,7 +42,28 @@ async function authSession(page: import("@playwright/test").Page) {
       sameSite: "Lax",
     },
   ]);
+
+  return user;
 }
+
+async function createImageAssetForUser(userId: string, name: string) {
+  return prisma.mediaAsset.create({
+    data: {
+      ownerId: userId,
+      type: "IMAGE",
+      path: `media/${userId}/${name}`,
+      originalName: name,
+      size: 1024,
+      sizeBytes: 1024,
+      mimeType: "image/png",
+    },
+    select: { id: true, originalName: true },
+  });
+}
+
+test.afterAll(async () => {
+  await prisma.$disconnect();
+});
 
 test("Add round dialog shows fields", async ({ page }) => {
   await authSession(page);
@@ -103,6 +126,79 @@ test("Question editor is compact with checks panel and blocks save when answer i
   await page.getByRole("textbox", { name: /^Answer$/ }).blur();
   await expect(page.getByTestId("answer-text-error")).toHaveText("Answer is required");
   await expect(page.getByRole("button", { name: /^save$/i })).toBeDisabled();
+});
+
+test("OPTIONS question supports question media and presenter renders it", async ({ page }) => {
+  const user = await authSession(page);
+  const seededAsset = await createImageAssetForUser(user.id, `options-question-image-${Date.now()}.png`);
+  await page.goto("/en/app/packs");
+
+  await page.getByRole("button", { name: /create pack/i }).first().click();
+  const createPackDialog = page.getByRole("dialog").last();
+  const packTitle = `Options Media Pack ${Date.now()}`;
+  await createPackDialog.getByLabel("Title").fill(packTitle);
+  await createPackDialog.getByRole("button", { name: /create pack/i }).click();
+  await page.waitForURL(/\/en\/app\/packs\/.+/);
+  const packMatch = page.url().match(/\/packs\/([^/]+)/);
+  if (!packMatch) throw new Error("Pack id not found in URL.");
+  const packId = packMatch[1];
+
+  await page.getByRole("button", { name: /add round/i }).first().click();
+  const dialog = page.getByRole("dialog").last();
+  const roundTitle = "Options media round";
+  await dialog.getByLabel("Title").fill(roundTitle);
+  await dialog.getByLabel("Default question type").selectOption("OPTIONS");
+  await dialog.getByRole("button", { name: /create/i }).click();
+
+  await page.getByLabel(`Open ${roundTitle}`).click();
+  await page.waitForURL(/\/en\/app\/packs\/.+\/rounds\/.+/);
+  const roundMatch = page.url().match(/\/rounds\/([^/]+)/);
+  if (!roundMatch) throw new Error("Round id not found in URL.");
+  const roundId = roundMatch[1];
+
+  await page.getByRole("link", { name: /add question/i }).first().click();
+  await page.waitForURL(/\/questions\/new/);
+
+  await page.getByLabel("Question type").selectOption("OPTIONS");
+  await expect(page.getByTestId("question-media-choose")).toBeVisible();
+  await expect(page.getByText("No media").first()).toBeVisible();
+
+  await page.getByTestId("question-media-choose").click();
+  await expect(page.getByTestId(`question-media-library-item-${seededAsset.id}`)).toBeVisible();
+  await page.getByTestId(`question-media-library-item-${seededAsset.id}`).click();
+  await expect(page.getByTestId("question-media-selected-name")).toContainText(seededAsset.originalName);
+
+  await page.getByLabel("Question text").fill("Which picture shows the correct option?");
+  await page.getByPlaceholder("Option A").fill("Option A");
+  await page.getByPlaceholder("Option B").fill("Option B");
+  await page.getByPlaceholder("Option C").fill("Option C");
+  await page.getByPlaceholder("Option D").fill("Option D");
+  await page.getByRole("textbox", { name: /^Answer$/ }).fill("Option A");
+
+  await page.getByTestId("question-media-preview").click();
+  await expect(page.getByTestId("question-media-preview-panel")).toBeVisible();
+  await expect(page.getByAltText(seededAsset.originalName)).toBeVisible();
+
+  await page.getByRole("button", { name: /^save$/i }).click();
+  await page.waitForURL(new RegExp(`/en/app/packs/${packId}/rounds/${roundId}$`));
+
+  const created = await prisma.question.findFirst({
+    where: { roundId, text: "Which picture shows the correct option?" },
+    orderBy: { createdAt: "desc" },
+    select: { id: true },
+  });
+  if (!created) throw new Error("Saved OPTIONS question was not found.");
+
+  await page.goto(`/en/app/packs/${packId}/rounds/${roundId}/questions/${created.id}/edit`);
+  await expect(page.getByTestId("question-media-selected-name")).toContainText(seededAsset.originalName);
+  await page.getByTestId("question-media-preview").click();
+  await expect(page.getByAltText(seededAsset.originalName)).toBeVisible();
+
+  await page.goto(`/en/app/presenter/${packId}`);
+  const nextButton = page.getByTestId("presenter-shell").locator("footer button").nth(1);
+  await nextButton.click();
+  await expect(page.getByTestId("presenter-media-image")).toBeVisible();
+  await expect(page.getByTestId("presenter-media-image")).toHaveAttribute("alt", seededAsset.originalName);
 });
 
 test("Questions reorder mode persists after refresh", async ({ page }) => {

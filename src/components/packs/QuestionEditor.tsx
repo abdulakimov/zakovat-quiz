@@ -413,7 +413,10 @@ export function QuestionEditor({
   const canSave = form.formState.isDirty && form.formState.isValid && !isPending;
   const isEdit = mode === "edit";
   const showOptions = selectedType === "OPTIONS";
-  const showQuestionMedia = selectedType === "IMAGE" || selectedType === "VIDEO" || selectedType === "AUDIO";
+  const showQuestionMedia =
+    selectedType === "IMAGE" || selectedType === "VIDEO" || selectedType === "AUDIO" || selectedType === "OPTIONS";
+  const questionMediaPickerType: "IMAGE" | "VIDEO" | "AUDIO" =
+    selectedType === "OPTIONS" ? "IMAGE" : (selectedType as "IMAGE" | "VIDEO" | "AUDIO");
   const showAnswerMedia = selectedAnswerType === "IMAGE" || selectedAnswerType === "VIDEO" || selectedAnswerType === "AUDIO";
   const confirmIfDirty = React.useCallback(() => {
     if (!form.formState.isDirty) return true;
@@ -544,9 +547,10 @@ export function QuestionEditor({
                       <p className="text-xs font-medium text-muted-foreground">Question media</p>
                       <MediaPickerSheet
                         title="Question media"
-                        allowed={selectedType}
+                        allowed={questionMediaPickerType}
                         disabled={isPending}
                         description=""
+                        testIdPrefix="question-media"
                         value={selectedQuestionAsset ? assetToPicker(selectedQuestionAsset) : null}
                         onChange={(asset) => {
                           form.setValue("primaryMediaAssetId", asset?.id ?? "", { shouldDirty: true, shouldValidate: true });
@@ -712,8 +716,8 @@ export function QuestionEditor({
                     <p className="text-xs text-muted-foreground">Question</p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       <span className="rounded-full border border-border px-2 py-0.5 text-xs text-foreground">{selectedType}</span>
-                      <span className={cn("rounded-full border px-2 py-0.5 text-xs", showQuestionMedia ? (selectedQuestionAsset ? "border-emerald-200 text-emerald-700" : "border-amber-200 text-amber-700") : "border-border text-muted-foreground")}>
-                        {showQuestionMedia ? (selectedQuestionAsset ? "Media attached" : "Media missing") : "No media"}
+                      <span className={cn("rounded-full border px-2 py-0.5 text-xs", selectedQuestionAsset ? "border-emerald-200 text-emerald-700" : "border-border text-muted-foreground")}>
+                        {selectedQuestionAsset ? "Media attached" : "No media"}
                       </span>
                       {showOptions ? (
                         <span className={cn("rounded-full border px-2 py-0.5 text-xs", options.filter((o) => o.text.trim().length > 0).length === 4 ? "border-emerald-200 text-emerald-700" : "border-amber-200 text-amber-700")}>

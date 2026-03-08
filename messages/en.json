@@ -71,7 +71,7 @@
   },
   "security": {
     "sectionTitle": "Security",
-    "sectionDescription": "Change your password and keep your account secure.",
+    "sectionDescription": "Review your connected sign-in methods.",
     "passwordTitle": "Password",
     "passwordSubtitle": "Update your password regularly.",
     "currentPasswordLabel": "Current password",
@@ -100,7 +100,12 @@
     "saveHintMinLength": "use at least 10 characters",
     "saveHintLetter": "add a letter",
     "saveHintNumber": "add a number",
-    "saveHintConfirmMatch": "confirm the password"
+    "saveHintConfirmMatch": "confirm the password",
+    "connectedAccountsTitle": "Connected accounts",
+    "connectedAccountsSubtitle": "Connected and available OAuth providers.",
+    "statusConnected": "Connected",
+    "statusAvailable": "Available",
+    "passwordlessNote": "No password is set. You sign in with Telegram or Google."
   },
   "packs": {
     "title": "Packs",

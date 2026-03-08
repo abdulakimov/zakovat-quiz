@@ -57,6 +57,10 @@ export function SlideRenderer({
     question?.primaryMedia && question.primaryMedia.type === "IMAGE"
       ? { kind: "IMAGE", url: question.primaryMedia.url, name: question.primaryMedia.name }
       : null;
+  const optionsQuestionMedia: MediaInfo | null =
+    question?.questionType === "OPTIONS" && question?.primaryMedia
+      ? { kind: question.primaryMedia.type, url: question.primaryMedia.url, name: question.primaryMedia.name }
+      : null;
 
   const askMedia: MediaInfo | null =
     question?.primaryMedia && (question.questionType === "AUDIO" || question.questionType === "VIDEO")
@@ -75,6 +79,10 @@ export function SlideRenderer({
     (item.kind === "ASK_TIMER" && questionImage) ||
     (item.kind === "REVEAL_QUESTION" && questionImage) ||
     (item.kind === "RECAP_QUESTION" && questionImage) ||
+    (item.kind === "ASK_READ" && optionsQuestionMedia) ||
+    (item.kind === "ASK_TIMER" && optionsQuestionMedia) ||
+    (item.kind === "REVEAL_QUESTION" && optionsQuestionMedia) ||
+    (item.kind === "RECAP_QUESTION" && optionsQuestionMedia) ||
     (item.kind === "REVEAL_ANSWER" && effectiveAnswerMedia);
 
   return (
@@ -143,6 +151,9 @@ export function SlideRenderer({
               ) : null}
               {(item.kind === "ASK_READ" || item.kind === "ASK_TIMER" || item.kind === "REVEAL_QUESTION" || item.kind === "RECAP_QUESTION") && questionImage ? (
                 <MinimalMedia media={questionImage} />
+              ) : null}
+              {(item.kind === "ASK_READ" || item.kind === "ASK_TIMER" || item.kind === "REVEAL_QUESTION" || item.kind === "RECAP_QUESTION") && !questionImage && optionsQuestionMedia ? (
+                <MinimalMedia media={optionsQuestionMedia} setClipRef={setClipRef} hint={mediaHint} />
               ) : null}
             </div>
           ) : null}

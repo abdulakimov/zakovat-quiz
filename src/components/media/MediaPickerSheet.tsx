@@ -58,6 +58,7 @@ export function MediaPickerSheet({
   onChange,
   disabled,
   description,
+  testIdPrefix,
 }: {
   title: string;
   allowed: AllowedType;
@@ -65,6 +66,7 @@ export function MediaPickerSheet({
   onChange: (asset: MediaPickerAsset | null) => void;
   disabled?: boolean;
   description?: string;
+  testIdPrefix?: string;
 }) {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
@@ -161,12 +163,13 @@ export function MediaPickerSheet({
         </div>
         <div className="flex items-center gap-2">
           <Button type="button" variant="outline" size="sm" disabled={disabled} onClick={() => setOpen(true)}>
-            Choose...
+            <span data-testid={testIdPrefix ? `${testIdPrefix}-choose` : undefined}>Choose...</span>
           </Button>
           <Button
             type="button"
             variant="ghost"
             size="sm"
+            data-testid={testIdPrefix ? `${testIdPrefix}-clear` : undefined}
             disabled={disabled || !value}
             onClick={() => onChange(null)}
           >
@@ -177,7 +180,10 @@ export function MediaPickerSheet({
 
       <div className="flex flex-wrap items-center gap-2">
         {value ? (
-          <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-foreground">
+          <span
+            data-testid={testIdPrefix ? `${testIdPrefix}-selected-name` : undefined}
+            className="inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-muted px-3 py-1 text-xs font-medium text-foreground"
+          >
             <span className="truncate">{value.name}</span>
           </span>
         ) : (
@@ -188,6 +194,7 @@ export function MediaPickerSheet({
           variant="outline"
           size="icon"
           className="h-7 w-7"
+          data-testid={testIdPrefix ? `${testIdPrefix}-preview` : undefined}
           disabled={!value}
           onClick={togglePreview}
           aria-label="Preview media"
@@ -198,7 +205,7 @@ export function MediaPickerSheet({
       </div>
 
       {showPreview && value ? (
-        <div className="rounded-lg border border-border bg-card p-3">
+        <div data-testid={testIdPrefix ? `${testIdPrefix}-preview-panel` : undefined} className="rounded-lg border border-border bg-card p-3">
           <MediaThumb asset={value} />
         </div>
       ) : null}
@@ -279,6 +286,7 @@ export function MediaPickerSheet({
                       <button
                         key={item.id}
                         type="button"
+                        data-testid={testIdPrefix ? `${testIdPrefix}-library-item-${item.id}` : undefined}
                         onClick={() => {
                           onChange(item);
                           setOpen(false);

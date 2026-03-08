@@ -144,8 +144,14 @@ async function applyQuestionTypeSideEffects(
   },
 ) {
   if (input.type === "OPTIONS") {
-    await clearPrimaryMedia(tx, questionId, "QUESTION_PRIMARY");
+    const mediaCheck = await assertMediaOwnershipForType(tx, userId, input.primaryMediaAssetId, input.type);
+    if (!mediaCheck.ok) throw new Error(mediaCheck.error);
     await replaceOptions(tx, questionId, input.options);
+    if (input.primaryMediaAssetId) {
+      await setPrimaryMedia(tx, questionId, input.primaryMediaAssetId, "QUESTION_PRIMARY");
+      return;
+    }
+    await clearPrimaryMedia(tx, questionId, "QUESTION_PRIMARY");
     return;
   }
 
@@ -476,7 +482,7 @@ export async function setQuestionPrimaryMediaAction(_prev: QuestionActionState, 
       const ownerCheck = await assertQuestionOwner(tx, user.id, input.questionId);
       if ("error" in ownerCheck) return { error: ownerCheck.error } satisfies QuestionActionState;
       const questionType = ownerCheck.question.type;
-      if (questionType !== "IMAGE" && questionType !== "VIDEO" && questionType !== "AUDIO") {
+      if (questionType !== "IMAGE" && questionType !== "VIDEO" && questionType !== "AUDIO" && questionType !== "OPTIONS") {
         return { error: "Question type does not accept primary media." } satisfies QuestionActionState;
       }
       const mediaCheck = await assertMediaOwnershipForType(tx, user.id, input.assetId, questionType);

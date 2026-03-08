@@ -28,13 +28,11 @@ export default async function ProfilePage() {
   const securityState = await prisma.user.findUnique({
     where: { id: user.id },
     select: {
-      passwordHash: true,
       authAccounts: {
         select: { provider: true },
       },
     },
   });
-  const hasPassword = Boolean(securityState?.passwordHash);
   const providerNames = securityState?.authAccounts.map((account) => account.provider) ?? [];
 
   return (
@@ -138,7 +136,7 @@ export default async function ProfilePage() {
             key: "security",
             label: tProfile("securityTabLabel"),
             icon: "security",
-            content: <ProfileSecurityForm hasPassword={hasPassword} providerNames={providerNames} />,
+            content: <ProfileSecurityForm providerNames={providerNames} />,
           },
         ]}
       />

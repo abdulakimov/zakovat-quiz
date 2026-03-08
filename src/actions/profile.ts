@@ -1,16 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { cookies, headers } from "next/headers";
-import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/auth";
-import { logger } from "@/lib/logger";
-import { consumeRateLimit } from "@/src/lib/rate-limit";
 import { safeAction, type ActionResult } from "@/src/lib/actions";
-import { passwordUpdateServerSchema, updateProfileSchema } from "@/src/schemas/profile";
-import { getSessionCookieName, getSessionMaxAge, signSession } from "@/lib/session";
-import { getCanonicalBaseUrl, isSecureBaseUrl } from "@/src/lib/url";
+import { updateProfileSchema } from "@/src/schemas/profile";
 
 type UpdateProfileResult = {
   success: string;
@@ -22,26 +16,6 @@ type UpdateProfileResult = {
   avatarAssetId: string | null;
   avatarUrl: string | null;
 };
-
-type ChangePasswordResult = {
-  success: string;
-  sessionRotated: boolean;
-};
-
-const PASSWORD_CHANGE_LIMIT = {
-  bucket: "profile:change-password",
-  limit: 5,
-  windowMs: 15 * 60 * 1000,
-};
-
-async function getClientIp() {
-  const h = await headers();
-  const forwarded = h.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0]?.trim() || "unknown";
-  const realIp = h.get("x-real-ip");
-  if (realIp) return realIp.trim();
-  return "unknown";
-}
 
 export async function updateProfileAction(
   input: unknown,
@@ -111,75 +85,12 @@ export async function updateProfileAction(
 }
 
 export async function changePasswordAction(
-  input: unknown,
-): Promise<ActionResult<ChangePasswordResult>> {
-  const user = await requireUser();
-  const clientIp = await getClientIp();
-
-  const execute = safeAction(passwordUpdateServerSchema, async (parsed) => {
-    const rate = consumeRateLimit({
-      ...PASSWORD_CHANGE_LIMIT,
-      key: `${clientIp}:${user.id}`,
-    });
-    if (!rate.ok) {
-      throw new Error("Too many password change attempts. Please try again later.");
-    }
-
-    const stored = await prisma.user.findUnique({
-      where: { id: user.id },
-      select: { id: true, username: true, name: true, role: true, passwordHash: true },
-    });
-    if (!stored) {
-      throw new Error("User not found.");
-    }
-
-    const hasPassword = typeof stored.passwordHash === "string" && stored.passwordHash.length > 0;
-
-    if (hasPassword) {
-      if (!parsed.currentPassword) {
-        throw new Error("Current password is required.");
-      }
-
-      const matches = await bcrypt.compare(parsed.currentPassword, stored.passwordHash);
-      if (!matches) {
-        throw new Error("Current password is incorrect.");
-      }
-    }
-
-    const newHash = await bcrypt.hash(parsed.newPassword, 12);
-    await prisma.user.update({
-      where: { id: stored.id },
-      data: { passwordHash: newHash },
-    });
-
-    const token = await signSession({
-      sub: stored.id,
-      role: stored.role,
-      username: stored.username,
-      name: stored.name ?? null,
-    });
-
-    const headerStore = await headers();
-    const cookieStore = await cookies();
-    cookieStore.set(getSessionCookieName(), token, {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: isSecureBaseUrl(getCanonicalBaseUrl(headerStore)),
-      path: "/",
-      maxAge: getSessionMaxAge(),
-    });
-
-    revalidatePath("/app/profile");
-    revalidatePath("/app", "layout");
-
-    logger.info("Password changed", { userId: user.id, clientIp });
-    return { success: "Password updated.", sessionRotated: true };
-  });
-
-  const result = await execute(input);
-  if (!result.ok) {
-    return result;
-  }
-
-  return result;
+  _input: unknown,
+): Promise<ActionResult<{ success: string; sessionRotated: boolean }>> {
+  await requireUser();
+  return {
+    ok: false,
+    error: "Password authentication is disabled for this app.",
+    fieldErrors: {},
+  };
 }

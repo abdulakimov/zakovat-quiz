@@ -3,29 +3,22 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { useForm, type UseFormRegister } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import type { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
 import { FormErrorSummary } from "@/src/components/form/FormErrorSummary";
 import { SettingsSectionCard, SettingsSectionGroup } from "@/src/components/layout/SettingsSectionCard";
 import { StickySaveBar } from "@/src/components/layout/StickySaveBar";
 import { FormFieldText } from "@/src/components/form/FormFieldText";
-import { changePasswordAction, updateProfileAction } from "@/src/actions/profile";
+import { updateProfileAction } from "@/src/actions/profile";
 import { UserAvatar } from "@/src/components/layout/UserAvatar";
 import { toast } from "@/src/components/ui/sonner";
-import { EyeIcon, EyeOffIcon, PencilIcon, UserIconLucide, ShieldIcon } from "@/src/ui/icons";
+import { PencilIcon, UserIconLucide, ShieldIcon } from "@/src/ui/icons";
 import { zodResolverCompat } from "@/src/validators/rhf-zod";
 import {
-  changePasswordSchema,
-  setPasswordSchema,
   updateProfileSchema,
-  type ChangePasswordInput,
-  type SetPasswordInput,
   type UpdateProfileInput,
 } from "@/src/schemas/profile";
 
@@ -387,183 +380,13 @@ export function ProfileSettingsForm({ user }: Props) {
   );
 }
 
-type PasswordFormValues = ChangePasswordInput & SetPasswordInput;
-
-type PasswordInputRowProps = {
-  id: "profile-current-password" | "profile-new-password" | "profile-confirm-password";
-  name: "currentPassword" | "newPassword" | "confirmNewPassword";
-  label: string;
-  placeholder: string;
-  autoComplete: string;
-  isVisible: boolean;
-  isDisabled: boolean;
-  error?: string;
-  toggleLabel: string;
-  onToggleVisibility: () => void;
-  register: UseFormRegister<PasswordFormValues>;
-};
-
-function PasswordInputRow({
-  id,
-  name,
-  label,
-  placeholder,
-  autoComplete,
-  isVisible,
-  isDisabled,
-  error,
-  toggleLabel,
-  onToggleVisibility,
-  register,
-}: PasswordInputRowProps) {
-  return (
-    <div className="space-y-1.5">
-      <Label htmlFor={id} className="text-sm text-muted-foreground">
-        {label}
-      </Label>
-      <div className="relative">
-        <Input
-          id={id}
-          {...register(name)}
-          type={isVisible ? "text" : "password"}
-          autoComplete={autoComplete}
-          disabled={isDisabled}
-          placeholder={placeholder}
-          aria-invalid={error ? "true" : "false"}
-          className={cn("pr-10", error ? "border-destructive focus-visible:ring-destructive" : "")}
-        />
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="absolute right-1 top-1 h-8 w-8 text-muted-foreground"
-          disabled={isDisabled}
-          onClick={onToggleVisibility}
-          title={toggleLabel}
-        >
-          {isVisible ? <EyeOffIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
-          <span className="sr-only">{toggleLabel}</span>
-        </Button>
-      </div>
-      {error ? <p className="text-xs text-destructive">{error}</p> : null}
-    </div>
-  );
-}
-
 type ProfileSecurityFormProps = {
-  hasPassword: boolean;
   providerNames?: string[];
 };
 
-export function ProfileSecurityForm({ hasPassword, providerNames = [] }: ProfileSecurityFormProps) {
+export function ProfileSecurityForm({ providerNames = [] }: ProfileSecurityFormProps) {
   const tSecurity = useTranslations("security");
-  const [passwordServerError, setPasswordServerError] = React.useState<string | null>(null);
-  const [isChangingPassword, startPasswordTransition] = React.useTransition();
-  const passwordSchema = React.useMemo(
-    () => (hasPassword ? changePasswordSchema : setPasswordSchema),
-    [hasPassword],
-  );
-  const [showPasswords, setShowPasswords] = React.useState({
-    current: false,
-    next: false,
-    confirm: false,
-  });
-  const passwordForm = useForm<PasswordFormValues>({
-    resolver: zodResolverCompat(passwordSchema as unknown as z.ZodType<PasswordFormValues>),
-    defaultValues: {
-      currentPassword: "",
-      newPassword: "",
-      confirmNewPassword: "",
-    },
-    mode: "onChange",
-    reValidateMode: "onChange",
-  });
-
-  const newPasswordValue = passwordForm.watch("newPassword") ?? "";
-  const confirmPasswordValue = passwordForm.watch("confirmNewPassword") ?? "";
-  const currentPasswordValue = passwordForm.watch("currentPassword") ?? "";
-  const passwordHasMinLength = newPasswordValue.length >= 10;
-  const passwordHasLetter = /[A-Za-z]/.test(newPasswordValue);
-  const passwordHasNumber = /\d/.test(newPasswordValue);
-  const confirmMatches = confirmPasswordValue.length > 0 && confirmPasswordValue === newPasswordValue;
-  const isSubmitting = isChangingPassword || passwordForm.formState.isSubmitting;
-  const canSave = passwordForm.formState.isDirty && passwordForm.formState.isValid && !isSubmitting;
-
-  const missingItems = React.useMemo(() => {
-    const missing: string[] = [];
-
-    if (hasPassword && currentPasswordValue.trim().length === 0) {
-      missing.push(tSecurity("saveHintCurrentPassword"));
-    }
-    if (!passwordHasMinLength) {
-      missing.push(tSecurity("saveHintMinLength"));
-    }
-    if (!passwordHasLetter) {
-      missing.push(tSecurity("saveHintLetter"));
-    }
-    if (!passwordHasNumber) {
-      missing.push(tSecurity("saveHintNumber"));
-    }
-    if (!confirmMatches) {
-      missing.push(tSecurity("saveHintConfirmMatch"));
-    }
-
-    return missing;
-  }, [
-    confirmMatches,
-    currentPasswordValue,
-    hasPassword,
-    passwordHasLetter,
-    passwordHasMinLength,
-    passwordHasNumber,
-    tSecurity,
-  ]);
-
-  const disabledSaveHint =
-    !canSave && missingItems.length > 0
-      ? tSecurity("saveHint", { items: missingItems.join(", ") })
-      : null;
-
-  const linkedProviderLabels = React.useMemo(() => {
-    const labels: string[] = [];
-    if (providerNames.includes("google")) {
-      labels.push(tSecurity("providerGoogle"));
-    }
-    if (providerNames.includes("telegram")) {
-      labels.push(tSecurity("providerTelegram"));
-    }
-    if (labels.length === 0) {
-      labels.push(tSecurity("providerGoogle"), tSecurity("providerTelegram"));
-    }
-    return labels.join(" / ");
-  }, [providerNames, tSecurity]);
-
-  const onPasswordSubmit = passwordForm.handleSubmit((values) => {
-    setPasswordServerError(null);
-
-    startPasswordTransition(() => {
-      void (async () => {
-        const result = await changePasswordAction({
-          currentPassword: hasPassword ? values.currentPassword : undefined,
-          newPassword: values.newPassword,
-        });
-
-        if (!result.ok) {
-          setPasswordServerError(result.error);
-          toast.error(result.error);
-          return;
-        }
-
-        toast.success(tSecurity("passwordUpdated"));
-        passwordForm.reset({
-          currentPassword: "",
-          newPassword: "",
-          confirmNewPassword: "",
-        });
-        setPasswordServerError(null);
-      })();
-    });
-  });
+  const normalizedProviders = React.useMemo(() => new Set(providerNames.map((provider) => provider.toLowerCase())), [providerNames]);
 
   return (
     <Card>
@@ -573,94 +396,24 @@ export function ProfileSecurityForm({ hasPassword, providerNames = [] }: Profile
       </CardHeader>
       <CardContent className="space-y-4">
         <SettingsSectionGroup>
-          <SettingsSectionCard icon={ShieldIcon} title={tSecurity("passwordTitle")} subtitle={tSecurity("passwordSubtitle")}>
-            <form onSubmit={onPasswordSubmit} className="mx-auto w-full max-w-xl space-y-3" noValidate>
-              {!hasPassword ? (
-                <div className="rounded-lg border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
-                  {tSecurity("setPasswordDescription", { providers: linkedProviderLabels })}
-                </div>
-              ) : null}
-
-              {hasPassword ? (
-                <PasswordInputRow
-                  id="profile-current-password"
-                  name="currentPassword"
-                  label={tSecurity("currentPasswordLabel")}
-                  placeholder={tSecurity("currentPasswordPlaceholder")}
-                  autoComplete="current-password"
-                  isVisible={showPasswords.current}
-                  isDisabled={isChangingPassword}
-                  error={passwordForm.formState.errors.currentPassword?.message}
-                  toggleLabel={showPasswords.current ? tSecurity("hidePassword") : tSecurity("showPassword")}
-                  onToggleVisibility={() => setShowPasswords((s) => ({ ...s, current: !s.current }))}
-                  register={passwordForm.register}
-                />
-              ) : null}
-
-              <PasswordInputRow
-                id="profile-new-password"
-                name="newPassword"
-                label={tSecurity("newPasswordLabel")}
-                placeholder={tSecurity("newPasswordPlaceholder")}
-                autoComplete="new-password"
-                isVisible={showPasswords.next}
-                isDisabled={isChangingPassword}
-                error={passwordForm.formState.errors.newPassword?.message}
-                toggleLabel={showPasswords.next ? tSecurity("hidePassword") : tSecurity("showPassword")}
-                onToggleVisibility={() => setShowPasswords((s) => ({ ...s, next: !s.next }))}
-                register={passwordForm.register}
-              />
-              <p className="text-xs text-muted-foreground">{tSecurity("passwordHint")}</p>
-              <div className="space-y-1 text-xs" data-testid="password-checklist">
-                <p className={cn(passwordHasMinLength ? "text-emerald-600" : "text-muted-foreground")}>
-                  {passwordHasMinLength ? tSecurity("checkOkLength") : tSecurity("checkMissingLength")}
-                </p>
-                <p className={cn(passwordHasLetter ? "text-emerald-600" : "text-muted-foreground")}>
-                  {passwordHasLetter ? tSecurity("checkOkLetter") : tSecurity("checkMissingLetter")}
-                </p>
-                <p className={cn(passwordHasNumber ? "text-emerald-600" : "text-muted-foreground")}>
-                  {passwordHasNumber ? tSecurity("checkOkNumber") : tSecurity("checkMissingNumber")}
-                </p>
-                <p className={cn(confirmMatches ? "text-emerald-600" : "text-muted-foreground")}>
-                  {confirmMatches ? tSecurity("checkOkMatch") : tSecurity("checkMissingMatch")}
-                </p>
+          <SettingsSectionCard icon={ShieldIcon} title={tSecurity("connectedAccountsTitle")} subtitle={tSecurity("connectedAccountsSubtitle")}>
+            <div className="mx-auto w-full max-w-xl space-y-3" data-testid="security-connected-accounts">
+              <div className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
+                <span className="text-sm font-medium">{tSecurity("providerGoogle")}</span>
+                <span className="text-xs text-muted-foreground" data-testid="security-provider-google">
+                  {normalizedProviders.has("google") ? tSecurity("statusConnected") : tSecurity("statusAvailable")}
+                </span>
               </div>
-
-              <PasswordInputRow
-                id="profile-confirm-password"
-                name="confirmNewPassword"
-                label={tSecurity("confirmNewPasswordLabel")}
-                placeholder={tSecurity("confirmNewPasswordPlaceholder")}
-                autoComplete="new-password"
-                isVisible={showPasswords.confirm}
-                isDisabled={isChangingPassword}
-                error={passwordForm.formState.errors.confirmNewPassword?.message}
-                toggleLabel={showPasswords.confirm ? tSecurity("hidePassword") : tSecurity("showPassword")}
-                onToggleVisibility={() => setShowPasswords((s) => ({ ...s, confirm: !s.confirm }))}
-                register={passwordForm.register}
-              />
-
-              <FormErrorSummary
-                serverError={passwordServerError}
-                errors={[
-                  hasPassword ? passwordForm.formState.errors.currentPassword?.message : undefined,
-                  passwordForm.formState.errors.newPassword?.message,
-                  passwordForm.formState.errors.confirmNewPassword?.message,
-                ]}
-              />
-
-              {disabledSaveHint ? (
-                <p className="text-xs text-muted-foreground" data-testid="security-save-hint">
-                  {disabledSaveHint}
-                </p>
-              ) : null}
-
-              <StickySaveBar
-                dirty={passwordForm.formState.isDirty}
-                pending={isSubmitting}
-                canSave={canSave}
-              />
-            </form>
+              <div className="flex items-center justify-between rounded-lg border border-border px-3 py-2">
+                <span className="text-sm font-medium">{tSecurity("providerTelegram")}</span>
+                <span className="text-xs text-muted-foreground" data-testid="security-provider-telegram">
+                  {normalizedProviders.has("telegram") ? tSecurity("statusConnected") : tSecurity("statusAvailable")}
+                </span>
+              </div>
+              <p className="rounded-lg border border-border bg-muted/40 p-3 text-sm text-muted-foreground" data-testid="security-passwordless-note">
+                {tSecurity("passwordlessNote")}
+              </p>
+            </div>
           </SettingsSectionCard>
         </SettingsSectionGroup>
       </CardContent>

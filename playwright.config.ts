@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const playwrightPort = process.env.PLAYWRIGHT_PORT ?? "3001";
-const playwrightBaseUrl = process.env.PLAYWRIGHT_BASE_URL ?? `http://localhost:${playwrightPort}`;
+const playwrightPort = process.env.PLAYWRIGHT_PORT ?? "3100";
+const playwrightBaseUrl = process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${playwrightPort}`;
 const appOrigin = new URL(playwrightBaseUrl).origin;
 
 const sessionSecret =
@@ -57,9 +57,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `pnpm exec next dev -p ${playwrightPort}`,
+    command: "pnpm e2e:server",
     url: playwrightBaseUrl,
-    reuseExistingServer: false,
+    reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     env: {
       ...process.env,

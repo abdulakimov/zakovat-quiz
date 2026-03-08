@@ -71,7 +71,7 @@
   },
   "security": {
     "sectionTitle": "Xavfsizlik",
-    "sectionDescription": "Parolni yangilang va akkauntingizni himoyalang.",
+    "sectionDescription": "Hisobingizga ulangan kirish usullarini ko'ring.",
     "passwordTitle": "Parol",
     "passwordSubtitle": "Parolni muntazam yangilab turing.",
     "currentPasswordLabel": "Joriy parol",
@@ -100,7 +100,12 @@
     "saveHintMinLength": "kamida 10 ta belgi kiriting",
     "saveHintLetter": "harf qo'shing",
     "saveHintNumber": "raqam qo'shing",
-    "saveHintConfirmMatch": "parolni tasdiqlang"
+    "saveHintConfirmMatch": "parolni tasdiqlang",
+    "connectedAccountsTitle": "Kirish usullari",
+    "connectedAccountsSubtitle": "Ulangan va mavjud OAuth provayderlari.",
+    "statusConnected": "Ulangan",
+    "statusAvailable": "Mavjud",
+    "passwordlessNote": "Parol mavjud emas. Tizimga Telegram yoki Google orqali kirasiz."
   },
   "packs": {
     "title": "Paketlar",
